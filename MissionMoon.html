@@ -4158,24 +4158,64 @@
         const conduitR = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.015, 8, 16, Math.PI * 0.7), carbonMat);
         conduitR.rotation.y = Math.PI / 3; conduitR.position.set(0.22, -0.05, -0.15); chest.add(conduitR);
 
-        // Compact Sleek Plasma Thruster Jets (Proportional & Neat)
-        const flameGroupL = new THREE.Group();
-        flameGroupL.position.set(-0.13, -0.37, 0); flameGroupL.visible = false; jetpack.add(flameGroupL);
+        // ---- UPGRADED PLASMA THRUSTER SYSTEM ----
+        // Multi-layer: white core → orange ring → cyan plume → purple afterburner → shock diamonds
 
-        const coreFlameL = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.24, 8), flameCoreMat);
-        coreFlameL.position.y = -0.12; coreFlameL.rotation.x = Math.PI; flameGroupL.add(coreFlameL);
+        const flameMats = {
+            core:         new THREE.MeshBasicMaterial({ color: 0xffffff }),
+            innerRing:    new THREE.MeshBasicMaterial({ color: 0xffa040, transparent: true, opacity: 0.92 }),
+            cyanPlume:    new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.78 }),
+            purpleWash:   new THREE.MeshBasicMaterial({ color: 0xa78bfa, transparent: true, opacity: 0.55, side: THREE.DoubleSide }),
+            shockDiamond: new THREE.MeshBasicMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.70, side: THREE.DoubleSide }),
+            nozzleGlow:   new THREE.MeshBasicMaterial({ color: 0xff6a00, transparent: true, opacity: 0.85 }),
+        };
 
-        const outerPlumeL = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.34, 8), flameOuterMat);
-        outerPlumeL.position.y = -0.17; outerPlumeL.rotation.x = Math.PI; flameGroupL.add(outerPlumeL);
+        function buildThruster(parent, xOffset) {
+            const grp = new THREE.Group();
+            grp.position.set(xOffset, -0.37, 0);
+            grp.visible = false;
+            parent.add(grp);
 
-        const flameGroupR = new THREE.Group();
-        flameGroupR.position.set(0.13, -0.37, 0); flameGroupR.visible = false; jetpack.add(flameGroupR);
+            // Nozzle exit glow ring
+            const nozzleGlowRing = new THREE.Mesh(new THREE.TorusGeometry(0.105, 0.018, 8, 20), flameMats.nozzleGlow);
+            nozzleGlowRing.rotation.x = Math.PI / 2;
+            nozzleGlowRing.position.y = -0.01;
+            grp.add(nozzleGlowRing);
 
-        const coreFlameR = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.24, 8), flameCoreMat);
-        coreFlameR.position.y = -0.12; coreFlameR.rotation.x = Math.PI; flameGroupR.add(coreFlameR);
+            // Layer 1 — Bright white-hot core (tight, hottest point)
+            const core = new THREE.Mesh(new THREE.ConeGeometry(0.038, 0.18, 8), flameMats.core);
+            core.rotation.x = Math.PI; core.position.y = -0.09;
+            grp.add(core);
 
-        const outerPlumeR = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.34, 8), flameOuterMat);
-        outerPlumeR.position.y = -0.17; outerPlumeR.rotation.x = Math.PI; flameGroupR.add(outerPlumeR);
+            // Layer 2 — Orange combustion zone
+            const orange = new THREE.Mesh(new THREE.ConeGeometry(0.072, 0.28, 8), flameMats.innerRing);
+            orange.rotation.x = Math.PI; orange.position.y = -0.14;
+            grp.add(orange);
+
+            // Layer 3 — Cyan supersonic plume
+            const cyan = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.46, 8), flameMats.cyanPlume);
+            cyan.rotation.x = Math.PI; cyan.position.y = -0.23;
+            grp.add(cyan);
+
+            // Layer 4 — Purple afterburner wash
+            const purple = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.62, 8), flameMats.purpleWash);
+            purple.rotation.x = Math.PI; purple.position.y = -0.31;
+            grp.add(purple);
+
+            // Shock diamonds (3 bright disc rings along exhaust stream)
+            for (let d = 0; d < 3; d++) {
+                const sd = new THREE.Mesh(new THREE.TorusGeometry(0.048 - d * 0.008, 0.012, 6, 14), flameMats.shockDiamond);
+                sd.rotation.x = Math.PI / 2;
+                sd.position.y = -0.18 - d * 0.14;
+                grp.add(sd);
+            }
+
+            return grp;
+        }
+
+        const flameGroupL = buildThruster(jetpack, -0.13);
+        const flameGroupR = buildThruster(jetpack,  0.13);
+
 
         // 4. Head, Sculpted Aerodynamic Astronaut Helmet, Visor & Comms
         const head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.34, 0.32), suitMat);
@@ -5955,18 +5995,41 @@
                 flameGroupL.visible = true;
                 flameGroupR.visible = true;
 
-                // Subtle high-frequency micro-flicker (clean, tight, sleek)
-                const flamePulse = 0.92 + Math.sin(time * 36.0) * 0.12;
-                const lengthScale = player.jetPulse > 0 ? 1.45 : (isSprinting ? 1.15 : (player.velY > 10.0 ? 1.25 : 1.0));
+                // Multi-frequency flicker — each layer at different rate for organic turbulence
+                const boostScale  = player.jetPulse > 0 ? 1.55 : (isSprinting ? 1.22 : (player.velY > 8 ? 1.35 : 1.0));
+                const flicker1    = 0.88 + Math.sin(time * 48.0) * 0.14;   // fast core flicker
+                const flicker2    = 0.92 + Math.sin(time * 28.0) * 0.10;   // medium plume breathe
+                const flicker3    = 0.95 + Math.sin(time * 14.0) * 0.07;   // slow outer wash
 
-                coreFlameL.scale.set(flamePulse, flamePulse * lengthScale, flamePulse);
-                coreFlameR.scale.set(flamePulse, flamePulse * lengthScale, flamePulse);
-                outerPlumeL.scale.set(flamePulse, flamePulse * lengthScale, flamePulse);
-                outerPlumeR.scale.set(flamePulse, flamePulse * lengthScale, flamePulse);
+                // Animate both groups together via group-level scale
+                for (const fg of [flameGroupL, flameGroupR]) {
+                    fg.scale.set(
+                        flicker2 * boostScale,
+                        flicker1 * boostScale,
+                        flicker2 * boostScale
+                    );
+                    // Pulsate children individually for organic look
+                    if (fg.children.length >= 7) {
+                        fg.children[0].scale.set(flicker1, flicker1, flicker1);       // nozzle ring
+                        fg.children[1].scale.set(flicker1, flicker1 * 1.05, flicker1); // core
+                        fg.children[2].scale.set(flicker2, flicker2 * 1.08, flicker2); // orange
+                        fg.children[3].scale.set(flicker2, flicker3 * 1.12, flicker2); // cyan
+                        fg.children[4].scale.set(flicker3, flicker3 * 1.15, flicker3); // purple
+                        // shock diamonds rotate and oscillate
+                        for (let sd = 5; sd < 8; sd++) {
+                            if (fg.children[sd]) {
+                                fg.children[sd].rotation.z += dt * (4.0 + sd * 1.5);
+                                const sdPulse = 0.8 + Math.sin(time * 20.0 + sd * 2.1) * 0.25;
+                                fg.children[sd].scale.setScalar(sdPulse);
+                            }
+                        }
+                    }
+                }
             } else {
                 flameGroupL.visible = false;
                 flameGroupR.visible = false;
             }
+
 
             // Arc Reactor Core Breathing Pulse
             const coreGlow = 0.9 + Math.sin(time * 6.0) * 0.2;
