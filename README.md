@@ -144,4 +144,15 @@ Below is the verified architecture prompt and telemetry specification powering t
 
 ---
 
-*Mission Moon © 2026. Powered by AntSeed AI & GLM 5.3 Flash.*
+## 📜 License & Ownership
+
+**Created and Owned by Faizan**
+- **X (Twitter):** [@Flickerrnft](https://x.com/Flickerrnft)
+- **Telegram:** [@flickerr098](https://t.me/flickerr098)
+- **Discord:** `flickerr098`
+
+Licensed under the [MIT License](LICENSE).
+
+---
+
+*Mission Moon © 2026. Created and Owned by Faizan. Powered by AntSeed AI & GLM 5.3 Flash.*
