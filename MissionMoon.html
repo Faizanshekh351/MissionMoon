@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#010308">
     <title>Mission Moon</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
@@ -83,71 +87,171 @@
         .btn-jump-main { border-color: #f59e0b; color: #fbbf24; }
         .btn-jump-main:hover { background: #fbbf24; color: #050505; box-shadow: 0 0 24px rgba(251, 191, 36, 0.85); }
 
-        /* Mobile Touch Controls */
-        #mobile-controls {
-            position: absolute; bottom: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 12; display: none;
+
+        /* ================================================================
+           MOBILE TOUCH CONTROLS — Touch-only devices (hidden on mouse/PC)
+           ================================================================ */
+
+        /* Landscape-only enforcement overlay */
+        #portrait-blocker {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0d1017;
+            z-index: 99999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            color: #fbbf24;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            padding: 30px;
         }
-        @media (max-width: 1024px), (pointer: coarse) {
-            #mobile-controls { display: block; }
-            #bottom-hud { bottom: 12px; }
-            .hud-btn { padding: 7px 12px; font-size: 10.5px; }
-            #top-hud { flex-direction: column; gap: 8px; align-items: flex-start; }
-            .brand-title { font-size: 13px; }
-            .progress-box { width: 160px; }
+        #portrait-blocker .pb-icon {
+            font-size: 64px;
+            animation: rotatePhone 1.4s ease-in-out infinite alternate;
         }
-        #mobile-dpad {
-            position: absolute; bottom: 20px; left: 16px;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            pointer-events: auto; user-select: none; -webkit-user-select: none;
+        #portrait-blocker h2 {
+            font-size: 20px; font-weight: 900; letter-spacing: 2px;
+            text-transform: uppercase; margin: 0;
+            text-shadow: 0 0 20px rgba(251,191,36,0.8);
         }
-        .dpad-row { display: flex; gap: 5px; align-items: center; }
-        .dpad-btn {
-            width: 48px; height: 48px; border-radius: 12px;
-            background: rgba(13, 16, 25, 0.85); backdrop-filter: blur(14px);
-            border: 1.5px solid rgba(245, 158, 11, 0.45); color: #fbbf24;
-            font-size: 18px; font-weight: 900; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.6); touch-action: none; cursor: pointer;
-            transition: transform 0.08s, background 0.08s;
+        #portrait-blocker p {
+            font-size: 13px; color: #94a3b8; margin: 0; line-height: 1.6;
         }
-        .dpad-btn:active, .dpad-btn.active {
-            background: #f59e0b; color: #000; transform: scale(0.92);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.9);
-        }
-        .dpad-sprint {
-            border-color: #38bdf8; color: #38bdf8; font-size: 14px;
-        }
-        .dpad-sprint:active, .dpad-sprint.active {
-            background: #38bdf8; color: #000;
+        @keyframes rotatePhone {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(90deg); }
         }
 
+        /* Mobile controls container — HIDDEN on pointer:fine (PC/mouse) */
+        #mobile-controls {
+            position: fixed; bottom: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 50;
+            display: none; /* JS will show this only on touch devices */
+        }
+
+        /* Only show on real touch devices */
+        @media (pointer: coarse) {
+            #mobile-controls { display: block; }
+            #portrait-blocker { display: none; } /* JS controls portrait blocker */
+            /* Hide the HUD jump/hover buttons on mobile to avoid clutter */
+            #b-jump, #b-hover { display: none !important; }
+            /* Shrink HUD on mobile */
+            #bottom-hud { bottom: 8px; gap: 6px; }
+            .hud-btn { padding: 6px 10px; font-size: 9.5px; letter-spacing: 0.5px; }
+            #top-hud { flex-direction: column; gap: 6px; align-items: flex-start; }
+            .brand-title { font-size: 12px; }
+            .progress-box { width: 140px; }
+        }
+
+        /* ---- D-PAD (Left side) ---- */
+        #mobile-dpad {
+            position: absolute;
+            bottom: 22px;
+            left: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            pointer-events: auto;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .dpad-row {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .dpad-btn {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: rgba(8, 10, 18, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid rgba(245, 158, 11, 0.5);
+            color: #fbbf24;
+            font-size: 22px; font-weight: 900;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06);
+            touch-action: none;
+            cursor: pointer;
+            transition: transform 0.07s, background 0.07s;
+        }
+        .dpad-btn:active, .dpad-btn.active {
+            background: rgba(245, 158, 11, 0.85);
+            color: #000;
+            transform: scale(0.9);
+            box-shadow: 0 0 22px rgba(245, 158, 11, 0.95);
+        }
+        /* Center sprint button */
+        .dpad-center {
+            width: 44px; height: 44px;
+            border-color: rgba(56, 189, 248, 0.55);
+            color: #38bdf8;
+            font-size: 13px; font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+        .dpad-center:active, .dpad-center.active {
+            background: rgba(56, 189, 248, 0.85);
+            color: #000;
+        }
+
+        /* ---- ACTION PAD (Right side) ---- */
         #mobile-action-pad {
-            position: absolute; bottom: 20px; right: 16px;
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            pointer-events: auto; user-select: none; -webkit-user-select: none;
+            position: absolute;
+            bottom: 22px;
+            right: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            user-select: none;
+            -webkit-user-select: none;
         }
         .mob-act-btn {
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            font-family: monospace; font-weight: 900; touch-action: none; cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.7); backdrop-filter: blur(14px);
-            transition: transform 0.08s, box-shadow 0.08s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            font-weight: 900;
+            touch-action: none;
+            cursor: pointer;
+            box-shadow: 0 6px 22px rgba(0,0,0,0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: transform 0.07s, box-shadow 0.07s;
+            border-radius: 50%;
         }
+        /* JUMP — big yellow primary button */
         .mob-btn-jump {
-            width: 72px; height: 72px; font-size: 11px; letter-spacing: 0.8px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            border: 2px solid #fbbf24; color: #050505;
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+            width: 80px; height: 80px;
+            font-size: 12px; letter-spacing: 1px;
+            background: linear-gradient(145deg, #f59e0b, #d97706);
+            border: 3px solid #fbbf24;
+            color: #050505;
+            box-shadow: 0 0 28px rgba(245, 158, 11, 0.7);
         }
         .mob-btn-jump:active {
-            transform: scale(0.9); box-shadow: 0 0 35px rgba(251, 191, 36, 0.95);
+            transform: scale(0.88);
+            box-shadow: 0 0 40px rgba(251, 191, 36, 1);
         }
+        /* HOVER — smaller cyan secondary button */
         .mob-btn-hover {
-            width: 48px; height: 48px; font-size: 18px;
-            background: rgba(14, 165, 233, 0.2); border: 1.5px solid #38bdf8; color: #38bdf8;
+            width: 54px; height: 54px;
+            font-size: 22px;
+            background: rgba(8, 10, 18, 0.85);
+            border: 2px solid #38bdf8;
+            color: #38bdf8;
+            box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
         }
         .mob-btn-hover:active, .mob-btn-hover.active {
-            background: #38bdf8; color: #000; transform: scale(0.92);
+            background: rgba(56, 189, 248, 0.85);
+            color: #000;
+            transform: scale(0.9);
         }
+
 
         /* Victory Flight Overlay */
         #victory-modal {
@@ -713,22 +817,32 @@
         <button class="hud-btn" id="b-home">🏠 HOMESCREEN</button>
     </div>
 
-    <!-- Mobile On-Screen Touch Controls (Active on phones & tablets) -->
+    <!-- Portrait-mode blocker (shown on touch devices in portrait) -->
+    <div id="portrait-blocker">
+        <div class="pb-icon">📱</div>
+        <h2>🚀 Rotate to Play</h2>
+        <p>Mission Moon requires<br><strong style="color:#fbbf24;">Landscape (Horizontal) Mode</strong><br>Please rotate your device.</p>
+    </div>
+
+    <!-- Mobile On-Screen Touch Controls (Touch devices only — hidden on PC) -->
     <div id="mobile-controls">
+        <!-- LEFT: D-Pad movement -->
         <div id="mobile-dpad">
-            <button class="dpad-btn" id="dpad-fwd" title="Forward (W)">▲</button>
+            <button class="dpad-btn" id="dpad-fwd" title="Forward">▲</button>
             <div class="dpad-row">
-                <button class="dpad-btn" id="dpad-left" title="Left (A)">◀</button>
-                <button class="dpad-btn dpad-sprint" id="dpad-sprint" title="Sprint (Shift)">⚡</button>
-                <button class="dpad-btn" id="dpad-right" title="Right (D)">▶</button>
+                <button class="dpad-btn" id="dpad-left" title="Left">◀</button>
+                <button class="dpad-btn dpad-center" id="dpad-sprint" title="Sprint">⚡<br><span style="font-size:8px;letter-spacing:0">RUN</span></button>
+                <button class="dpad-btn" id="dpad-right" title="Right">▶</button>
             </div>
-            <button class="dpad-btn" id="dpad-back" title="Back (S)">▼</button>
+            <button class="dpad-btn" id="dpad-back" title="Back">▼</button>
         </div>
+        <!-- RIGHT: Action buttons -->
         <div id="mobile-action-pad">
-            <button class="mob-act-btn mob-btn-hover" id="mob-hover" title="Hover (H)">🛸</button>
-            <button class="mob-act-btn mob-btn-jump" id="mob-jump" title="Jump / Boost (Space)">▲ JUMP</button>
+            <button class="mob-act-btn mob-btn-hover" id="mob-hover" title="Hover">🛸</button>
+            <button class="mob-act-btn mob-btn-jump" id="mob-jump" title="Jump">▲<br>JUMP</button>
         </div>
     </div>
+
 
     <!-- Cinematic Full-Screen Mission Briefing Intro (True Fullscreen Ken Burns Cutscenes & Deep Commander Voice) -->
     <div id="intro-modal">
@@ -4278,36 +4392,104 @@
             el.addEventListener('mouseleave', release);
         }
 
-        bindTouchKey('dpad-fwd', 'w');
-        bindTouchKey('dpad-back', 's');
-        bindTouchKey('dpad-left', 'a');
-        bindTouchKey('dpad-right', 'd');
-        bindTouchKey('dpad-sprint', 'shift');
+        // ================================================================
+        // MOBILE DEVICE DETECTION & LANDSCAPE ENFORCEMENT
+        // ================================================================
+        const mobileControls  = document.getElementById('mobile-controls');
+        const portraitBlocker = document.getElementById('portrait-blocker');
 
-        const mobJump = document.getElementById('mob-jump');
-        if (mobJump) {
-            mobJump.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleJumpAction();
-            }, { passive: false });
-            mobJump.addEventListener('click', (e) => {
-                e.stopPropagation();
-                handleJumpAction();
-            });
-        }
+        // Detect real touch device (NOT a laptop with touchscreen that also has mouse)
+        const isTouchDevice = ('ontouchstart' in window) ||
+                              (navigator.maxTouchPoints > 1) ||
+                              (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 
-        const mobHover = document.getElementById('mob-hover');
-        if (mobHover) {
-            mobHover.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleHoverPower();
-            }, { passive: false });
-            mobHover.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleHoverPower();
+        if (isTouchDevice) {
+            // Show mobile controls
+            if (mobileControls) mobileControls.style.display = 'block';
+
+            // Bind D-pad buttons
+            bindTouchKey('dpad-fwd',    'w');
+            bindTouchKey('dpad-back',   's');
+            bindTouchKey('dpad-left',   'a');
+            bindTouchKey('dpad-right',  'd');
+            bindTouchKey('dpad-sprint', 'shift');
+
+            // Jump action button
+            const mobJump = document.getElementById('mob-jump');
+            if (mobJump) {
+                mobJump.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    handleJumpAction();
+                }, { passive: false });
+                mobJump.addEventListener('click', (e) => { e.stopPropagation(); handleJumpAction(); });
+            }
+
+            // Hover action button
+            const mobHover = document.getElementById('mob-hover');
+            if (mobHover) {
+                mobHover.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    toggleHoverPower();
+                }, { passive: false });
+                mobHover.addEventListener('click', (e) => { e.stopPropagation(); toggleHoverPower(); });
+            }
+
+            // --- Landscape-only enforcement ---
+            function checkOrientation() {
+                const isPortrait = window.innerHeight > window.innerWidth;
+                if (portraitBlocker) {
+                    portraitBlocker.style.display = isPortrait ? 'flex' : 'none';
+                }
+                if (mobileControls) {
+                    mobileControls.style.display = isPortrait ? 'none' : 'block';
+                }
+            }
+
+            // Check immediately
+            checkOrientation();
+
+            // Listen for orientation/resize changes
+            window.addEventListener('resize', checkOrientation, { passive: true });
+            window.addEventListener('orientationchange', () => {
+                setTimeout(checkOrientation, 200); // slight delay for accurate dimensions
+            }, { passive: true });
+            if (screen.orientation) {
+                screen.orientation.addEventListener('change', () => {
+                    setTimeout(checkOrientation, 150);
+                });
+            }
+
+            // Try to lock to landscape (works on Android Chrome, Safari ignores silently)
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {}); // fail silently if not allowed
+            }
+
+            // Request fullscreen on first touch for better immersion
+            document.addEventListener('touchstart', function reqFS() {
+                const el = document.documentElement;
+                if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                document.removeEventListener('touchstart', reqFS);
+            }, { passive: true, once: true });
+
+            // Screen Wake Lock (keep screen on while playing — Chrome Android & Edge)
+            let wakeLock = null;
+            async function acquireWakeLock() {
+                if ('wakeLock' in navigator) {
+                    try {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    } catch (e) {}
+                }
+            }
+            acquireWakeLock();
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') acquireWakeLock();
             });
+
+        } else {
+            // PC / Mouse device — hide mobile controls completely
+            if (mobileControls) mobileControls.style.display = 'none';
+            if (portraitBlocker) portraitBlocker.style.display = 'none';
         }
 
         // UI Buttons
