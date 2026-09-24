@@ -919,7 +919,7 @@
         
         // High-Graphic HDR Post-Processing Pipeline
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.28;
+        renderer.toneMappingExposure = 1.05;
         renderer.outputEncoding = THREE.sRGBEncoding;
         // SHADOWMAP COMPLETELY DISABLED: Permanently eliminates the dark green diamond artifact on the grass!
         renderer.shadowMap.enabled = false;
@@ -929,7 +929,7 @@
         // CINEMATIC 3-POINT PBR LIGHTING (SOLAR KEY, NEBULA FILL, ELECTRIC RIM)
         // =====================================================================
         // 1. Key Solar Directional Light (Warm celestial sunlight with specular sheen)
-        const sunLight = new THREE.DirectionalLight(0xfffaed, 2.5);
+        const sunLight = new THREE.DirectionalLight(0xfffaed, 1.45);
         sunLight.position.set(1550, 880, -100);
         scene.add(sunLight);
 
@@ -1504,14 +1504,15 @@
         const grassTex = createGrassTexture();
         const grassMat = new THREE.MeshStandardMaterial({
             map: grassTex,
-            roughness: 0.85,
-            metalness: 0.02
+            color: 0x16a34a,
+            roughness: 0.98,
+            metalness: 0.0
         });
 
-        // Pristine Starting Meadow Hub (Z=+28m to +55m)
-        // Beyond this starting hub lies the infinite starry cosmic abyss!
-        const meadow = new THREE.Mesh(new THREE.BoxGeometry(50, 1.6, 28), grassMat);
-        meadow.position.set(0, -0.8, 42);
+        // Pristine Lush Emerald Green Starting Meadow Hub (Z=+22m to +70m)
+        // Beyond this green lawn lies the infinite starry cosmic abyss!
+        const meadow = new THREE.Mesh(new THREE.BoxGeometry(60, 1.6, 48), grassMat);
+        meadow.position.set(0, -0.8, 46);
         scene.add(meadow);
 
         // Ambient Floating Bio-Luminescent Fireflies
@@ -1607,7 +1608,7 @@
             tree.position.set(x, 0, z);
 
             const trunkGeo = new THREE.CylinderGeometry(0.22 * scale, 0.4 * scale, 3.4 * scale, 8);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x3d2314, roughness: 0.9, metalness: 0.1 });
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x543216, roughness: 0.96, metalness: 0.04 });
             const trunk = new THREE.Mesh(trunkGeo, trunkMat);
             trunk.position.y = 1.7 * scale;
             tree.add(trunk);
@@ -1650,17 +1651,16 @@
             treeGroup.add(tree);
         }
 
+        // Organic Wooden Bark Trunk & Vibrant Emerald Foliage
         const treePlacements = [
-            [-24, 45, 1.1], [24, 45, 1.15],
-            [-28, 35, 1.3], [28, 35, 1.25],
-            [-22, 25, 1.05], [23, 25, 1.1],
-            [-30, 15, 1.4], [29, 15, 1.35],
-            [-20, 5, 1.0], [21, 5, 1.05],
-            [-31, -5, 1.35], [30, -5, 1.25],
-            [-23, -15, 1.1], [24, -15, 1.15],
-            [-29, -25, 1.4], [28, -25, 1.35],
-            [-35, 48, 1.5], [35, 48, 1.5],
-            [-35, -35, 1.45], [35, -35, 1.45]
+            // Left flank (firmly grounded on meadow)
+            [-24, 58, 1.2], [-20, 50, 1.1], [-25, 42, 1.3], [-21, 34, 1.05], [-23, 26, 1.15],
+            // Right flank (firmly grounded on meadow)
+            [24, 58, 1.25], [20, 50, 1.15], [25, 42, 1.35], [21, 34, 1.1], [23, 26, 1.2],
+            // Rear perimeter
+            [-14, 64, 1.3], [0, 65, 1.35], [14, 64, 1.3],
+            // Forward edge framing the gauntlet launch
+            [-18, 24, 0.95], [18, 24, 0.95]
         ];
         treePlacements.forEach(([tx, tz, ts]) => createCosmicPineTree(tx, tz, ts));
 
@@ -1922,79 +1922,79 @@
             // =================================================================
             // Stage 1: Hexagonal Cyber Skyscraper Plaza Tower
             { type: "buildingHex", x: 0, y: 1.4, z: 38, r: 2.2, h: 2.8, name: "1. CYBER PLAZA SKYSCRAPER", facade: bldgFacadeAmberTex, color: 0x1e3a8a },
-            // Stage 2: Spherical Mars Crater Asteroid (Precision Sphere Perch!)
+            // Stage 2: Spherical Mars Crater Asteroid
             { type: "planet", x: -2.8, y: 4.0, z: 30, r: 2.2, name: "2. MARS CRATER ASTEROID", map: marsTex },
-            // Stage 3: Suspended Cyber Transit Sky-Bridge (Actively Oscillating!)
-            { type: "skyBridge", x: 2.5, y: 7.0, z: 22, w: 2.0, h: 1.2, d: 4.6, name: "3. SWAYING SKYWAY BRIDGE", color: 0x2563eb, isOscillating: true, oscSpeed: 1.4, oscAmp: 2.8, baseX: 2.5 },
-            // Stage 4: Skyscraper Rooftop Ion Launch Deck (Rocket Boost across chasm!)
-            { type: "trampolineBuilding", x: -1.5, y: 8.8, z: 15, r: 2.3, h: 1.2, name: "4. SKY-SPIRE LAUNCH DECK", color: 0xa855f7, isSuperBounce: true, boostY: 27.5, airLaunchZ: -9.0 },
-            // Stage 5: Neo-Shanghai Apex Tower
-            { type: "buildingHex", x: 2.0, y: 18.5, z: 6, r: 2.2, h: 2.8, name: "5. NEO-SHANGHAI APEX TOWER", facade: bldgFacadeCyanTex, color: 0x4f46e5 },
+            // Stage 3: Swaying Emerald Transit Bridge (Oscillating)
+            { type: "skyBridge", x: 2.5, y: 7.0, z: 22, w: 2.0, h: 1.2, d: 4.6, name: "3. SWAYING TRANSIT BRIDGE", color: 0x10b981, isOscillating: true, oscSpeed: 1.4, oscAmp: 2.8, baseX: 2.5 },
+            // Stage 4: Ion Accelerator Catapult Deck
+            { type: "trampolineBuilding", x: -1.5, y: 8.8, z: 15, r: 2.3, h: 1.2, name: "4. ION CATAPULT LAUNCH DECK", color: 0xa855f7, isSuperBounce: true, boostY: 27.5, airLaunchZ: -9.0 },
+            // Stage 5: Diamond Crystal Obelisk (Faceted Prismatic Crystal Platform)
+            { type: "crystalPrism", x: 2.0, y: 18.5, z: 6, r: 2.2, h: 2.2, name: "5. PRISMATIC CRYSTAL OBELISK", color: 0x06b6d4 },
 
             // =================================================================
-            // SECTOR 2: CLOUDLINE SKYWAYS & ASTEROID DRIFT (Altitude: 20m - 45m)
+            // SECTOR 2: GLACIAL ICE, CRYSTAL ASTEROIDS & SOLAR ARRAYS (20m - 45m)
             // =================================================================
-            // Stage 6: Frozen Ice Dwarf Planetoid (Slippery Glacial Sphere)
+            // Stage 6: [CHECKPOINT 1] Glacial Ice Dwarf Planet
             { type: "planet", x: -2.8, y: 22.0, z: -3, r: 2.2, name: "6. FROZEN ICE PLANETOID (CHECKPOINT 1)", map: iceTex, isCheckpoint: true, stageNum: 6 },
-            // Stage 7: Rotating Omni-Corp Spire
-            { type: "buildingHex", x: 2.0, y: 25.2, z: -12, r: 2.0, h: 2.4, name: "7. ROTATING OMNI-CORP SPIRE", facade: bldgFacadeAmberTex, color: 0xd97706, isRotating: true, rotSpeed: 0.55 },
-            // Stage 8: Hyperion Tower Rooftop Launch Catapult (Boost forward to Y=37m!)
+            // Stage 7: Golden Solar Array Station (Twin photovoltaic wings)
+            { type: "solarStation", x: 2.0, y: 25.2, z: -12, r: 2.1, h: 2.2, name: "7. ORBITAL SOLAR ARRAY", color: 0xf59e0b, isRotating: true, rotSpeed: 0.4 },
+            // Stage 8: Hyperion Launch Catapult Pad
             { type: "trampolineBuilding", x: -1.5, y: 27.4, z: -20, r: 2.3, h: 1.2, name: "8. HYPERION LAUNCH TOWER", color: 0xec4899, isSuperBounce: true, boostY: 29.5, airLaunchZ: -10.0 },
             // Stage 9: Golden Saturnian Ringed Moon
             { type: "ringPlanet", x: 2.5, y: 36.8, z: -30, r: 2.2, ringR: 4.6, name: "9. RINGED CELESTIAL MOON", map: ringPlanetTex },
-            // Stage 10: Swaying Emerald Skyway (Oscillating)
-            { type: "skyBridge", x: -2.5, y: 40.2, z: -39, w: 1.8, h: 1.4, d: 3.2, name: "10. SWAYING EMERALD SKYWAY", color: 0x059669, isOscillating: true, oscSpeed: 1.6, oscAmp: 3.0, baseX: -2.5 },
-            // Stage 11: Rotating Zenith Transmission Tower
-            { type: "buildingHex", x: 1.5, y: 43.2, z: -47, r: 1.8, h: 2.4, name: "11. ROTATING ZENITH TRANSMISSION TOWER", facade: bldgFacadeCyanTex, color: 0x8b5cf6, isRotating: true, rotSpeed: -0.65 },
+            // Stage 10: Swaying Quantum Rail Truss Bridge (Oscillating)
+            { type: "skyBridge", x: -2.5, y: 40.2, z: -39, w: 1.8, h: 1.4, d: 3.2, name: "10. QUANTUM RAIL TRUSS", color: 0x3b82f6, isOscillating: true, oscSpeed: 1.6, oscAmp: 3.0, baseX: -2.5 },
+            // Stage 11: Amethyst Crystal Monolith
+            { type: "crystalPrism", x: 1.5, y: 43.2, z: -47, r: 2.0, h: 2.2, name: "11. AMETHYST CRYSTAL MONOLITH", color: 0x8b5cf6, isRotating: true, rotSpeed: -0.5 },
 
             // =================================================================
-            // SECTOR 3: MESOSPHERE ION RING PLATFORMS (Altitude: 45m - 75m)
+            // SECTOR 3: QUANTUM ANTI-GRAVITY & CELESTIAL ASTRO-DECKS (45m - 75m)
             // =================================================================
-            // Stage 12: Stratosphere Launch Complex (Ion launcher to Y=55m!)
+            // Stage 12: Stratosphere Launch Complex
             { type: "trampolineBuilding", x: 0, y: 45.4, z: -55, r: 2.3, h: 1.2, name: "12. STRATOSPHERE LAUNCH COMPLEX", color: 0x06b6d4, isSuperBounce: true, boostY: 28.5, airLaunchZ: -10.0 },
-            // Stage 13: Rotating Celestial Sky-Deck
+            // Stage 13: [CHECKPOINT 2] Rotating Celestial Astro-Deck
             { type: "buildingHex", x: 2.0, y: 54.8, z: -65, r: 2.2, h: 2.0, name: "13. CELESTIAL ASTRO-DECK (CHECKPOINT 2)", facade: bldgFacadeAmberTex, color: 0x6366f1, isRotating: true, rotSpeed: 0.45, isCheckpoint: true, stageNum: 13 },
-            // Stage 14: Suspended Girder Skyway
-            { type: "skyBridge", x: -2.0, y: 58.4, z: -74, w: 1.6, h: 1.4, d: 4.2, name: "14. SUSPENDED GIRDER SKYWAY", color: 0x3b82f6 },
-            // Stage 15: Rotating Orbital Sky-Tower
-            { type: "buildingHex", x: 2.0, y: 62.0, z: -83, r: 2.0, h: 1.8, name: "15. ROTATING ORBITAL SKY-TOWER", facade: bldgFacadeCyanTex, color: 0x0284c7, isRotating: true, rotSpeed: -0.5 },
-            // Stage 16: Quantum Plasma Relay Tower
-            { type: "buildingHex", x: -1.8, y: 65.5, z: -91, r: 2.1, h: 2.0, name: "16. QUANTUM PLASMA RELAY TOWER", facade: bldgFacadeAmberTex, color: 0xd946ef },
-            // Stage 17: High Mesosphere Transit Bridge (Oscillating)
+            // Stage 14: Quantum Portal Stargate Ring (Spinning Torus Portal)
+            { type: "quantumPortal", x: -2.0, y: 58.4, z: -74, r: 2.2, h: 1.4, name: "14. QUANTUM STARGATE RING", color: 0x38bdf8 },
+            // Stage 15: Rotating Orbital Telemetry Radar Hub
+            { type: "radarHub", x: 2.0, y: 62.0, z: -83, r: 2.1, h: 1.8, name: "15. ORBITAL TELEMETRY RADOME", isRotating: true, rotSpeed: -0.4 },
+            // Stage 16: Emerald Bio-Crystalline Spire
+            { type: "crystalPrism", x: -1.8, y: 65.5, z: -91, r: 2.1, h: 2.0, name: "16. EMERALD CRYSTAL SPIRE", color: 0x10b981 },
+            // Stage 17: High Mesosphere Swaying Skyway (Oscillating)
             { type: "skyBridge", x: 1.5, y: 69.0, z: -99, w: 1.8, h: 1.2, d: 3.6, name: "17. HIGH MESOSPHERE SKYWAY", color: 0x06b6d4, isOscillating: true, oscSpeed: 1.5, oscAmp: 2.6, baseX: 1.5 },
-            // Stage 18: Aurora Ion Overdrive Pad (Boost to Y=82m!)
+            // Stage 18: Aurora Ion Overdrive Pad
             { type: "trampolineBuilding", x: -1.0, y: 71.8, z: -107, r: 2.3, h: 1.2, name: "18. AURORA ION OVERDRIVE PAD", color: 0xf59e0b, isSuperBounce: true, boostY: 29.0, airLaunchZ: -10.0 },
 
             // =================================================================
-            // SECTOR 4: THERMOSPHERE ORBITAL SUPER-TOWERS (Altitude: 75m - 105m)
+            // SECTOR 4: THERMOSPHERE SATELLITE ARRAYS & TWIN PLANETS (75m - 105m)
             // =================================================================
-            // Stage 19: Rotating Helios Observation Spire
-            { type: "buildingHex", x: 2.2, y: 81.5, z: -117, r: 2.2, h: 2.0, name: "19. HELIOS SOLAR ARRAY (CHECKPOINT 3)", facade: bldgFacadeAmberTex, color: 0xf97316, isRotating: true, rotSpeed: 0.5, isCheckpoint: true, stageNum: 19 },
+            // Stage 19: [CHECKPOINT 3] Rotating Helios Solar Station
+            { type: "solarStation", x: 2.2, y: 81.5, z: -117, r: 2.2, h: 2.0, name: "19. HELIOS SOLAR STATION (CHECKPOINT 3)", isRotating: true, rotSpeed: 0.45, isCheckpoint: true, stageNum: 19 },
             // Stage 20: Crimson Mars Twin Asteroid
             { type: "planet", x: -2.5, y: 85.0, z: -125, r: 2.2, name: "20. CRIMSON MARS TWIN ASTEROID", map: marsTex },
-            // Stage 21: Swaying Titanium Truss Bridge (Oscillating)
-            { type: "skyBridge", x: 1.8, y: 88.4, z: -133, w: 1.8, h: 1.2, d: 3.8, name: "21. SWAYING TITANIUM TRUSS BRIDGE", color: 0x3b82f6, isOscillating: true, oscSpeed: 1.7, oscAmp: 3.2, baseX: 1.8 },
-            // Stage 22: Rotating Vortex Telemetry Hub
-            { type: "buildingHex", x: -2.0, y: 91.8, z: -141, r: 2.0, h: 2.2, name: "22. ROTATING VORTEX TELEMETRY HUB", facade: bldgFacadeCyanTex, color: 0x14b8a6, isRotating: true, rotSpeed: -0.6 },
-            // Stage 23: Starlight Catapult Deck (Boost to Y=103m!)
+            // Stage 21: Titanium Truss Runway (Oscillating)
+            { type: "skyBridge", x: 1.8, y: 88.4, z: -133, w: 1.8, h: 1.2, d: 3.8, name: "21. TITANIUM TRUSS RUNWAY", color: 0x3b82f6, isOscillating: true, oscSpeed: 1.7, oscAmp: 3.2, baseX: 1.8 },
+            // Stage 22: Rotating Deep Space Radar Hub
+            { type: "radarHub", x: -2.0, y: 91.8, z: -141, r: 2.0, h: 2.0, name: "22. DEEP SPACE TELEMETRY RADAR", isRotating: true, rotSpeed: -0.5 },
+            // Stage 23: Starlight Catapult Deck
             { type: "trampolineBuilding", x: 1.0, y: 94.2, z: -149, r: 2.3, h: 1.2, name: "23. STARLIGHT CATAPULT DECK", color: 0x8b5cf6, isSuperBounce: true, boostY: 29.5, airLaunchZ: -10.0 },
             // Stage 24: Glacial Ringed Planetoid
             { type: "ringPlanet", x: -2.2, y: 103.5, z: -159, r: 2.2, ringR: 4.5, name: "24. GLACIAL RINGED PLANETOID", map: ringPlanetTex },
 
             // =================================================================
-            // SECTOR 5: CELESTIAL EXOSPHERE & PLANETARY ORBIT (Altitude: 105m - 126m)
+            // SECTOR 5: CELESTIAL EXOSPHERE & PLANETARY SUMMIT (105m - 126m)
             // =================================================================
-            // Stage 25: Orbital Monolith Spire
-            { type: "buildingHex", x: 2.0, y: 106.8, z: -167, r: 2.1, h: 2.0, name: "25. ORBITAL MONOLITH (CHECKPOINT 4)", facade: bldgFacadeAmberTex, color: 0x0284c7, isCheckpoint: true, stageNum: 25 },
-            // Stage 26: Zero-G Expedition Skyway (Oscillating)
-            { type: "skyBridge", x: -1.5, y: 110.2, z: -174, w: 1.8, h: 1.2, d: 3.6, name: "26. ZERO-G EXPEDITION SKYWAY", color: 0x10b981, isOscillating: true, oscSpeed: 1.6, oscAmp: 2.8, baseX: -1.5 },
-            // Stage 27: Rotating Exosphere Zenith Bastion
-            { type: "buildingHex", x: 1.8, y: 113.6, z: -181, r: 2.0, h: 2.0, name: "27. EXOSPHERE ZENITH BASTION", facade: bldgFacadeCyanTex, color: 0xa855f7, isRotating: true, rotSpeed: 0.55 },
-            // Stage 28: Sub-Orbital Runway
-            { type: "skyBridge", x: -1.2, y: 116.8, z: -187, w: 1.8, h: 1.2, d: 3.4, name: "28. SUB-ORBITAL RUNWAY", color: 0x38bdf8 },
-            // Stage 29: Stargate Observatory Deck
-            { type: "buildingHex", x: 1.2, y: 119.8, z: -193, r: 2.2, h: 2.0, name: "29. STARGATE OBSERVATORY DECK", facade: bldgFacadeAmberTex, color: 0xec4899 },
-            // Stage 30: Earth Approach Gantry
+            // Stage 25: [CHECKPOINT 4] Grand Orbital Monolith Gateway
+            { type: "buildingHex", x: 2.0, y: 106.8, z: -167, r: 2.2, h: 2.2, name: "25. ORBITAL MONOLITH (CHECKPOINT 4)", facade: bldgFacadeAmberTex, color: 0x0284c7, isCheckpoint: true, stageNum: 25 },
+            // Stage 26: Zero-G Translucent Runway (Oscillating)
+            { type: "skyBridge", x: -1.5, y: 110.2, z: -174, w: 1.8, h: 1.2, d: 3.6, name: "26. ZERO-G EXPEDITION RUNWAY", color: 0x10b981, isOscillating: true, oscSpeed: 1.6, oscAmp: 2.8, baseX: -1.5 },
+            // Stage 27: Exosphere Zenith Crystal Bastion
+            { type: "crystalPrism", x: 1.8, y: 113.6, z: -181, r: 2.1, h: 2.0, name: "27. EXOSPHERE CRYSTAL BASTION", color: 0xa855f7, isRotating: true, rotSpeed: 0.5 },
+            // Stage 28: Sub-Orbital Magnetic Rail
+            { type: "skyBridge", x: -1.2, y: 116.8, z: -187, w: 1.8, h: 1.2, d: 3.4, name: "28. SUB-ORBITAL MAGNETIC RAIL", color: 0x38bdf8 },
+            // Stage 29: Stargate Celestial Observatory Radome
+            { type: "radarHub", x: 1.2, y: 119.8, z: -193, r: 2.2, h: 2.0, name: "29. STARGATE OBSERVATORY RADOME" },
+            // Stage 30: Earth Approach Docking Gantry Runway
             { type: "skyBridge", x: 0, y: 122.6, z: -198, w: 2.2, h: 1.2, d: 3.8, name: "30. EARTH APPROACH GANTRY", color: 0x22c55e },
             // Stage 31: THE BLUE MARBLE: PLANET EARTH (Center Y = 120.8m, Z = -205m, r = 5.2, Summit Y = 126.0m!)
             { type: "earth", x: 0, y: 120.8, z: -205, r: 5.2, name: "31. PLANET EARTH (FINAL HURDLE)", isEarth: true }
@@ -2249,6 +2249,94 @@
                 mesh.add(rInner);
                 hurdlePlanets.push({ mesh: sMesh, ring: rMesh, ring2: rInner, speed: 0.38 });
 
+            
+            } else if (p.type === "crystalPrism") {
+                mesh = new THREE.Group();
+                mesh.position.set(p.x, p.y, p.z);
+
+                const prismGeo = new THREE.OctahedronGeometry(p.r, 0);
+                const prismMat = new THREE.MeshPhysicalMaterial({
+                    color: p.color || 0xd946ef,
+                    roughness: 0.08,
+                    metalness: 0.15,
+                    transmission: 0.65,
+                    transparent: true,
+                    opacity: 0.88,
+                    emissive: p.color || 0xa855f7,
+                    emissiveIntensity: 0.4
+                });
+                const prism = new THREE.Mesh(prismGeo, prismMat);
+                mesh.add(prism);
+
+                const prismEdges = new THREE.LineSegments(
+                    new THREE.EdgesGeometry(prismGeo),
+                    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 })
+                );
+                mesh.add(prismEdges);
+
+                // Landing Platform Top Deck
+                const pDeck = new THREE.Mesh(
+                    new THREE.CylinderGeometry(p.r * 0.72, p.r * 0.72, 0.35, 8),
+                    new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.25 })
+                );
+                pDeck.position.y = p.r * 0.45;
+                mesh.add(pDeck);
+
+            } else if (p.type === "solarStation") {
+                mesh = new THREE.Group();
+                mesh.position.set(p.x, p.y, p.z);
+
+                // Central Station Hub
+                const hubGeo = new THREE.CylinderGeometry(p.r * 0.7, p.r * 0.7, p.h || 1.8, 16);
+                const hubMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.95, roughness: 0.2 });
+                const hub = new THREE.Mesh(hubGeo, hubMat);
+                mesh.add(hub);
+
+                // Golden Photovoltaic Solar Arrays
+                const solarWingGeo = new THREE.BoxGeometry(p.r * 2.4, 0.08, p.r * 1.1);
+                const solarWingMat = new THREE.MeshStandardMaterial({
+                    color: 0xf59e0b, metalness: 0.9, roughness: 0.2, emissive: 0xb45309, emissiveIntensity: 0.45
+                });
+                const wingL = new THREE.Mesh(solarWingGeo, solarWingMat);
+                wingL.position.x = -p.r * 1.6; mesh.add(wingL);
+                const wingR = new THREE.Mesh(solarWingGeo, solarWingMat);
+                wingR.position.x = p.r * 1.6; mesh.add(wingR);
+
+            } else if (p.type === "quantumPortal") {
+                mesh = new THREE.Group();
+                mesh.position.set(p.x, p.y, p.z);
+
+                // Spinning Luminous Torus Stargate Ring
+                const portalGeo = new THREE.TorusGeometry(p.r * 1.15, 0.18, 16, 48);
+                const portalMat = new THREE.MeshBasicMaterial({ color: p.color || 0x38bdf8 });
+                const portalRing = new THREE.Mesh(portalGeo, portalMat);
+                portalRing.rotation.y = Math.PI / 4;
+                mesh.add(portalRing);
+
+                // Inner Kinetic Deck
+                const pDeck = new THREE.Mesh(
+                    new THREE.CylinderGeometry(p.r * 0.8, p.r * 0.8, 0.4, 24),
+                    new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3, metalness: 0.9 })
+                );
+                mesh.add(pDeck);
+
+            } else if (p.type === "radarHub") {
+                mesh = new THREE.Group();
+                mesh.position.set(p.x, p.y, p.z);
+
+                const domeGeo = new THREE.SphereGeometry(p.r * 0.85, 24, 24, 0, Math.PI * 2, 0, Math.PI / 2);
+                const domeMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.9, roughness: 0.3 });
+                const dome = new THREE.Mesh(domeGeo, domeMat);
+                mesh.add(dome);
+
+                // Revolving Parabolic Radar Dish
+                const dishGeo = new THREE.ConeGeometry(p.r * 0.75, 0.3, 24, 1, true);
+                const dishMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.95, roughness: 0.15 });
+                const dish = new THREE.Mesh(dishGeo, dishMat);
+                dish.rotation.x = Math.PI * 0.65;
+                dish.position.set(0, p.r * 0.5, 0);
+                mesh.add(dish);
+
             } else if (p.type === "earth") {
                 mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
@@ -2327,7 +2415,7 @@
                     minZ: p.z - p.r, maxZ: p.z + p.r,
                     name: p.name, isSuperBounce: false, isEarth: !!p.isEarth
                 };
-            } else if (p.type === "buildingHex" || p.type === "trampolineBuilding" || p.type === "hex" || p.type === "trampoline") {
+            } else if (p.type === "buildingHex" || p.type === "trampolineBuilding" || p.type === "hex" || p.type === "trampoline" || p.type === "crystalPrism" || p.type === "solarStation" || p.type === "quantumPortal" || p.type === "radarHub") {
                 physObj = {
                     shape: "cylinder",
                     cx: p.x, cy: p.y, cz: p.z, r: p.r, halfH: p.h / 2,
@@ -3391,193 +3479,103 @@
         const antseeds = [];
 
         // =====================================================================
-        // THE CELESTIAL STARSHIP & MECHAZILLA LAUNCH COMPLEX (DOCKED ON EARTH APEX AT Y=126.0m)
+        // THE COMPACT CELESTIAL STARSHIP (SLEEK 3D AEROSPACE ESCAPE VESSEL)
+        // Stationed atop Planet Earth Summit at Y = 126.8m, Z = -207.0m
+        // Compact personal starship scale (Length 5.2m, Width 3.2m, Height 2.2m)
         // =====================================================================
         const spaceship = new THREE.Group();
-        spaceship.position.set(0, 126.4, -207.5);
+        spaceship.position.set(0, 126.8, -207.0);
         scene.add(spaceship);
 
-        const stainlessSteelMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.96, roughness: 0.18 });
-        const thermalTilesMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.7, metalness: 0.85 });
-        const chromeActuatorMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1.0, roughness: 0.05 });
-        const raptorTitaniumMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.95, roughness: 0.25 });
-        const raptorChamberMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-        const gantryTrussMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.3 });
-        const cautionStripeMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0x854d0e, emissiveIntensity: 0.5 });
+        const shipWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25, metalness: 0.85 });
+        const shipDarkMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.45, metalness: 0.9 });
+        const shipCanopyMat = new THREE.MeshPhysicalMaterial({
+            color: 0xfacc15, roughness: 0.05, metalness: 0.95, transmission: 0.35, emissive: 0xca8a04, emissiveIntensity: 0.45
+        });
+        const shipEngineMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.95, roughness: 0.2 });
+        const shipGlowCyan = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
 
-        // 1. Starship Main Fuselage
-        const shipBody = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.4, 8.6, 32), stainlessSteelMat);
-        shipBody.position.y = 5.2;
-        spaceship.add(shipBody);
+        // 1. Sleek Aerodynamic Fuselage (Horizontal forward flight orientation)
+        const shipFuselage = new THREE.Mesh(new THREE.ConeGeometry(0.72, 4.6, 24), shipWhiteMat);
+        shipFuselage.rotation.x = -Math.PI / 2;
+        shipFuselage.position.set(0, 0.65, 0.4);
+        spaceship.add(shipFuselage);
 
-        // Black Ceramic Thermal Protection Tile Shield on windward belly
-        const tpsTileShield = new THREE.Mesh(
-            new THREE.CylinderGeometry(1.415, 1.415, 8.62, 32, 1, false, -Math.PI / 2, Math.PI),
-            thermalTilesMat
-        );
-        tpsTileShield.position.y = 5.2;
-        spaceship.add(tpsTileShield);
+        // Underside Heat Shield (Dark carbon composite)
+        const shipBelly = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.72, 3.2, 16), shipDarkMat);
+        shipBelly.rotation.x = -Math.PI / 2;
+        shipBelly.position.set(0, 0.45, -0.2);
+        spaceship.add(shipBelly);
 
-        // 2. Aerodynamic Ogive Nosecone
-        const nosecone = new THREE.Mesh(new THREE.ConeGeometry(1.4, 3.8, 32), stainlessSteelMat);
-        nosecone.position.y = 11.4;
-        spaceship.add(nosecone);
+        // 2. Cockpit Glass Canopy (Gold mirrored solar reflection)
+        const shipCanopy = new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 16), shipCanopyMat);
+        shipCanopy.scale.set(0.65, 0.55, 1.45);
+        shipCanopy.position.set(0, 0.92, 0.6);
+        spaceship.add(shipCanopy);
 
-        const noseconeTPS = new THREE.Mesh(
-            new THREE.ConeGeometry(1.415, 3.81, 32, 1, false, -Math.PI / 2, Math.PI),
-            thermalTilesMat
-        );
-        noseconeTPS.position.y = 11.4;
-        spaceship.add(noseconeTPS);
+        // 3. Compact Swept Delta Wings with Cyan Formation Beacons
+        const wingShape = new THREE.BoxGeometry(3.2, 0.08, 1.6);
+        const wings = new THREE.Mesh(wingShape, shipWhiteMat);
+        wings.position.set(0, 0.55, -0.4);
+        spaceship.add(wings);
 
-        // Forward Cabin Window
-        const cabinWindow = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.2, 0.08), raptorChamberMat);
-        cabinWindow.position.set(0, 10.5, 1.38);
-        spaceship.add(cabinWindow);
+        // Wingtip Beacons
+        const wingLightL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), shipGlowCyan);
+        wingLightL.position.set(-1.6, 0.55, -0.4); spaceship.add(wingLightL);
+        const wingLightR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), shipGlowCyan);
+        wingLightR.position.set(1.6, 0.55, -0.4); spaceship.add(wingLightR);
 
-        // 3. Forward Aerodynamic Canards
-        const canardL = new THREE.Group();
-        canardL.position.set(-1.4, 10.2, 0);
-        const canardLMesh = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 0.8), stainlessSteelMat);
-        canardLMesh.position.x = -0.9; canardL.add(canardLMesh);
-        const canardLTile = new THREE.Mesh(new THREE.BoxGeometry(1.81, 0.05, 0.81), thermalTilesMat);
-        canardLTile.position.set(-0.9, -0.04, 0); canardL.add(canardLTile);
-        const canardLHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.9, 12), chromeActuatorMat);
-        canardLHinge.rotation.x = Math.PI / 2; canardL.add(canardLHinge);
-        spaceship.add(canardL);
+        // 4. Twin Canted Vertical Stabilizers (Tail Fins)
+        const finL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.85, 0.9), shipDarkMat);
+        finL.position.set(-0.65, 0.95, -1.2); finL.rotation.z = -0.25; spaceship.add(finL);
+        const finR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.85, 0.9), shipDarkMat);
+        finR.position.set(0.65, 0.95, -1.2); finR.rotation.z = 0.25; spaceship.add(finR);
 
-        const canardR = new THREE.Group();
-        canardR.position.set(1.4, 10.2, 0);
-        const canardRMesh = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.1, 0.8), stainlessSteelMat);
-        canardRMesh.position.x = 0.9; canardR.add(canardRMesh);
-        const canardRTile = new THREE.Mesh(new THREE.BoxGeometry(1.81, 0.05, 0.81), thermalTilesMat);
-        canardRTile.position.set(0.9, -0.04, 0); canardR.add(canardRTile);
-        const canardRHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.9, 12), chromeActuatorMat);
-        canardRHinge.rotation.x = Math.PI / 2; canardR.add(canardRHinge);
-        spaceship.add(canardR);
-
-        // 4. Aft Aerodynamic Body Flaps
-        const aftFlapL = new THREE.Group();
-        aftFlapL.position.set(-1.4, 2.8, 0);
-        const aftFlapLMesh = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.14, 1.8), stainlessSteelMat);
-        aftFlapLMesh.position.set(-1.2, 0, -0.2); aftFlapL.add(aftFlapLMesh);
-        const aftFlapLTiles = new THREE.Mesh(new THREE.BoxGeometry(2.41, 0.06, 1.81), thermalTilesMat);
-        aftFlapLTiles.position.set(-1.2, -0.05, -0.2); aftFlapL.add(aftFlapLTiles);
-        const aftFlapLHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 1.9, 12), chromeActuatorMat);
-        aftFlapLHinge.rotation.x = Math.PI / 2; aftFlapLHinge.position.z = -0.2; aftFlapL.add(aftFlapLHinge);
-        spaceship.add(aftFlapL);
-
-        const aftFlapR = new THREE.Group();
-        aftFlapR.position.set(1.4, 2.8, 0);
-        const aftFlapRMesh = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.14, 1.8), stainlessSteelMat);
-        aftFlapRMesh.position.set(1.2, 0, -0.2); aftFlapR.add(aftFlapRMesh);
-        const aftFlapRTiles = new THREE.Mesh(new THREE.BoxGeometry(2.41, 0.06, 1.81), thermalTilesMat);
-        aftFlapRTiles.position.set(1.2, -0.05, -0.2); aftFlapR.add(aftFlapRTiles);
-        const aftFlapRHinge = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 1.9, 12), chromeActuatorMat);
-        aftFlapRHinge.rotation.x = Math.PI / 2; aftFlapRHinge.position.z = -0.2; aftFlapR.add(aftFlapRHinge);
-        spaceship.add(aftFlapR);
-
-        // 5. Engine Skirt & 6 Raptor Engine Cluster
-        const skirtGeo = new THREE.CylinderGeometry(1.4, 1.48, 1.2, 32);
-        const skirt = new THREE.Mesh(skirtGeo, stainlessSteelMat);
-        skirt.position.y = 0.6;
-        spaceship.add(skirt);
-
-        const raptorEngines = [];
+        // 5. Twin Rocket Exhaust Nozzles & Glowing Combustion Bells
         const raptorPlumes = [];
-        const raptorPositions = [
-            [0, 0, 0.42, 0.28], [-0.36, 0, -0.21, 0.28], [0.36, 0, -0.21, 0.28],
-            [0, 0, -0.72, 0.45], [-0.68, 0, 0.38, 0.45], [0.68, 0, 0.38, 0.45]
-        ];
+        [-0.32, 0.32].forEach(nx => {
+            const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.26, 0.45, 16), shipEngineMat);
+            nozzle.rotation.x = Math.PI / 2;
+            nozzle.position.set(nx, 0.6, -1.75);
+            spaceship.add(nozzle);
 
-        raptorPositions.forEach(([rx, ry, rz, nozzleR]) => {
-            const bell = new THREE.Mesh(new THREE.CylinderGeometry(nozzleR * 0.5, nozzleR, 0.75, 16), raptorTitaniumMat);
-            bell.position.set(rx, 0.05, rz);
-            spaceship.add(bell);
+            const nGlow = new THREE.Mesh(new THREE.CircleGeometry(0.16, 12), shipGlowCyan);
+            nGlow.position.set(nx, 0.6, -1.98);
+            spaceship.add(nGlow);
 
-            const glow = new THREE.Mesh(new THREE.CircleGeometry(nozzleR * 0.45, 12), raptorChamberMat);
-            glow.rotation.x = Math.PI / 2; glow.position.set(rx, -0.32, rz);
-            spaceship.add(glow);
-            raptorEngines.push(glow);
-
+            // Supersonic Exhaust Plume (Ignited upon launch)
             const plume = new THREE.Mesh(
-                new THREE.ConeGeometry(nozzleR * 0.95, 4.2, 12),
+                new THREE.ConeGeometry(0.24, 2.8, 12),
                 new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 })
             );
-            plume.position.set(rx, -2.4, rz);
-            plume.rotation.x = Math.PI;
+            plume.rotation.x = -Math.PI / 2;
+            plume.position.set(nx, 0.6, -3.3);
             plume.visible = false;
             spaceship.add(plume);
             raptorPlumes.push(plume);
         });
 
-        // 6. Orbital Launch Mount & Mechazilla Gantry Catch Tower
-        const gantryTower = new THREE.Group();
-        gantryTower.position.set(-3.8, 0, -0.5);
-        spaceship.add(gantryTower);
+        // 6. Compact Illuminated Boarding Ramp Pad
+        const rampGeo = new THREE.BoxGeometry(1.8, 0.25, 2.2);
+        const rampMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.3 });
+        const boardingRamp = new THREE.Mesh(rampGeo, rampMat);
+        boardingRamp.position.set(0, 0.12, 1.8);
+        spaceship.add(boardingRamp);
 
-        const towerHeight = 16.5;
-        const towerLegGeo = new THREE.BoxGeometry(0.25, towerHeight, 0.25);
-        [[-0.9, -0.9], [0.9, -0.9], [-0.9, 0.9], [0.9, 0.9]].forEach(([lx, lz]) => {
-            const leg = new THREE.Mesh(towerLegGeo, gantryTrussMat);
-            leg.position.set(lx, towerHeight / 2, lz);
-            gantryTower.add(leg);
-        });
-        for (let th = 2; th <= towerHeight; th += 2.5) {
-            const beam = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.15, 2.0), gantryTrussMat);
-            beam.position.set(0, th, 0);
-            gantryTower.add(beam);
-        }
+        const rampGlowL = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 2.2), new THREE.MeshBasicMaterial({ color: 0x22c55e }));
+        rampGlowL.position.set(-0.9, 0.15, 1.8); spaceship.add(rampGlowL);
+        const rampGlowR = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 2.2), new THREE.MeshBasicMaterial({ color: 0x22c55e }));
+        rampGlowR.position.set(0.9, 0.15, 1.8); spaceship.add(rampGlowR);
 
-        const qdArm = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.35, 0.4), cautionStripeMat);
-        qdArm.position.set(1.9, 9.8, 0.2);
-        gantryTower.add(qdArm);
-
-        const towerBeacon = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), new THREE.MeshBasicMaterial({ color: 0xef4444 }));
-        towerBeacon.position.set(0, towerHeight + 0.2, 0);
-        gantryTower.add(towerBeacon);
-        aviationBeacons.push(towerBeacon);
-
-        // 7. Boarding Catwalk / Launchpad Runway
-        const catwalkGeo = new THREE.BoxGeometry(2.6, 0.4, 4.2);
-        const catwalkMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.85 });
-        const catwalk = new THREE.Mesh(catwalkGeo, catwalkMat);
-        catwalk.position.set(0, 0.8, 2.6);
-        spaceship.add(catwalk);
-
-        const runwayEdgeL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.8, 4.2), new THREE.MeshBasicMaterial({ color: 0x22c55e }));
-        runwayEdgeL.position.set(-1.3, 1.2, 2.6); spaceship.add(runwayEdgeL);
-        const runwayEdgeR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.8, 4.2), new THREE.MeshBasicMaterial({ color: 0x22c55e }));
-        runwayEdgeR.position.set(1.3, 1.2, 2.6); spaceship.add(runwayEdgeR);
-
-        const gantrySign = new THREE.Mesh(
-            new THREE.PlaneGeometry(2.4, 0.6),
-            new THREE.MeshBasicMaterial({
-                map: createHoloSignTexture("STARSHIP LAUNCH"),
-                side: THREE.DoubleSide, transparent: true, opacity: 0.95
-            })
-        );
-        gantrySign.position.set(0, 2.1, 4.6);
-        spaceship.add(gantrySign);
-
-        const cryoVaporMat = new THREE.SpriteMaterial({
-            map: createNebulaTexture('rgba(224, 242, 254, 0.6)', 'rgba(186, 230, 253, 0.15)'),
-            transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending
-        });
-        const cryoVaporSprite = new THREE.Sprite(cryoVaporMat);
-        cryoVaporSprite.position.set(0.6, 9.6, 0.3);
-        cryoVaporSprite.scale.set(2.4, 2.4, 1);
-        spaceship.add(cryoVaporSprite);
-
-        // Spaceship Boarding Platform Registration
+        // Spaceship Boarding Platform Registration (Compact & tight)
         physicalPlatforms.push({
             shape: "box",
-            cx: 0, cy: 127.45, cz: -207.5,
-            minX: -2.6, maxX: 2.6,
-            minY: 126.3, maxY: 128.8,
-            minZ: -210.5, maxZ: -205.0,
-            halfW: 2.6, halfH: 1.25, halfD: 2.75,
-            name: "32. CELESTIAL STARSHIP (JUMP ON ROCKET TO LAUNCH!)",
+            cx: 0, cy: 127.3, cz: -207.0,
+            minX: -1.6, maxX: 1.6,
+            minY: 126.4, maxY: 128.2,
+            minZ: -209.2, maxZ: -205.2,
+            halfW: 1.6, halfH: 0.9, halfD: 2.0,
+            name: "32. COMPACT LUNAR STARSHIP (JUMP ON CRAFT TO LAUNCH!)",
             isSpaceship: true
         });
 
@@ -3591,7 +3589,9 @@
         const suitMat = new THREE.MeshStandardMaterial({ color: 0x090d16, roughness: 0.4, metalness: 0.85 });
         const armorMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.18, metalness: 0.92, emissive: 0x0369a1, emissiveIntensity: 0.35 });
         const darkTitaniumMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.95 });
-        const goldVisorMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.05, metalness: 0.98, emissive: 0xeab308, emissiveIntensity: 0.95 });
+        const goldVisorMat = new THREE.MeshPhysicalMaterial({
+            color: 0xfbbf24, roughness: 0.02, metalness: 0.95, transmission: 0.45, emissive: 0xf59e0b, emissiveIntensity: 0.8
+        });
         const scarfMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0ea5e9, emissiveIntensity: 0.7 });
         const jetMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.95, roughness: 0.2 });
         const nozzleMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x38bdf8, emissiveIntensity: 0.35, metalness: 0.98 });
@@ -5007,7 +5007,7 @@
                 }
 
                 // 2. Check touchdown on Meadow Floor (Only over Starting Hub: Z >= 27m and |X| <= 25m)
-                if (player.pos.y <= 0 && player.pos.z >= 26.5 && Math.abs(player.pos.x) <= 25.0) {
+                if (player.pos.y <= 0 && player.pos.z >= 21.0 && Math.abs(player.pos.x) <= 30.0) {
                     const impactSpeed = Math.abs(player.velY);
                     player.pos.y = 0;
                     player.velY = 0;
