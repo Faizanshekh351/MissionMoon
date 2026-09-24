@@ -7,9 +7,9 @@
 [![Live Game](https://img.shields.io/badge/Play_Live-GitHub_Pages-0284c7?style=for-the-badge&logo=googlechrome&logoColor=white)](https://faizanshekh351.github.io/MissionMoon/)
 [![Cost](https://img.shields.io/badge/Total_Cost-$0.00_(100%25_Free)-22c55e?style=for-the-badge&logo=cashapp&logoColor=white)](https://antseed.ai)
 [![Software](https://img.shields.io/badge/Software-AntSeed_AI_Platform-10b981?style=for-the-badge&logo=anthropic&logoColor=white)](https://antseed.ai)
-[![Core Model](https://img.shields.io/badge/Core_Model-GLM_5.3_Flash_(85%25%2B)-f59e0b?style=for-the-badge&logo=openai&logoColor=white)](https://antseed.ai)
-[![Auxiliary Model](https://img.shields.io/badge/Aux_Model-DeepSeek_V4_Flash-3b82f6?style=for-the-badge&logo=deepseek&logoColor=white)](https://antseed.ai)
-[![Auxiliary Model](https://img.shields.io/badge/Aux_Model-GPT_OSS_120B-8b5cf6?style=for-the-badge&logo=chatgpt&logoColor=white)](https://antseed.ai)
+[![Core Model](https://img.shields.io/badge/Core_Model-GLM_5.3_Flash_(90%25)-f59e0b?style=for-the-badge&logo=openai&logoColor=white)](https://antseed.ai)
+[![Auxiliary Model](https://img.shields.io/badge/Aux_Model-DeepSeek_V4_Flash_(5%25)-3b82f6?style=for-the-badge&logo=deepseek&logoColor=white)](https://antseed.ai)
+[![Auxiliary Model](https://img.shields.io/badge/Aux_Model-GPT_OSS_120B_(5%25)-8b5cf6?style=for-the-badge&logo=chatgpt&logoColor=white)](https://antseed.ai)
 [![Engine](https://img.shields.io/badge/Engine-Three.js_WebGL_%2B_UE5_C%2B%2B-22c55e?style=for-the-badge&logo=threedotjs&logoColor=white)](https://faizanshekh351.github.io/MissionMoon/)
 [![License](https://img.shields.io/badge/License-MIT-a855f7?style=for-the-badge)](LICENSE)
 
@@ -19,7 +19,7 @@
 
 This entire game, engine architecture, physics calculations, and procedural asset pipelines were designed, programmed, and refined completely from scratch inside the **AntSeed AI Software** at **$0.00 Total Cost (100% Free)**.
 
-**AntSeed AI** is the core software and autonomous development environment. Inside the AntSeed AI software, three distinct AI models were selected to build the game, with **GLM 5.3 Flash** carrying over **85%+ of the entire build**:
+**AntSeed AI** is the core software and autonomous development environment. Inside the AntSeed AI software, three distinct AI models were selected to build the game, with **GLM 5.3 Flash** carrying **90% of the entire build**:
 
 > 💰 **Zero-Cost Engineering:** Built without any paid subscriptions, commercial API expenses, or proprietary engine licenses ($0.00 spent). Powered entirely by free open-tier models available inside the AntSeed AI software platform.
 
@@ -28,9 +28,9 @@ This entire game, engine architecture, physics calculations, and procedural asse
 | AI Software / Model | Type | Workload | Role & Technical Accomplishments |
 | :--- | :---: | :---: | :--- |
 | **AntSeed AI** | **Software Platform** | Host / Orchestrator | The autonomous software platform used to engineer the project: project scaffolding, multi-file synchronizer, live WebGL code injection, and GitHub Pages deployment. |
-| **GLM 5.3 Flash** | **Primary Model inside Software** | **85%+** | **Generated the entire standalone Three.js WebGL game engine from scratch:**<br>• Full 6,000+ line game loop, camera rig, and procedural lighting.<br>• Complete real-time low-gravity physics, swept landing collision detection & AABB solvers.<br>• 5-layer supersonic plasma thrusters with animated Mach shock diamonds.<br>• Complete procedural 18-hurdle level generation (oscillating bridges, rotating stations, planets).<br>• Web Audio API acoustic synthesizer (thruster hiss, jumps, rocket rumble).<br>• Fully responsive mobile touch architecture (D-pad scaling, horizontal landscape lock).<br>• Live in-game P2P DePIN flight telemetry and sub-second tactical co-pilot. |
-| **DeepSeek V4 Flash** | **Auxiliary Model inside Software** | **3%** | Secondary mathematical verification of gravity attenuation curves $g(y)$ and harmonic oscillation formulas. |
-| **GPT OSS 120B / ChatGPT** | **Auxiliary Model inside Software** | **2%** | Minor C++ syntax template formatting for Unreal Engine 5.4 header scaffolding (`MissionCharacter`). |
+| **GLM 5.3 Flash** | **Primary Model inside Software** | **90%** | **Generated the entire standalone Three.js WebGL game engine from scratch:**<br>• Full 6,000+ line game loop, camera rig, and procedural lighting.<br>• Complete real-time low-gravity physics, swept landing collision detection & AABB solvers.<br>• 5-layer supersonic plasma thrusters with animated Mach shock diamonds.<br>• Complete procedural 18-hurdle level generation (oscillating bridges, rotating stations, planets).<br>• Web Audio API acoustic synthesizer (thruster hiss, jumps, rocket rumble).<br>• Fully responsive mobile touch architecture (D-pad scaling, horizontal landscape lock).<br>• Live in-game P2P DePIN flight telemetry and sub-second tactical co-pilot. |
+| **DeepSeek V4 Flash** | **Auxiliary Model inside Software** | **5%** | Secondary mathematical verification of gravity attenuation curves $g(y)$ and harmonic oscillation formulas. |
+| **GPT OSS 120B / ChatGPT** | **Auxiliary Model inside Software** | **5%** | Minor C++ syntax template formatting for Unreal Engine 5.4 header scaffolding (`MissionCharacter`). |
 
 ---
 
