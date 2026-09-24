@@ -1,8 +1,8 @@
 using UnrealBuildTool;
 
-public class AntigravityShowcase : ModuleRules
+public class MissionMoon : ModuleRules
 {
-	public AntigravityShowcase(ReadOnlyTargetRules Target) : base(Target)
+	public MissionMoon(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 

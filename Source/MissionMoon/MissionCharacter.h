@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "AntigravCharacter.generated.h"
+#include "MissionCharacter.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
@@ -20,83 +20,83 @@ enum class ETetherState : uint8
 };
 
 UCLASS()
-class ANTIGRAVITYSHOWCASE_API AAntigravCharacter : public ACharacter
+class MISSIONMOON_API AMissionCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	AAntigravCharacter(const FObjectInitializer& ObjectInitializer);
+	AMissionCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// -------------------------------------------------------------------------
-	// Antigravity & Alignment Properties
+	// Zero-G & Alignment Properties
 	// -------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Physics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Physics")
 	float GravityMagnitude = 980.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Alignment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Alignment")
 	float AlignmentInterpSpeed = 6.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Trace")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Trace")
 	float SurfaceTraceDistance = 300.0f;
 
 	// -------------------------------------------------------------------------
 	// Gravity Tether Properties
 	// -------------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Tether")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Tether")
 	float TetherSpringConstant = 2600.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Tether")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Tether")
 	float TetherDamping = 8.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Tether")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Tether")
 	float TetherMaxDistance = 5000.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Tether")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Tether")
 	float TangentialConservationRate = 0.94f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Antigrav|Tether")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ZeroG|Tether")
 	ETetherState TetherState = ETetherState::Inactive;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Antigrav|Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ZeroG|Components")
 	TObjectPtr<UCableComponent> TetherCable;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Antigrav|Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ZeroG|Components")
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Antigrav|Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ZeroG|Components")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
 	// -------------------------------------------------------------------------
 	// Input Actions
 	// -------------------------------------------------------------------------
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Antigrav|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ZeroG|Input")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Antigrav|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ZeroG|Input")
 	TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Antigrav|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ZeroG|Input")
 	TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Antigrav|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ZeroG|Input")
 	TObjectPtr<UInputAction> ShiftGravityAction;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Antigrav|Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ZeroG|Input")
 	TObjectPtr<UInputAction> FireTetherAction;
 
 	// -------------------------------------------------------------------------
 	// Public Methods
 	// -------------------------------------------------------------------------
-	UFUNCTION(BlueprintCallable, Category = "Antigrav|Mechanics")
+	UFUNCTION(BlueprintCallable, Category = "ZeroG|Mechanics")
 	void ShiftGravityToCrosshair();
 
-	UFUNCTION(BlueprintCallable, Category = "Antigrav|Mechanics")
+	UFUNCTION(BlueprintCallable, Category = "ZeroG|Mechanics")
 	void FireTether();
 
-	UFUNCTION(BlueprintCallable, Category = "Antigrav|Mechanics")
+	UFUNCTION(BlueprintCallable, Category = "ZeroG|Mechanics")
 	void ReleaseTether();
 
 protected:

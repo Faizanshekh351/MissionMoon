@@ -932,7 +932,7 @@
 
     <!-- Bottom Controls -->
     <div id="bottom-hud">
-        <button class="hud-btn" id="b-hover" style="border-color:#38bdf8;color:#38bdf8;background:rgba(56,189,248,0.16);" title="Toggle Anti-Gravity Hover (H)">🛸 HOVER [H]</button>
+        <button class="hud-btn" id="b-hover" style="border-color:#38bdf8;color:#38bdf8;background:rgba(56,189,248,0.16);" title="Toggle Zero-G Hover (H)">🛸 HOVER [H]</button>
         <button class="hud-btn btn-jump-main" id="b-jump">▲ JUMP (SPACE)</button>
     </div>
 
@@ -2263,7 +2263,7 @@
             { type: "crystalPrism", x: 1.5, y: 43.2, z: -47, r: 2.0, h: 2.2, name: "11. AMETHYST CRYSTAL MONOLITH", color: 0x8b5cf6, isRotating: true, rotSpeed: -0.7 },
 
             // =================================================================
-            // SECTOR 3: QUANTUM ANTI-GRAVITY & CELESTIAL ASTRO-DECKS (45m - 75m)
+            // SECTOR 3: QUANTUM ZERO-G & CELESTIAL ASTRO-DECKS (45m - 75m)
             // =================================================================
             // Stage 12: Stratosphere Launch Complex
             { type: "trampolineBuilding", x: 0, y: 45.4, z: -55, r: 2.3, h: 1.2, name: "12. STRATOSPHERE LAUNCH COMPLEX", color: 0x06b6d4, isSuperBounce: true, boostY: 28.5, airLaunchZ: -10.0 },
@@ -2535,7 +2535,7 @@
                 railR.position.set(p.w / 2 - 0.04, p.h / 2 + 0.35, 0);
                 mesh.add(railR);
 
-                // Sleek suspended anti-gravity skyway (no heavy under-blocks)
+                // Sleek suspended zero-g skyway (no heavy under-blocks)
 
             } else if (p.type === "planet") {
                 mesh = new THREE.Group();
@@ -3760,7 +3760,7 @@
                 const fallbackLatency = 35 + Math.floor(Math.random() * 30);
                 const fallbacks = [
                     `Antseed harvested! Quantum warp fuel injected. Thrusters nominal for the next jump arc.`,
-                    `Gravitational shear detected. Antseed anti-gravitons stabilized Zaddr's inertia.`,
+                    `Gravitational shear detected. Antseed graviton dampeners stabilized Zaddr's inertia.`,
                     `Orbital altitude increasing. Planetary summit gantry in telemetry range.`,
                     `P2P mesh routing optimal. Double-jump capacitors fully recharged!`,
                     `Low-gravity kinetic arc locked. Maintain horizontal sprint cadence.`
@@ -5067,7 +5067,7 @@
 
         
         // =====================================================================
-        // ANTI-GRAVITY HOVER POWER (360° FREE LOOK & LEVITATION)
+        // ZERO-G HOVER POWER (360° FREE LOOK & LEVITATION)
         // =====================================================================
         function toggleHoverPower() {
             player.isHovering = !player.isHovering;
@@ -5084,7 +5084,7 @@
                     hBtn.style.color = "#ffffff";
                 }
                 if (alertBanner) {
-                    alertBanner.textContent = "🛸 ANTI-GRAVITY HOVER ENGAGED // 360° FREE LOOK ACTIVE (SPACE: UP | SHIFT: DOWN | H: OFF)";
+                    alertBanner.textContent = "🛸 ZERO-G HOVER ENGAGED // 360° FREE LOOK ACTIVE (SPACE: UP | SHIFT: DOWN | H: OFF)";
                     alertBanner.style.background = "linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.95))";
                     alertBanner.style.borderColor = "#38bdf8";
                     alertBanner.style.boxShadow = "0 0 35px rgba(56, 189, 248, 0.8)";
@@ -5633,7 +5633,7 @@
                 } else if (keys['shift'] || keys['c']) {
                     player.velY = -6.5; // Descend
                 } else {
-                    player.velY = Math.sin(time * 3.0) * 0.15; // Gentle anti-gravity bob
+                    player.velY = Math.sin(time * 3.0) * 0.15; // Gentle zero-g bob
                 }
                 player.pos.y += player.velY * dt;
                 flameGroupL.visible = true;

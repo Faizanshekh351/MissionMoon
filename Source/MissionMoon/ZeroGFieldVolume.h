@@ -23,7 +23,7 @@ struct FPhysicsObjectOriginalState
 };
 
 UCLASS()
-class ANTIGRAVITYSHOWCASE_API AZeroGFieldVolume : public AActor
+class MISSIONMOON_API AZeroGFieldVolume : public AActor
 {
 	GENERATED_BODY()
 
@@ -32,22 +32,22 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Antigrav|Volume")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ZeroG|Volume")
 	TObjectPtr<UBoxComponent> VolumeBounds;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Physics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Physics")
 	float ZeroGLinearDamping = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Physics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Physics")
 	float ZeroGAngularDamping = 0.75f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Physics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Physics")
 	float InitialKickStrength = 120.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Physics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Physics")
 	float MicroTurbulenceStrength = 45.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Antigrav|Physics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ZeroG|Physics")
 	float TurbulenceFrequency = 0.005f;
 
 protected:

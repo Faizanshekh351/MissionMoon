@@ -1,8 +1,8 @@
-#include "AntigravGameMode.h"
-#include "AntigravCharacter.h"
+#include "MissionGameMode.h"
+#include "MissionCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
-AAntigravGameMode::AAntigravGameMode()
+AMissionGameMode::AMissionGameMode()
 {
-	DefaultPawnClass = AAntigravCharacter::StaticClass();
+	DefaultPawnClass = AMissionCharacter::StaticClass();
 }

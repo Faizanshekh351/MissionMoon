@@ -1,13 +1,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class AntigravityShowcaseEditorTarget : TargetRules
+public class MissionMoonEditorTarget : TargetRules
 {
-	public AntigravityShowcaseEditorTarget(TargetInfo Target) : base(Target)
+	public MissionMoonEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
-		ExtraModuleNames.Add("AntigravityShowcase");
+		ExtraModuleNames.Add("MissionMoon");
 	}
 }

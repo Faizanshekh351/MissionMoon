@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ===================================================
-echo Antigravity Cinematic Showcase - Project Setup
+echo Mission Moon Cinematic Showcase - Project Setup
 echo ===================================================
 
 :: Look for UnrealBuildTool or Epic Games install directory
@@ -19,11 +19,11 @@ for %%D in (C D E) do (
 if defined UBT_PATH (
     echo Found Unreal Engine Build Tool at: !UBT_PATH!
     echo Generating Visual Studio Solution files...
-    "!UBT_PATH!" -projectfiles -project="%~dp0AntigravityShowcase.uproject" -game -engine
+    "!UBT_PATH!" -projectfiles -project="%~dp0MissionMoon.uproject" -game -engine
     echo Done.
 ) else (
     echo [INFO] Unreal Engine standard path not auto-detected.
-    echo Right-click 'AntigravityShowcase.uproject' and select 'Generate Visual Studio project files'
+    echo Right-click 'MissionMoon.uproject' and select 'Generate Visual Studio project files'
     echo or double-click to launch directly in Unreal Engine 5.
 )
 

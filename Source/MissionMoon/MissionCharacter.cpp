@@ -1,5 +1,5 @@
-#include "AntigravCharacter.h"
-#include "AntigravityShowcase.h"
+#include "MissionCharacter.h"
+#include "MissionMoon.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -9,7 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetMathLibrary.h"
 
-AAntigravCharacter::AAntigravCharacter(const FObjectInitializer& ObjectInitializer)
+AMissionCharacter::AMissionCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -49,7 +49,7 @@ AAntigravCharacter::AAntigravCharacter(const FObjectInitializer& ObjectInitializ
 	TetherCable->CableWidth = 2.5f;
 }
 
-void AAntigravCharacter::BeginPlay()
+void AMissionCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -66,7 +66,7 @@ void AAntigravCharacter::BeginPlay()
 	}
 }
 
-void AAntigravCharacter::Tick(float DeltaTime)
+void AMissionCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -75,7 +75,7 @@ void AAntigravCharacter::Tick(float DeltaTime)
 	UpdateTetherPhysics(DeltaTime);
 }
 
-void AAntigravCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AMissionCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -83,28 +83,28 @@ void AAntigravCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	{
 		if (MoveAction)
 		{
-			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAntigravCharacter::Move);
+			EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMissionCharacter::Move);
 		}
 
 		if (LookAction)
 		{
-			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAntigravCharacter::Look);
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMissionCharacter::Look);
 		}
 
 		if (ShiftGravityAction)
 		{
-			EnhancedInputComponent->BindAction(ShiftGravityAction, ETriggerEvent::Started, this, &AAntigravCharacter::ShiftGravityToCrosshair);
+			EnhancedInputComponent->BindAction(ShiftGravityAction, ETriggerEvent::Started, this, &AMissionCharacter::ShiftGravityToCrosshair);
 		}
 
 		if (FireTetherAction)
 		{
-			EnhancedInputComponent->BindAction(FireTetherAction, ETriggerEvent::Started, this, &AAntigravCharacter::FireTether);
-			EnhancedInputComponent->BindAction(FireTetherAction, ETriggerEvent::Completed, this, &AAntigravCharacter::ReleaseTether);
+			EnhancedInputComponent->BindAction(FireTetherAction, ETriggerEvent::Started, this, &AMissionCharacter::FireTether);
+			EnhancedInputComponent->BindAction(FireTetherAction, ETriggerEvent::Completed, this, &AMissionCharacter::ReleaseTether);
 		}
 	}
 }
 
-void AAntigravCharacter::Move(const FInputActionValue& Value)
+void AMissionCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -119,7 +119,7 @@ void AAntigravCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AAntigravCharacter::Look(const FInputActionValue& Value)
+void AMissionCharacter::Look(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -130,7 +130,7 @@ void AAntigravCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void AAntigravCharacter::UpdateSurfaceAlignment(float DeltaTime)
+void AMissionCharacter::UpdateSurfaceAlignment(float DeltaTime)
 {
 	const FVector ActorLoc = GetActorLocation();
 	const FVector DownVector = -GetActorUpVector();
@@ -177,14 +177,14 @@ void AAntigravCharacter::UpdateSurfaceAlignment(float DeltaTime)
 	SetActorRotation(SmoothedQuat);
 }
 
-void AAntigravCharacter::ApplyCustomGravity(float DeltaTime)
+void AMissionCharacter::ApplyCustomGravity(float DeltaTime)
 {
 	// Custom gravity acceleration along CurrentGravityDirection
 	const FVector GravityAcceleration = CurrentGravityDirection * GravityMagnitude;
 	GetCharacterMovement()->Velocity += GravityAcceleration * DeltaTime;
 }
 
-void AAntigravCharacter::ShiftGravityToCrosshair()
+void AMissionCharacter::ShiftGravityToCrosshair()
 {
 	if (!FollowCamera) return;
 
@@ -218,7 +218,7 @@ void AAntigravCharacter::ShiftGravityToCrosshair()
 	}
 }
 
-void AAntigravCharacter::FireTether()
+void AMissionCharacter::FireTether()
 {
 	if (!FollowCamera) return;
 
@@ -245,7 +245,7 @@ void AAntigravCharacter::FireTether()
 	}
 }
 
-void AAntigravCharacter::ReleaseTether()
+void AMissionCharacter::ReleaseTether()
 {
 	TetherState = ETetherState::Inactive;
 	TetheredComponent.Reset();
@@ -256,7 +256,7 @@ void AAntigravCharacter::ReleaseTether()
 	}
 }
 
-void AAntigravCharacter::UpdateTetherPhysics(float DeltaTime)
+void AMissionCharacter::UpdateTetherPhysics(float DeltaTime)
 {
 	if (TetherState != ETetherState::Anchored) return;
 

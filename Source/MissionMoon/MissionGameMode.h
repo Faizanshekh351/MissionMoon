@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "AntigravGameMode.generated.h"
+#include "MissionGameMode.generated.h"
 
 UCLASS()
-class ANTIGRAVITYSHOWCASE_API AAntigravGameMode : public AGameModeBase
+class MISSIONMOON_API AMissionGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	AAntigravGameMode();
+	AMissionGameMode();
 };
