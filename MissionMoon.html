@@ -21,10 +21,11 @@
             pointer-events: none; z-index: 10;
         }
         .hud-glass {
-            background: rgba(10, 12, 18, 0.88); backdrop-filter: blur(24px);
-            border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 14px;
-            padding: 12px 20px; pointer-events: auto;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08);
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 10px 16px; pointer-events: auto;
+            box-shadow: none;
         }
         @keyframes brandGlow {
             0% { filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.5)); }
@@ -923,19 +924,11 @@
     <!-- Tiny ping counter -->
     <div id="ping-display">0ms</div>
 
-    <!-- Floating AntSeed AI Tactical Co-Pilot HUD Widget -->
-    <div id="ai-copilot-hud">
-        <div class="ai-copilot-head">
-            <span class="ai-badge">
-                <span id="ai-dot-indicator" class="ai-dot"></span>
-                ANTSEED AI VPN // P2P CO-PILOT
-            </span>
-            <span id="ai-copilot-telemetry" class="ai-meta">P2P Mesh: 127.0.0.1:8377 | 619ms</span>
-        </div>
-        <div id="ai-copilot-text" class="ai-message">
-            Tactical P2P neural link established via AntSeed AI VPN. Ready for lunar ascent.
-        </div>
+    <!-- Powered by label -->
+    <div id="ai-copilot-hud" style="background:transparent;border:none;box-shadow:none;padding:6px 24px;">
+        <span style="font-size:10px;font-family:monospace;color:rgba(148,163,184,0.5);letter-spacing:1px;">Powered by ANTSEED AI</span>
     </div>
+
 
     <!-- Bottom Controls -->
     <div id="bottom-hud">
