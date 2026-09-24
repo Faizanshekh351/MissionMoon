@@ -1490,10 +1490,69 @@
             return tex;
         }
 
+        function createHoloSignTexture(title) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256; canvas.height = 96;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'rgba(6, 18, 38, 0.85)';
+            ctx.fillRect(0, 0, 256, 96);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(4, 4, 248, 88);
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 20px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const shortName = title.replace(/^\d+\.\s*/, '').slice(0, 15).toUpperCase();
+            ctx.fillText(shortName, 128, 48);
+            return new THREE.CanvasTexture(canvas);
+        }
+
         const bldgFacadeAmberTex = createBuildingFacadeTexture('amber');
         const bldgFacadeCyanTex = createBuildingFacadeTexture('cyan');
         const bldgRoofTex = createBuildingRoofTexture();
         const aviationBeacons = [];
+
+        // =====================================================================
+        // DISTANT CYBER METROPOLIS LOWER GRID (FAR BELOW THE SKYSCRAPERS)
+        // =====================================================================
+        const cityGroundGroup = new THREE.Group();
+        cityGroundGroup.position.set(0, -42, -35);
+        scene.add(cityGroundGroup);
+
+        // Distant Highway Light Ribbons
+        const highwayMatCyan = new THREE.LineBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.65 });
+        const highwayMatOrange = new THREE.LineBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.65 });
+
+        for (let h = -4; h <= 4; h++) {
+            const hPts = [];
+            const hx = h * 16;
+            for (let hz = 120; hz >= -220; hz -= 20) {
+                hPts.push(new THREE.Vector3(hx + Math.sin(hz * 0.03) * 6, (Math.random() - 0.5) * 2, hz));
+            }
+            const hGeo = new THREE.BufferGeometry().setFromPoints(hPts);
+            const hLine = new THREE.Line(hGeo, h % 2 === 0 ? highwayMatCyan : highwayMatOrange);
+            cityGroundGroup.add(hLine);
+        }
+
+        // Secondary Distant Cyber Tower Silhouettes Rising through the low mist
+        const distantTowerGeo = new THREE.BoxGeometry(4.5, 45, 4.5);
+        const distantTowerMat = new THREE.MeshBasicMaterial({ color: 0x070c18 });
+        const distantEdgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a8a, transparent: true, opacity: 0.45 });
+
+        for (let t = 0; t < 36; t++) {
+            const tx = (Math.random() - 0.5) * 130;
+            const tz = 70 - Math.random() * 250;
+            if (Math.abs(tx) > 7) {
+                const bldg = new THREE.Mesh(distantTowerGeo, distantTowerMat);
+                bldg.position.set(tx, 15, tz);
+                bldg.scale.set(0.6 + Math.random() * 0.8, 0.5 + Math.random() * 0.9, 0.6 + Math.random() * 0.8);
+                cityGroundGroup.add(bldg);
+
+                const bEdges = new THREE.LineSegments(new THREE.EdgesGeometry(distantTowerGeo), distantEdgeMat);
+                bldg.add(bEdges);
+            }
+        }
 
         // =====================================================================
         // SPACED-OUT 18-STAGE GAUNTLET (3D SKYSCRAPERS, SKYWAYS & CELESTIAL BODIES)
@@ -1606,6 +1665,44 @@
                 const shaft = new THREE.Mesh(shaftGeo, facadeMat);
                 shaft.position.y = -shaftHeight / 2;
                 mesh.add(shaft);
+
+                // Vertical Neon Corner Accent Ribs
+                const shaftEdges = new THREE.LineSegments(
+                    new THREE.EdgesGeometry(shaftGeo),
+                    new THREE.LineBasicMaterial({
+                        color: p.facade === bldgFacadeAmberTex ? 0xf59e0b : 0x38bdf8,
+                        transparent: true,
+                        opacity: 0.75
+                    })
+                );
+                shaft.add(shaftEdges);
+
+                // Holographic Neon Corporate Signboard on Building Front
+                const signGeo = new THREE.PlaneGeometry(2.4, 0.8);
+                const signMat = new THREE.MeshBasicMaterial({
+                    map: createHoloSignTexture(p.name),
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.88
+                });
+                const signMesh = new THREE.Mesh(signGeo, signMat);
+                signMesh.position.set(0, -2.6, p.r * 0.98);
+                mesh.add(signMesh);
+
+                // Rooftop Satellite Uplink Dish
+                const dishGroup = new THREE.Group();
+                dishGroup.position.set(-p.r * 0.45, p.h / 2 + 0.35, p.r * 0.35);
+                const dish = new THREE.Mesh(
+                    new THREE.ConeGeometry(0.32, 0.14, 16, 1, true),
+                    new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.95, roughness: 0.2 })
+                );
+                dish.rotation.x = Math.PI * 0.65; dish.rotation.y = 0.5; dishGroup.add(dish);
+                const dishFeed = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.015, 0.015, 0.22, 6),
+                    new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.8 })
+                );
+                dishFeed.position.set(0, 0.12, 0.08); dishGroup.add(dishFeed);
+                mesh.add(dishGroup);
 
                 // 3. Rooftop Architectural Details: HVAC Chiller Penthouse & Antenna Mast
                 const hvacGeo = new THREE.BoxGeometry(0.7, 0.45, 0.7);
