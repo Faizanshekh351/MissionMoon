@@ -4460,136 +4460,97 @@
         }
 
         // ================================================================
-        // MOBILE DEVICE DETECTION & LANDSCAPE ENFORCEMENT
+        // MOBILE CONTROLS — Always bind, CSS controls visibility
+        // CSS @media (pointer: coarse) shows #mobile-controls on touch devices
+        // and hides it on PC. JS just binds events and handles extras.
         // ================================================================
         const mobileControls  = document.getElementById('mobile-controls');
         const portraitBlocker = document.getElementById('portrait-blocker');
 
-        // Detect real touch device (NOT a laptop with touchscreen that also has mouse)
-        const isTouchDevice = ('ontouchstart' in window) ||
-                              (navigator.maxTouchPoints > 1) ||
-                              (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        // Always bind D-pad — safe on PC (touch events won't fire there)
+        bindTouchKey('dpad-fwd',    'w');
+        bindTouchKey('dpad-back',   's');
+        bindTouchKey('dpad-left',   'a');
+        bindTouchKey('dpad-right',  'd');
+        bindTouchKey('dpad-sprint', 'shift');
 
-        if (isTouchDevice) {
-            // Show mobile controls
-            if (mobileControls) mobileControls.style.display = 'block';
+        // Jump button
+        const mobJump = document.getElementById('mob-jump');
+        if (mobJump) {
+            mobJump.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); handleJumpAction(); }, { passive: false });
+            mobJump.addEventListener('click', (e) => { e.stopPropagation(); handleJumpAction(); });
+        }
 
-            // Bind D-pad buttons
-            bindTouchKey('dpad-fwd',    'w');
-            bindTouchKey('dpad-back',   's');
-            bindTouchKey('dpad-left',   'a');
-            bindTouchKey('dpad-right',  'd');
-            bindTouchKey('dpad-sprint', 'shift');
+        // Hover panel swap logic
+        const mobActionPad     = document.getElementById('mobile-action-pad');
+        const mobHoverControls = document.getElementById('mob-hover-controls');
 
-            // Jump action button
-            const mobJump = document.getElementById('mob-jump');
-            if (mobJump) {
-                mobJump.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    handleJumpAction();
-                }, { passive: false });
-                mobJump.addEventListener('click', (e) => { e.stopPropagation(); handleJumpAction(); });
-            }
+        function updateHoverPanel() {
+            const isHov = typeof player !== 'undefined' && player && player.isHovering;
+            if (mobActionPad)     mobActionPad.style.display    = isHov ? 'none' : 'flex';
+            if (mobHoverControls) mobHoverControls.style.display = isHov ? 'flex' : 'none';
+            const mobHoverBtn = document.getElementById('mob-hover');
+            if (mobHoverBtn) mobHoverBtn.classList.toggle('active', !!isHov);
+        }
 
-            // Hover toggle button + panel swap
-            const mobActionPad     = document.getElementById('mobile-action-pad');
-            const mobHoverControls = document.getElementById('mob-hover-controls');
+        // Hover toggle
+        const mobHover = document.getElementById('mob-hover');
+        if (mobHover) {
+            const onHoverTap = (e) => { e.preventDefault(); e.stopPropagation(); toggleHoverPower(); setTimeout(updateHoverPanel, 60); };
+            mobHover.addEventListener('touchstart', onHoverTap, { passive: false });
+            mobHover.addEventListener('click', (e) => { e.stopPropagation(); toggleHoverPower(); setTimeout(updateHoverPanel, 60); });
+        }
 
-            function updateHoverPanel() {
-                const isHov = player && player.isHovering;
-                if (mobActionPad)     mobActionPad.style.display     = isHov ? 'none' : 'flex';
-                if (mobHoverControls) mobHoverControls.style.display  = isHov ? 'flex' : 'none';
-                const mobHoverBtn = document.getElementById('mob-hover');
-                if (mobHoverBtn) mobHoverBtn.classList.toggle('active', !!isHov);
-            }
+        // Hover-exit button
+        const mobHoverExit = document.getElementById('mob-hover-exit');
+        if (mobHoverExit) {
+            const onExitTap = (e) => {
+                e.preventDefault(); e.stopPropagation();
+                if (typeof player !== 'undefined' && player && player.isHovering) { toggleHoverPower(); setTimeout(updateHoverPanel, 60); }
+            };
+            mobHoverExit.addEventListener('touchstart', onExitTap, { passive: false });
+            mobHoverExit.addEventListener('click', (e) => { e.stopPropagation(); if (typeof player !== 'undefined' && player && player.isHovering) { toggleHoverPower(); setTimeout(updateHoverPanel, 60); } });
+        }
 
-            const mobHover = document.getElementById('mob-hover');
-            if (mobHover) {
-                const onHoverTap = (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    toggleHoverPower();
-                    setTimeout(updateHoverPanel, 50);
-                };
-                mobHover.addEventListener('touchstart', onHoverTap, { passive: false });
-                mobHover.addEventListener('click', (e) => { e.stopPropagation(); toggleHoverPower(); setTimeout(updateHoverPanel, 50); });
-            }
+        // Ascend (hold) = space key, Descend (hold) = c key
+        bindTouchKey('mob-ascend',  'space');
+        bindTouchKey('mob-descend', 'c');
 
-            // Hover-exit button (inside hover controls panel)
-            const mobHoverExit = document.getElementById('mob-hover-exit');
-            if (mobHoverExit) {
-                const onExitTap = (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    if (player && player.isHovering) { toggleHoverPower(); setTimeout(updateHoverPanel, 50); }
-                };
-                mobHoverExit.addEventListener('touchstart', onExitTap, { passive: false });
-                mobHoverExit.addEventListener('click', (e) => { e.stopPropagation(); if (player && player.isHovering) { toggleHoverPower(); setTimeout(updateHoverPanel, 50); } });
-            }
+        // Keep hover panel in sync every 250ms
+        setInterval(updateHoverPanel, 250);
 
-            // ASCEND button — hold to go up (sets space key)
-            bindTouchKey('mob-ascend', 'space');
+        // ---- Touch-device extras (landscape, fullscreen, wake lock) ----
+        const isRealTouch = ('ontouchstart' in window) ||
+                            (navigator.maxTouchPoints >= 1) ||
+                            (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
 
-            // DESCEND button — hold to go down (sets c key, which triggers descent in hover)
-            bindTouchKey('mob-descend', 'c');
-
-            // Poll hover state every 200ms to keep panel in sync
-            setInterval(updateHoverPanel, 200);
-
-            // --- Landscape-only enforcement ---
+        if (isRealTouch) {
+            // Landscape-only enforcement
             function checkOrientation() {
-                const isPortrait = window.innerHeight > window.innerWidth;
-                if (portraitBlocker) {
-                    portraitBlocker.style.display = isPortrait ? 'flex' : 'none';
-                }
-                if (mobileControls) {
-                    mobileControls.style.display = isPortrait ? 'none' : 'block';
-                }
+                const portrait = window.innerHeight > window.innerWidth;
+                if (portraitBlocker) portraitBlocker.style.display = portrait ? 'flex' : 'none';
+                if (mobileControls)  mobileControls.style.display  = portrait ? 'none' : 'block';
             }
-
-            // Check immediately
             checkOrientation();
-
-            // Listen for orientation/resize changes
             window.addEventListener('resize', checkOrientation, { passive: true });
-            window.addEventListener('orientationchange', () => {
-                setTimeout(checkOrientation, 200); // slight delay for accurate dimensions
-            }, { passive: true });
-            if (screen.orientation) {
-                screen.orientation.addEventListener('change', () => {
-                    setTimeout(checkOrientation, 150);
-                });
-            }
+            window.addEventListener('orientationchange', () => setTimeout(checkOrientation, 200), { passive: true });
+            if (screen.orientation) screen.orientation.addEventListener('change', () => setTimeout(checkOrientation, 150));
+            if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {});
 
-            // Try to lock to landscape (works on Android Chrome, Safari ignores silently)
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(() => {}); // fail silently if not allowed
-            }
-
-            // Request fullscreen on first touch for better immersion
+            // Fullscreen on first tap
             document.addEventListener('touchstart', function reqFS() {
-                const el = document.documentElement;
-                if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                const d = document.documentElement;
+                if (d.requestFullscreen) d.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+                else if (d.webkitRequestFullscreen) d.webkitRequestFullscreen();
                 document.removeEventListener('touchstart', reqFS);
             }, { passive: true, once: true });
 
-            // Screen Wake Lock (keep screen on while playing — Chrome Android & Edge)
-            let wakeLock = null;
+            // Wake lock
             async function acquireWakeLock() {
-                if ('wakeLock' in navigator) {
-                    try {
-                        wakeLock = await navigator.wakeLock.request('screen');
-                    } catch (e) {}
-                }
+                if ('wakeLock' in navigator) { try { await navigator.wakeLock.request('screen'); } catch(e) {} }
             }
             acquireWakeLock();
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') acquireWakeLock();
-            });
-
-        } else {
-            // PC / Mouse device — hide mobile controls completely
-            if (mobileControls) mobileControls.style.display = 'none';
-            if (portraitBlocker) portraitBlocker.style.display = 'none';
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') acquireWakeLock(); });
         }
 
         // UI Buttons
