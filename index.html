@@ -909,6 +909,22 @@
 
     <script>
         // =====================================================================
+        // CORE GLOBAL GAME STATE & SHARED ARRAYS
+        // =====================================================================
+        let gameState = "HOMESCREEN";
+        let flightTime = 0;
+        const alertBanner = document.getElementById('alert-banner');
+        let bannerTimer = 0;
+        let activeCheckpoint = null;
+        const checkpointBeacons = [];
+        const physicalPlatforms = [];
+        const rotatingPlatforms = [];
+        const oscillatingPlatforms = [];
+        const animatedTrampolines = [];
+        const hurdlePlanets = [];
+        let earthMesh = null;
+        let cloudsMesh = null;
+
         // =====================================================================
         // THREE.JS SETUP & CINEMATIC PBR LIGHTING (ACES FILMIC & sRGB ENCODING)
         // =====================================================================
@@ -2004,14 +2020,6 @@
             { type: "earth", x: 0, y: 120.8, z: -205, r: 5.2, name: "31. PLANET EARTH (FINAL HURDLE)", isEarth: true }
         ];
 
-        const physicalPlatforms = [];
-        const rotatingPlatforms = [];
-        const oscillatingPlatforms = [];
-        const animatedTrampolines = [];
-        const hurdlePlanets = [];
-        let earthMesh = null;
-        let cloudsMesh = null;
-
         // Build all hurdles with High-End 3D Skyscraper Architecture & Cybernetic Lighting
         hurdleDefinitions.forEach(p => {
             let mesh;
@@ -2792,6 +2800,67 @@
                     } catch(e) {}
                 });
                 this.horrorDroneOscs = [];
+            },
+
+            stopRelaxingMusic() {
+                clearInterval(this.droneTimer);
+                clearTimeout(this.chimeTimer);
+                this.droneTimer = null;
+                this.chimeTimer = null;
+                this.isMusicPlaying = false;
+                if (!this.ctx || this.droneOscs.length === 0) return;
+                const now = this.ctx.currentTime;
+                this.droneOscs.forEach(o => {
+                    try {
+                        o.gain.gain.cancelScheduledValues(now);
+                        o.gain.gain.linearRampToValueAtTime(0.0001, now + 1.2);
+                        setTimeout(() => {
+                            try { o.osc.stop(); o.osc.disconnect(); } catch(e) {}
+                        }, 1300);
+                    } catch(e) {}
+                });
+                this.droneOscs = [];
+            },
+
+            playJump() {
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.exponentialRampToValueAtTime(380, now + 0.16);
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                    osc.connect(gain);
+                    gain.connect(this.sfxGain || this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.24);
+                } catch(e) {}
+            },
+
+            playVictory() {
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const chordNotes = [523.25, 659.25, 783.99, 1046.5];
+                    chordNotes.forEach((f, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sawtooth';
+                        const startTime = now + idx * 0.12;
+                        osc.frequency.setValueAtTime(f, startTime);
+                        gain.gain.setValueAtTime(0.15, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.2);
+                        osc.connect(gain);
+                        gain.connect(this.sfxGain || this.ctx.destination);
+                        osc.start(startTime);
+                        osc.stop(startTime + 1.3);
+                    });
+                } catch(e) {}
             }
         };
 
@@ -3056,7 +3125,6 @@
                     }
                 }, 400);
 
-                const alertBanner = document.getElementById('alert-banner');
                 if (alertBanner) {
                     alertBanner.textContent = "🎙️ MISSION CONTROL: \"Are you ready cadet, to reach the moon?\" 🚀";
                     alertBanner.style.background = "linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95))";
@@ -3989,9 +4057,6 @@
             updateDifficultyUI();
         }
 
-        let gameState = "PLAYING";
-        let flightTime = 0;
-
         const keys = {};
         window.addEventListener('keydown', (e) => {
             AudioMaster.init();
@@ -4364,9 +4429,6 @@
         // =====================================================================
         // CHECKPOINT & RESPAWN STATE (FIRST LANE VS SECTOR MILESTONES)
         // =====================================================================
-        let activeCheckpoint = null; // { x, y, z, name, stageNum }
-        const checkpointBeacons = [];
-
         function setCheckpoint(stageNum, name, x, y, z) {
             if (activeCheckpoint && activeCheckpoint.stageNum >= stageNum) return; // Keep highest checkpoint
             activeCheckpoint = { stageNum, name, x, y, z };
@@ -4638,8 +4700,6 @@
         // MAIN GAME ANIMATION & PHYSICS TICK
         // =====================================================================
         const clock = new THREE.Clock();
-        const alertBanner = document.getElementById('alert-banner');
-        let bannerTimer = 0;
 
         function animate() {
             requestAnimationFrame(animate);
