@@ -2836,7 +2836,12 @@
             chimeTimer: null,
 
             init() {
-                if (this.ctx) return;
+                if (this.ctx) {
+                    if (this.ctx.state === 'suspended') {
+                        try { this.ctx.resume(); } catch(e) {}
+                    }
+                    return;
+                }
                 try {
                     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
                     if (!AudioContextClass) return;
@@ -3220,26 +3225,79 @@
             }
         };
 
-        // Deep Horror Voice Selector with Powerful Sub-Octave Resonance
+        // Cached system voices for mobile browsers (iOS WebKit / Android Chrome) where voices load asynchronously
+        let cachedSystemVoices = [];
+        function refreshSystemVoices() {
+            if (typeof window !== 'undefined' && window.speechSynthesis) {
+                try {
+                    const v = window.speechSynthesis.getVoices();
+                    if (v && v.length > 0) cachedSystemVoices = v;
+                } catch(e) {}
+            }
+        }
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            refreshSystemVoices();
+            if ('onvoiceschanged' in window.speechSynthesis) {
+                window.speechSynthesis.onvoiceschanged = refreshSystemVoices;
+            }
+        }
+
+        // Deep Cinematic Voice Selector with Robust Mobile (iOS/Android) & Desktop Support
         function getHorrorVoice(synth) {
+            if (!synth) synth = (typeof window !== 'undefined') ? window.speechSynthesis : null;
             if (!synth) return null;
-            const voices = synth.getVoices();
+            let voices = [];
+            try {
+                voices = synth.getVoices() || [];
+            } catch(e) {}
+            if (!voices || voices.length === 0) {
+                voices = cachedSystemVoices;
+            }
             if (!voices || voices.length === 0) return null;
-            // Seek authoritative, deep male or commanding natural voices
-            const preferred = voices.find(v => 
-                v.lang.startsWith('en') && (
-                    v.name.includes('David') || 
-                    v.name.includes('Mark') || 
-                    v.name.includes('Google UK English Male') || 
-                    v.name.includes('Guy') ||
-                    v.name.includes('Ryan') ||
-                    v.name.includes('Daniel') ||
-                    v.name.includes('George') ||
-                    v.name.includes('Oliver') ||
-                    v.name.includes('Male')
-                )
-            );
-            return preferred || voices.find(v => v.lang.startsWith('en')) || voices[0];
+
+            const enVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+            const pool = enVoices.length > 0 ? enVoices : voices;
+
+            // 1. Explicit search for premier authoritative deep male voices across Android, iOS, Windows, Mac
+            const preferredMale = pool.find(v => {
+                const name = (v.name || '').toLowerCase();
+                const uri = (v.voiceURI || '').toLowerCase();
+                const combined = name + ' ' + uri;
+                return (
+                    combined.includes('male') ||
+                    combined.includes('david') ||
+                    combined.includes('daniel') ||
+                    combined.includes('arthur') ||
+                    combined.includes('aaron') ||
+                    combined.includes('gordon') ||
+                    combined.includes('george') ||
+                    combined.includes('guy') ||
+                    combined.includes('mark') ||
+                    combined.includes('rishi') ||
+                    combined.includes('rjs') ||   // Android Google UK Male
+                    combined.includes('tpd') ||   // Android Google US Male
+                    combined.includes('iol') ||   // Android Google Male
+                    combined.includes('en-gb') || // British voices tend to be deeper and clearer
+                    combined.includes('en-au')
+                ) && !combined.includes('female') && !combined.includes('fred');
+            });
+            if (preferredMale) return preferredMale;
+
+            // 2. Reject known high-pitched female voices (Samantha on iOS, Zira on Windows, etc.)
+            const nonFemale = pool.find(v => {
+                const name = (v.name || '').toLowerCase();
+                return !name.includes('female') &&
+                       !name.includes('samantha') &&
+                       !name.includes('zira') &&
+                       !name.includes('karen') &&
+                       !name.includes('victoria') &&
+                       !name.includes('eva') &&
+                       !name.includes('helena') &&
+                       !name.includes('moira');
+            });
+            if (nonFemale) return nonFemale;
+
+            return pool[0];
         }
 
         // =====================================================================
@@ -3266,8 +3324,9 @@
                 }
                 this.synth.cancel();
                 this.utterance = new SpeechSynthesisUtterance(this.storyText);
-                this.utterance.rate = 0.80;  // Slow, menacing cadence
-                this.utterance.pitch = 0.54; // Ultra-deep, powerful horror vocal timbre
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                this.utterance.rate = isMobile ? 0.88 : 0.80;  // Measured cadence
+                this.utterance.pitch = isMobile ? 0.78 : 0.54; // Deep, rich horror vocal timbre
                 this.utterance.volume = 1.0;
 
                 const horrorVoice = getHorrorVoice(this.synth);
@@ -3343,7 +3402,10 @@
                 }
             ],
 
+            startTime: 0,
+
             start() {
+                this.startTime = Date.now();
                 const modal = document.getElementById('intro-modal');
                 if (!modal) return;
                 modal.style.display = 'block';
@@ -3360,9 +3422,25 @@
                     if (dot) dot.classList.toggle('active', i === 0);
                 }
 
+                // Prime speech synthesis on touch gesture
+                if (this.synth) {
+                    try {
+                        this.synth.cancel();
+                        this.synth.resume();
+                        const prime = new SpeechSynthesisUtterance(' ');
+                        prime.volume = 0.01;
+                        prime.rate = 2.0;
+                        this.synth.speak(prime);
+                    } catch(e) {}
+                }
+
                 // Start atmospheric cinematic intro soundscape
                 AudioMaster.startHorrorIntroAmbience();
-                this.showStep(0);
+                setTimeout(() => {
+                    if (this.active && this.step === 0) {
+                        this.showStep(0);
+                    }
+                }, 80);
             },
 
             showStep(index) {
@@ -3403,28 +3481,33 @@
                     }
                 };
 
-                // Ultra-deep, powerful horror voice narration
-                // Narration drives the cinematic timeline: slide stays until speech completes + natural pause
+                // Calibrated pitch & rate: consistent deep cinematic tone on both mobile & PC
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                const voicePitch = isMobile ? 0.78 : 0.62; // Deep and rich, preventing mobile TTS helium/distortion
+                const voiceRate = isMobile ? 0.88 : 0.82;  // Measured cinematic cadence
+
                 if (this.synth) {
                     try {
-                        this.synth.cancel();
+                        if (this.synth.speaking) {
+                            this.synth.cancel();
+                        }
+                        this.synth.resume();
                         const utt = new SpeechSynthesisUtterance(s.caption);
-                        utt.pitch = 0.54; // Ultra-deep, demonic/horror vocal power
-                        utt.rate = 0.78;  // Slow, menacing, powerful cadence
+                        utt.pitch = voicePitch;
+                        utt.rate = voiceRate;
                         utt.volume = 1.0;
                         const horrorVoice = getHorrorVoice(this.synth);
                         if (horrorVoice) utt.voice = horrorVoice;
 
                         utt.onend = () => {
                             clearTimeout(this.timer);
-                            // On the last slide, give 1.4s dramatic silence after the final word before game start
-                            const pauseMs = (index === this.slides.length - 1) ? 1400 : 1100;
+                            const pauseMs = (index === this.slides.length - 1) ? 1400 : 1000;
                             this.timer = setTimeout(advanceStep, pauseMs);
                         };
 
                         utt.onerror = () => {
                             clearTimeout(this.timer);
-                            this.timer = setTimeout(advanceStep, 1000);
+                            this.timer = setTimeout(advanceStep, 800);
                         };
 
                         this.synth.speak(utt);
@@ -3433,9 +3516,9 @@
                     }
                 }
 
-                // Safety fallback timer (14 seconds) in case speech is disabled or blocked in the browser
+                // Fallback timer matched to slide duration (6-7s) so mobile advances naturally even if TTS is muted
                 clearTimeout(this.timer);
-                this.timer = setTimeout(advanceStep, 14000);
+                this.timer = setTimeout(advanceStep, s.duration || 6500);
             },
 
             stop() {
@@ -3478,9 +3561,11 @@
                     if (window.speechSynthesis) {
                         try {
                             window.speechSynthesis.cancel();
+                            window.speechSynthesis.resume();
                             const readyUtt = new SpeechSynthesisUtterance("Are you ready cadet, to reach the moon?");
-                            readyUtt.rate = 0.88;
-                            readyUtt.pitch = 0.72; // Deep, commanding mission commander voice
+                            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                            readyUtt.rate = isMobile ? 0.88 : 0.86;
+                            readyUtt.pitch = isMobile ? 0.78 : 0.70; // Deep, commanding mission commander voice
                             readyUtt.volume = 1.0;
                             const voice = getHorrorVoice(window.speechSynthesis);
                             if (voice) readyUtt.voice = voice;
@@ -3515,27 +3600,32 @@
             step: 0,
             timer: null,
             synth: window.speechSynthesis,
+            startTime: 0,
             slides: [
                 {
                     imgId: 'outro-slide-1',
                     dotId: 'dot-o1',
-                    caption: "Against all celestial odds, Pilot Zaddr conquered all thirty-two gravity monoliths across five atmospheric tiers and broke Earth's dying atmosphere. The Lunar Starship pierced the cosmic void."
+                    caption: "Against all celestial odds, Pilot Zaddr conquered all thirty-two gravity monoliths across five atmospheric tiers and broke Earth's dying atmosphere. The Lunar Starship pierced the cosmic void.",
+                    duration: 6800
                 },
                 {
                     imgId: 'outro-slide-2',
                     dotId: 'dot-o2',
-                    caption: "Touching down upon the silent lunar regolith, Zaddr gazed back at the pale blue world. The nightmare of the anomaly was left behind in the stars."
+                    caption: "Touching down upon the silent lunar regolith, Zaddr gazed back at the pale blue world. The nightmare of the anomaly was left behind in the stars.",
+                    duration: 6800
                 },
                 {
                     imgId: 'outro-slide-3',
                     dotId: 'dot-o3',
-                    caption: "At the dawn of the new lunar colony, humanity's future was secured. Pilot Zaddr's name is carved into eternity. Mission Moon is won."
+                    caption: "At the dawn of the new lunar colony, humanity's future was secured. Pilot Zaddr's name is carved into eternity. Mission Moon is won.",
+                    duration: 6500
                 }
             ],
 
             start() {
                 if (this.active) return;
                 this.active = true;
+                this.startTime = Date.now();
                 this.step = 0;
                 clearTimeout(this.timer);
                 this.timer = null;
@@ -3594,9 +3684,11 @@
                 if (this.synth) {
                     try {
                         this.synth.cancel();
+                        this.synth.resume();
                         const utt = new SpeechSynthesisUtterance(s.caption);
-                        utt.pitch = 0.54;
-                        utt.rate = 0.78;
+                        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                        utt.pitch = isMobile ? 0.78 : 0.60;
+                        utt.rate = isMobile ? 0.88 : 0.80;
                         utt.volume = 1.0;
                         const horrorVoice = getHorrorVoice(this.synth);
                         if (horrorVoice) utt.voice = horrorVoice;
@@ -3621,7 +3713,7 @@
                 }
 
                 clearTimeout(this.timer);
-                this.timer = setTimeout(advanceStep, 16000);
+                this.timer = setTimeout(advanceStep, s.duration || 7200);
             },
 
             stop() {
@@ -4729,39 +4821,28 @@
             });
         }
 
-        // Cinematic Intro & Skip Controls
+        // Cinematic Intro & Skip Controls (Touch-safe: only explicit button or ESC/Space skips)
         const btnSkipIntro = document.getElementById('btn-skip-intro');
         if (btnSkipIntro) {
-            btnSkipIntro.addEventListener('click', (e) => {
+            const handleSkip = (e) => {
                 e.stopPropagation();
+                if (e.cancelable) e.preventDefault();
                 IntroSequence.finish();
-            });
-        }
-        const introModalElem = document.getElementById('intro-modal');
-        if (introModalElem) {
-            introModalElem.addEventListener('click', (e) => {
-                if (IntroSequence.active) {
-                    e.stopPropagation();
-                    IntroSequence.finish();
-                }
-            });
+            };
+            btnSkipIntro.addEventListener('click', handleSkip);
+            btnSkipIntro.addEventListener('touchend', handleSkip, { passive: false });
         }
 
-        // Cinematic Outro Skip Controls
+        // Cinematic Outro Skip Controls (Touch-safe)
         const btnSkipOutro = document.getElementById('btn-skip-outro');
         if (btnSkipOutro) {
-            btnSkipOutro.addEventListener('click', (e) => {
+            const handleOutroSkip = (e) => {
                 e.stopPropagation();
+                if (e.cancelable) e.preventDefault();
                 OutroSequence.finish();
-            });
-        }
-        const outroModalElem = document.getElementById('outro-modal');
-        if (outroModalElem) {
-            outroModalElem.addEventListener('click', (e) => {
-                if (OutroSequence.active) {
-                    OutroSequence.finish();
-                }
-            });
+            };
+            btnSkipOutro.addEventListener('click', handleOutroSkip);
+            btnSkipOutro.addEventListener('touchend', handleOutroSkip, { passive: false });
         }
 
         // =====================================================================
@@ -4870,28 +4951,28 @@
             }
         }
 
+        let lastExpeditionLaunchTime = 0;
+        function handleExpeditionLaunch(e) {
+            if (e) {
+                if (e.cancelable) e.preventDefault();
+                e.stopPropagation();
+            }
+            const now = Date.now();
+            if (now - lastExpeditionLaunchTime < 1200) return;
+            lastExpeditionLaunchTime = now;
+            startExpeditionWithIntro();
+        }
+
         const btnStartExp = document.getElementById('btn-start-expedition');
         if (btnStartExp) {
-            btnStartExp.addEventListener('click', (e) => {
-                e.stopPropagation();
-                startExpeditionWithIntro();
-            });
-            btnStartExp.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                startExpeditionWithIntro();
-            }, { passive: true });
+            btnStartExp.addEventListener('click', handleExpeditionLaunch);
+            btnStartExp.addEventListener('touchend', handleExpeditionLaunch, { passive: false });
         }
 
         const btnWatchBriefing = document.getElementById('btn-watch-briefing');
         if (btnWatchBriefing) {
-            btnWatchBriefing.addEventListener('click', (e) => {
-                e.stopPropagation();
-                startExpeditionWithIntro();
-            });
-            btnWatchBriefing.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                startExpeditionWithIntro();
-            }, { passive: true });
+            btnWatchBriefing.addEventListener('click', handleExpeditionLaunch);
+            btnWatchBriefing.addEventListener('touchend', handleExpeditionLaunch, { passive: false });
         }
 
         // AntSeed AI VPN Live Inspector Modal Controls
