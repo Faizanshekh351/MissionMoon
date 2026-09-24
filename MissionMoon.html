@@ -928,7 +928,7 @@
         // =====================================================================
         // 1. Key Solar Directional Light (Warm celestial sunlight with specular sheen)
         const sunLight = new THREE.DirectionalLight(0xfffaed, 2.5);
-        sunLight.position.set(180, 240, -320);
+        sunLight.position.set(850, 620, -1450);
         scene.add(sunLight);
 
         // 2. Cosmic Ambient Fill Light (Luminous indigo sky & deep space floor bounce)
@@ -944,65 +944,194 @@
         scene.add(new THREE.AmbientLight(0x1e293b, 1.15));
 
         // =====================================================================
-        // THE BLAZING 3D CELESTIAL SUN & MULTI-LAYER SOLAR CORONA
+        // THE BLAZING 3D CELESTIAL SUN & MULTI-LAYER SOLAR CORONA (FAR DEEP SPACE)
+        // Positioned far into upper-right cosmos (X=850, Y=620, Z=-1450, Distance > 1800m)
+        // Completely separated from other planets!
         // =====================================================================
         const sunGroup = new THREE.Group();
-        sunGroup.position.set(180, 240, -320);
+        sunGroup.position.set(850, 620, -1450);
         scene.add(sunGroup);
 
-        // 1. Core Solar Sphere
-        const sunCoreGeo = new THREE.SphereGeometry(32, 32, 32);
-        const sunCoreMat = new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false });
+        // Procedural Solar Surface Photosphere Texture (Boiling Convection Granulation & Flares)
+        function createSolarSurfaceTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Radiant Incandescent Solar Base
+            const grad = ctx.createRadialGradient(256, 256, 40, 256, 256, 256);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.35, '#fef08a');
+            grad.addColorStop(0.7, '#f59e0b');
+            grad.addColorStop(1, '#ea580c');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Granular Convection Boiling Cells
+            for (let i = 0; i < 90; i++) {
+                const cx = Math.random() * 512;
+                const cy = Math.random() * 512;
+                const cr = 6 + Math.random() * 28;
+                const cGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, cr);
+                cGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+                cGrad.addColorStop(0.6, 'rgba(251, 191, 36, 0.4)');
+                cGrad.addColorStop(1, 'rgba(234, 88, 12, 0)');
+                ctx.fillStyle = cGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Active Magnetic Sunspots
+            for (let s = 0; s < 12; s++) {
+                const sx = 120 + Math.random() * 272;
+                const sy = 120 + Math.random() * 272;
+                const sr = 3 + Math.random() * 7;
+                ctx.fillStyle = 'rgba(67, 20, 7, 0.75)';
+                ctx.beginPath();
+                ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+                ctx.fill();
+                // Penumbra
+                ctx.strokeStyle = 'rgba(154, 52, 18, 0.5)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // 1. Core Photosphere Sphere (Radius 85m)
+        const sunTex = createSolarSurfaceTexture();
+        const sunCoreGeo = new THREE.SphereGeometry(85, 48, 48);
+        const sunCoreMat = new THREE.MeshBasicMaterial({ map: sunTex, fog: false });
         const sunCore = new THREE.Mesh(sunCoreGeo, sunCoreMat);
         sunGroup.add(sunCore);
 
-        // 2. Golden Inner Corona
-        const sunCoronaGeo = new THREE.SphereGeometry(44, 32, 32);
-        const sunCoronaMat = new THREE.MeshBasicMaterial({
-            color: 0xfde047, side: THREE.BackSide, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, fog: false
-        });
-        const sunCorona = new THREE.Mesh(sunCoronaGeo, sunCoronaMat);
-        sunGroup.add(sunCorona);
+        // 2. 3D Coronal Prominence Arcs (Magnetic Plasma Loops extending off the sun!)
+        const prominenceGroup = new THREE.Group();
+        sunGroup.add(prominenceGroup);
 
-        // 3. Blazing Outer Solar Flare Halo
-        const sunFlareGeo = new THREE.SphereGeometry(62, 32, 32);
-        const sunFlareMat = new THREE.MeshBasicMaterial({
-            color: 0xf97316, side: THREE.BackSide, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, fog: false
+        const promGeo = new THREE.TorusGeometry(45, 5.5, 8, 32, Math.PI * 0.85);
+        const promMat1 = new THREE.MeshBasicMaterial({
+            color: 0xfb923c, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, fog: false
         });
-        const sunFlare = new THREE.Mesh(sunFlareGeo, sunFlareMat);
-        sunGroup.add(sunFlare);
+        const promMat2 = new THREE.MeshBasicMaterial({
+            color: 0xf43f5e, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, fog: false
+        });
 
-        // 4. Anamorphic Solar Lens Flare Starburst
-        function createSolarFlareTexture() {
+        const prominence1 = new THREE.Mesh(promGeo, promMat1);
+        prominence1.position.set(65, 30, 0); prominence1.rotation.y = 0.4; prominenceGroup.add(prominence1);
+
+        const prominence2 = new THREE.Mesh(promGeo, promMat2);
+        prominence2.position.set(-60, 40, 15); prominence2.rotation.z = 1.2; prominenceGroup.add(prominence2);
+
+        const prominence3 = new THREE.Mesh(promGeo, promMat1);
+        prominence3.position.set(0, -65, -20); prominence3.rotation.x = 1.4; prominenceGroup.add(prominence3);
+
+        const prominence4 = new THREE.Mesh(promGeo, promMat2);
+        prominence4.position.set(-50, -45, 35); prominence4.rotation.y = -1.1; prominenceGroup.add(prominence4);
+
+        // 3. Multi-Layer Volumetric Corona Textures
+        function createCoronaGradientTexture(r1, r2, c0, c1, c2) {
             const canvas = document.createElement('canvas');
             canvas.width = 512; canvas.height = 512;
             const ctx = canvas.getContext('2d');
             const cx = 256, cy = 256;
-            const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 250);
-            grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            grad.addColorStop(0.2, 'rgba(253, 224, 71, 0.85)');
-            grad.addColorStop(0.5, 'rgba(249, 115, 22, 0.4)');
+            const grad = ctx.createRadialGradient(cx, cy, r1, cx, cy, r2);
+            grad.addColorStop(0, c0);
+            grad.addColorStop(0.35, c1);
+            grad.addColorStop(0.75, c2);
             grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 512, 512);
-
-            // Cross starburst rays
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-            ctx.lineWidth = 4;
-            ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(512, cy); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, 512); ctx.stroke();
-            ctx.strokeStyle = 'rgba(253, 224, 71, 0.45)';
-            ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(512, 512); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(512, 0); ctx.lineTo(0, 512); ctx.stroke();
             return new THREE.CanvasTexture(canvas);
         }
-        const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({
-            map: createSolarFlareTexture(), transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, fog: false
-        }));
-        sunSprite.scale.set(220, 220, 1);
-        sunGroup.add(sunSprite);
 
+        // Inner Golden-White Corona
+        const sunInnerCoronaTex = createCoronaGradientTexture(
+            20, 240, 'rgba(255, 255, 255, 1)', 'rgba(254, 240, 138, 0.85)', 'rgba(245, 158, 11, 0.25)'
+        );
+        const sunInnerCorona = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: sunInnerCoronaTex, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, fog: false
+        }));
+        sunInnerCorona.scale.set(450, 450, 1);
+        sunGroup.add(sunInnerCorona);
+
+        // Broad Fiery Outer Corona Flare
+        const sunOuterCoronaTex = createCoronaGradientTexture(
+            40, 250, 'rgba(253, 224, 71, 0.85)', 'rgba(249, 115, 22, 0.45)', 'rgba(225, 29, 72, 0.1)'
+        );
+        const sunOuterCorona = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: sunOuterCoronaTex, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, fog: false
+        }));
+        sunOuterCorona.scale.set(880, 880, 1);
+        sunGroup.add(sunOuterCorona);
+
+        // 4. Anamorphic 12-Point Starburst Diffraction Spikes
+        function createStarburstDiffractionTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024; canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            const cx = 512, cy = 512;
+
+            // Soft core glow
+            const cGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 320);
+            cGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            cGrad.addColorStop(0.2, 'rgba(254, 240, 138, 0.7)');
+            cGrad.addColorStop(0.6, 'rgba(249, 115, 22, 0.25)');
+            cGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = cGrad;
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            // Primary Anamorphic Horizontal Flare (Ultra-wide camera lens flare)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, 510, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(253, 224, 71, 0.45)';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, 500, 22, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Vertical & Diagonal Diffraction Rays
+            const angles = [
+                Math.PI / 2,
+                Math.PI / 4, -Math.PI / 4,
+                Math.PI / 6, -Math.PI / 6,
+                Math.PI / 3, -Math.PI / 3
+            ];
+            angles.forEach((ang, idx) => {
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(ang);
+                const rayLen = idx === 0 ? 460 : 380;
+                const rGrad = ctx.createLinearGradient(-rayLen, 0, rayLen, 0);
+                rGrad.addColorStop(0, 'rgba(0,0,0,0)');
+                rGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.7)');
+                rGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = rGrad;
+                ctx.fillRect(-rayLen, -3, rayLen * 2, 6);
+                ctx.restore();
+            });
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const sunStarburst = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: createStarburstDiffractionTexture(),
+            transparent: true,
+            opacity: 0.95,
+            blending: THREE.AdditiveBlending,
+            fog: false
+        }));
+        sunStarburst.scale.set(1450, 900, 1);
+        sunGroup.add(sunStarburst);
+
+        // Direct Sunlight pointing down across all hurdles from deep cosmos
+        if (typeof sunLight !== 'undefined') {
+            sunLight.position.set(850, 620, -1450);
+        }
         // =====================================================================
         // VOLUMETRIC DEEP-SPACE NEBULA CLOUDS & STELLAR SYSTEM
         // =====================================================================
@@ -1154,55 +1283,137 @@
         const nebPoints = new THREE.Points(nebGeo, new THREE.PointsMaterial({ size: 8.0, vertexColors: true, fog: false, transparent: true, opacity: 0.75 }));
         scene.add(nebPoints);
 
-        // Distant Purple Ringed Gas Planet
+        // =====================================================================
+        // THE VAST GAS GIANT (MAJESTIC VISTA: HIGH UPPER-LEFT HORIZON)
+        // Positioned at X=-780, Y=440, Z=-1250 with grand scale (Radius 180m, Rings 390m)
+        // =====================================================================
         const distPlanetGroup = new THREE.Group();
-        distPlanetGroup.position.set(-280, 180, -500);
+        distPlanetGroup.position.set(-780, 440, -1250);
+        distPlanetGroup.rotation.z = 0.38; // Majestic axial tilt
         scene.add(distPlanetGroup);
+
+        function createGasGiantTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Rich multi-banded gas giant atmosphere (Royal Violet, Sapphire, Cyan & Amber storms)
+            const bands = [
+                { y: 0, h: 45, c1: '#1e1b4b', c2: '#312e81' },
+                { y: 45, h: 40, c1: '#3730a3', c2: '#4338ca' },
+                { y: 85, h: 50, c1: '#4f46e5', c2: '#6366f1' },
+                { y: 135, h: 35, c1: '#0284c7', c2: '#0369a1' },
+                { y: 170, h: 60, c1: '#1e1b4b', c2: '#2e1065' },
+                { y: 230, h: 55, c1: '#581c87', c2: '#7e22ce' },
+                { y: 285, h: 45, c1: '#0c4a6e', c2: '#0284c7' },
+                { y: 330, h: 50, c1: '#4338ca', c2: '#3730a3' },
+                { y: 380, h: 45, c1: '#1e1b4b', c2: '#312e81' },
+                { y: 425, h: 87, c1: '#0f172a', c2: '#1e1b4b' }
+            ];
+
+            bands.forEach(b => {
+                const bGrad = ctx.createLinearGradient(0, b.y, 0, b.y + b.h);
+                bGrad.addColorStop(0, b.c1);
+                bGrad.addColorStop(1, b.c2);
+                ctx.fillStyle = bGrad;
+                ctx.fillRect(0, b.y, 1024, b.h + 2);
+            });
+
+            // Atmospheric Turbulence Filaments & Jet Stream Eddies
+            for (let i = 0; i < 40; i++) {
+                const ey = 50 + Math.random() * 412;
+                ctx.strokeStyle = Math.random() > 0.5 ? 'rgba(56, 189, 248, 0.4)' : 'rgba(216, 180, 254, 0.35)';
+                ctx.lineWidth = 2 + Math.random() * 4;
+                ctx.beginPath();
+                ctx.moveTo(0, ey);
+                for (let x = 0; x <= 1024; x += 64) {
+                    ctx.lineTo(x, ey + Math.sin(x * 0.02) * 8);
+                }
+                ctx.stroke();
+            }
+
+            // Great Cyan Storm Vortex (Cyclonic storm spot)
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.85)';
+            ctx.beginPath();
+            ctx.ellipse(620, 260, 75, 38, 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(620, 260, 25, 12, 0.08, 0, Math.PI * 2);
+            ctx.fill();
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const gasGiantTex = createGasGiantTexture();
         const distPlanetMesh = new THREE.Mesh(
-            new THREE.SphereGeometry(85, 32, 32),
-            new THREE.MeshStandardMaterial({ color: 0x4f46e5, roughness: 0.5, metalness: 0.3, emissive: 0x1e1b4b, emissiveIntensity: 0.45 })
+            new THREE.SphereGeometry(180, 48, 48),
+            new THREE.MeshStandardMaterial({
+                map: gasGiantTex, roughness: 0.45, metalness: 0.25,
+                emissive: 0x1e1b4b, emissiveIntensity: 0.45, fog: false
+            })
         );
         distPlanetGroup.add(distPlanetMesh);
+
+        // Luminous Multi-Ring System (Inner ring + Cassini Gap + Outer ring)
         const distRingMesh = new THREE.Mesh(
-            new THREE.RingGeometry(105, 175, 64),
-            new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.55 })
+            new THREE.RingGeometry(220, 390, 64),
+            new THREE.MeshBasicMaterial({
+                color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.65, fog: false
+            })
         );
-        distRingMesh.rotation.x = Math.PI / 2.3;
+        distRingMesh.rotation.x = Math.PI / 2.2;
         distPlanetGroup.add(distRingMesh);
+
+        const distRingInner = new THREE.Mesh(
+            new THREE.RingGeometry(195, 215, 64),
+            new THREE.MeshBasicMaterial({
+                color: 0xa855f7, side: THREE.DoubleSide, transparent: true, opacity: 0.45, fog: false
+            })
+        );
+        distRingInner.rotation.x = Math.PI / 2.2;
+        distPlanetGroup.add(distRingInner);
+
+        // Atmospheric Back-Scatter Limb Glow
         const distPlanetHalo = new THREE.Mesh(
-            new THREE.SphereGeometry(92, 32, 32),
-            new THREE.MeshBasicMaterial({ color: 0x818cf8, side: THREE.BackSide, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending })
+            new THREE.SphereGeometry(192, 36, 36),
+            new THREE.MeshBasicMaterial({
+                color: 0x818cf8, side: THREE.BackSide, transparent: true, opacity: 0.45,
+                blending: THREE.AdditiveBlending, fog: false
+            })
         );
         distPlanetGroup.add(distPlanetHalo);
 
-        // Orbiting Gas Giant Moonlets
+        // Orbiting Gas Giant Moons
         const miniMoon1 = new THREE.Mesh(
-            new THREE.SphereGeometry(14, 16, 16),
-            new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8, emissive: 0x334155, emissiveIntensity: 0.3 })
+            new THREE.SphereGeometry(22, 16, 16),
+            new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.8, emissive: 0x334155, emissiveIntensity: 0.35, fog: false })
         );
-        miniMoon1.position.set(160, 45, 0);
+        miniMoon1.position.set(320, 60, 0);
         distPlanetGroup.add(miniMoon1);
 
         const miniMoon2 = new THREE.Mesh(
-            new THREE.SphereGeometry(9, 16, 16),
-            new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.7, emissive: 0x78350f, emissiveIntensity: 0.3 })
+            new THREE.SphereGeometry(15, 16, 16),
+            new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.7, emissive: 0x78350f, emissiveIntensity: 0.35, fog: false })
         );
-        miniMoon2.position.set(-210, -35, 40);
+        miniMoon2.position.set(-390, -45, 80);
         distPlanetGroup.add(miniMoon2);
 
-        // Distant Glowing Cratered Moon (The Mission Objective in Deep Space)
+        // =====================================================================
+        // DISTANT GLOWING CRATERED MOON (THE CELESTIAL TARGET IN UPPER SKY)
+        // Positioned at X=-160, Y=460, Z=-980 (Completely separated from Sun & Gas Giant!)
+        // =====================================================================
         const moonGroup = new THREE.Group();
-        moonGroup.position.set(160, 220, -520);
+        moonGroup.position.set(-160, 460, -980);
         scene.add(moonGroup);
 
         function createMoonTexture() {
             const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 512;
+            canvas.width = 512; canvas.height = 512;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#cbd5e1';
             ctx.fillRect(0, 0, 512, 512);
-            // Lunar craters & maria
+
             for (let i = 0; i < 60; i++) {
                 const cx = Math.random() * 512;
                 const cy = Math.random() * 512;
@@ -1216,37 +1427,35 @@
                 ctx.arc(cx, cy, cr, 0, Math.PI * 2);
                 ctx.fill();
             }
-            const tex = new THREE.CanvasTexture(canvas);
-            return tex;
+            return new THREE.CanvasTexture(canvas);
         }
 
         const moonMesh = new THREE.Mesh(
-            new THREE.SphereGeometry(65, 32, 32),
+            new THREE.SphereGeometry(85, 36, 36),
             new THREE.MeshStandardMaterial({
                 map: createMoonTexture(),
                 color: 0xf8fafc,
                 roughness: 0.8,
                 metalness: 0.1,
                 emissive: 0x94a3b8,
-                emissiveIntensity: 0.4,
+                emissiveIntensity: 0.42,
                 fog: false
             })
         );
         moonGroup.add(moonMesh);
 
         const moonHalo = new THREE.Mesh(
-            new THREE.SphereGeometry(72, 32, 32),
+            new THREE.SphereGeometry(94, 36, 36),
             new THREE.MeshBasicMaterial({
                 color: 0xfef08a,
                 side: THREE.BackSide,
                 transparent: true,
-                opacity: 0.35,
+                opacity: 0.4,
                 blending: THREE.AdditiveBlending,
                 fog: false
             })
         );
         moonGroup.add(moonHalo);
-
         // 3D sky banners completely removed per user request (pristine cosmic atmosphere)
 
         // =====================================================================
@@ -4372,6 +4581,83 @@
                 sporeGeo.attributes.position.needsUpdate = true;
             }
 
+            // =====================================================================
+            // MASTER AMBIENT & CELESTIAL ANIMATION CONTROLLER (EVERY FRAME)
+            // =====================================================================
+            // 1. Dynamic Sun Rotations, Solar Prominence Loops & Pulsing Corona
+            if (typeof sunCore !== 'undefined') {
+                sunCore.rotation.y += dt * 0.05;
+                sunCore.rotation.x += dt * 0.02;
+            }
+            if (typeof prominence1 !== 'undefined') prominence1.rotation.z += dt * 0.32;
+            if (typeof prominence2 !== 'undefined') prominence2.rotation.y += dt * 0.24;
+            if (typeof prominence3 !== 'undefined') prominence3.rotation.x += dt * 0.2;
+            if (typeof prominence4 !== 'undefined') prominence4.rotation.z -= dt * 0.28;
+            if (typeof prominenceGroup !== 'undefined') prominenceGroup.rotation.y += dt * 0.04;
+
+            if (typeof sunInnerCorona !== 'undefined') {
+                const cPulse = 450 + Math.sin(time * 3.2) * 35;
+                sunInnerCorona.scale.set(cPulse, cPulse, 1);
+            }
+            if (typeof sunOuterCorona !== 'undefined') {
+                const oPulse = 880 + Math.cos(time * 2.4) * 55;
+                sunOuterCorona.scale.set(oPulse, oPulse, 1);
+            }
+            if (typeof sunStarburst !== 'undefined') {
+                sunStarburst.rotation.z += dt * 0.035;
+                const sbX = 1450 + Math.sin(time * 2.0) * 110;
+                const sbY = 900 + Math.cos(time * 2.2) * 75;
+                sunStarburst.scale.set(sbX, sbY, 1);
+            }
+
+            // 2. Vast Gas Giant, Rings & Orbiting Moons
+            if (typeof distPlanetMesh !== 'undefined') distPlanetMesh.rotation.y += dt * 0.04;
+            if (typeof distRingMesh !== 'undefined') distRingMesh.rotation.z += dt * 0.02;
+            if (typeof distRingInner !== 'undefined') distRingInner.rotation.z -= dt * 0.015;
+            if (typeof miniMoon1 !== 'undefined') {
+                const mAngle = time * 0.35;
+                miniMoon1.position.set(Math.cos(mAngle) * 320, 60, Math.sin(mAngle) * 320);
+            }
+            if (typeof miniMoon2 !== 'undefined') {
+                const mAngle2 = -time * 0.5;
+                miniMoon2.position.set(Math.cos(mAngle2) * 390, -45, Math.sin(mAngle2) * 390);
+            }
+
+            // 3. Moon & Earth Summit Rotations
+            if (typeof moonMesh !== 'undefined') moonMesh.rotation.y += dt * 0.025;
+            if (typeof earthMesh !== 'undefined' && earthMesh) earthMesh.rotation.y += dt * 0.03;
+            if (typeof cloudsMesh !== 'undefined' && cloudsMesh) cloudsMesh.rotation.y += dt * 0.045;
+
+            // 4. Continuous rotation of all celestial planet hurdles
+            if (typeof hurdlePlanets !== 'undefined') {
+                hurdlePlanets.forEach(p => {
+                    if (p.mesh) p.mesh.rotation.y += dt * p.speed;
+                });
+            }
+
+            // 5. 3D Grass Tufts Organic Wind Sway
+            if (typeof grassTufts !== 'undefined') {
+                for (let g = 0; g < grassTufts.length; g++) {
+                    const gt = grassTufts[g];
+                    gt.mesh.rotation.z = Math.sin(time * 2.2 + gt.phase) * 0.09;
+                }
+            }
+
+            // 6. Blinking Aviation Warning Beacons on Skyscraper & Tower Pylons
+            if (typeof aviationBeacons !== 'undefined') {
+                const beaconFlash = (Math.sin(time * 7.0) > 0.15) ? 1.0 : 0.1;
+                for (let b = 0; b < aviationBeacons.length; b++) {
+                    aviationBeacons[b].material.opacity = beaconFlash;
+                }
+            }
+
+            // 7. Cryogenic Vapor Billow on Starship Gantry
+            if (typeof cryoVaporSprite !== 'undefined') {
+                const vPulse = 2.4 + Math.sin(time * 4.0) * 0.4;
+                cryoVaporSprite.scale.set(vPulse, vPulse, 1);
+                cryoVaporSprite.material.opacity = 0.45 + Math.sin(time * 3.0) * 0.15;
+            }
+
             // -------------------------------------------------------------
             // A. CINEMATIC SPACESHIP FLIGHT STATE (ZADDR FLYING AWAY TOGETHER FOR 5s)
             // -------------------------------------------------------------
@@ -4431,63 +4717,7 @@
                 document.getElementById('val-alt').textContent = `${spaceship.position.y.toFixed(1)}m (ORBIT)`;
                 document.getElementById('val-stage').textContent = "COSMIC DEEP SPACE";
 
-                // Dynamic Multi-Axis Celestial Body & Sky Planet Rotations
-            if (typeof distPlanetMesh !== 'undefined') distPlanetMesh.rotation.y += dt * 0.04;
-            if (typeof distRingMesh !== 'undefined') distRingMesh.rotation.z += dt * 0.02;
-            if (typeof miniMoon1 !== 'undefined') {
-                const mAngle = time * 0.4;
-                miniMoon1.position.set(Math.cos(mAngle) * 160, 45, Math.sin(mAngle) * 160);
-            }
-            if (typeof miniMoon2 !== 'undefined') {
-                const mAngle2 = -time * 0.6;
-                miniMoon2.position.set(Math.cos(mAngle2) * 210, -35, Math.sin(mAngle2) * 210);
-            }
-            if (typeof moonMesh !== 'undefined') moonMesh.rotation.y += dt * 0.025;
-            if (typeof earthMesh !== 'undefined' && earthMesh) earthMesh.rotation.y += dt * 0.03;
-            if (typeof cloudsMesh !== 'undefined' && cloudsMesh) cloudsMesh.rotation.y += dt * 0.045;
 
-            // Continuous rotation of all celestial planet hurdles
-            if (typeof hurdlePlanets !== 'undefined') {
-                hurdlePlanets.forEach(p => {
-                    if (p.mesh) p.mesh.rotation.y += dt * p.speed;
-                });
-            }
-
-            // Blazing 3D Sun Dynamic Corona & Flare Oscillation
-            if (typeof sunCorona !== 'undefined') {
-                const cPulse = 1.0 + Math.sin(time * 3.2) * 0.045;
-                sunCorona.scale.set(cPulse, cPulse, cPulse);
-            }
-            if (typeof sunFlare !== 'undefined') {
-                sunFlare.rotation.z += dt * 0.08;
-            }
-            if (typeof sunSprite !== 'undefined') {
-                const sPulse = 220 + Math.sin(time * 2.8) * 14;
-                sunSprite.scale.set(sPulse, sPulse, 1);
-            }
-
-            // Cryogenic Vapor Billow
-            if (typeof cryoVaporSprite !== 'undefined') {
-                const vPulse = 2.4 + Math.sin(time * 4.0) * 0.4;
-                cryoVaporSprite.scale.set(vPulse, vPulse, 1);
-                cryoVaporSprite.material.opacity = 0.45 + Math.sin(time * 3.0) * 0.15;
-            }
-
-            // 3D Grass Tufts Organic Wind Sway
-            if (typeof grassTufts !== 'undefined') {
-                for (let g = 0; g < grassTufts.length; g++) {
-                    const gt = grassTufts[g];
-                    gt.mesh.rotation.z = Math.sin(time * 2.2 + gt.phase) * 0.09;
-                }
-            }
-
-            // Blinking Aviation Warning Beacons on Skyscraper & Tower Pylons
-            if (typeof aviationBeacons !== 'undefined') {
-                const beaconFlash = (Math.sin(time * 7.0) > 0.15) ? 1.0 : 0.1;
-                for (let b = 0; b < aviationBeacons.length; b++) {
-                    aviationBeacons[b].material.opacity = beaconFlash;
-                }
-            }
 
             renderer.render(scene, camera);
                 return;
