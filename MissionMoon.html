@@ -928,7 +928,7 @@
         // =====================================================================
         // 1. Key Solar Directional Light (Warm celestial sunlight with specular sheen)
         const sunLight = new THREE.DirectionalLight(0xfffaed, 2.5);
-        sunLight.position.set(850, 620, -1450);
+        sunLight.position.set(1550, 880, -100);
         scene.add(sunLight);
 
         // 2. Cosmic Ambient Fill Light (Luminous indigo sky & deep space floor bounce)
@@ -949,7 +949,7 @@
         // Completely separated from other planets!
         // =====================================================================
         const sunGroup = new THREE.Group();
-        sunGroup.position.set(850, 620, -1450);
+        sunGroup.position.set(1550, 880, -100);
         scene.add(sunGroup);
 
         // Procedural Solar Surface Photosphere Texture (Boiling Convection Granulation & Flares)
@@ -1506,9 +1506,10 @@
             metalness: 0.02
         });
 
-        // Expanded 275-Meter Lush Grass Meadow Floor (Center Z = -82.5m)
-        const meadow = new THREE.Mesh(new THREE.BoxGeometry(80, 1.6, 275), grassMat);
-        meadow.position.set(0, -0.8, -82.5);
+        // Pristine Starting Meadow Hub (Z=+28m to +55m)
+        // Beyond this starting hub lies the infinite starry cosmic abyss!
+        const meadow = new THREE.Mesh(new THREE.BoxGeometry(50, 1.6, 28), grassMat);
+        meadow.position.set(0, -0.8, 42);
         scene.add(meadow);
 
         // Ambient Floating Bio-Luminescent Fireflies
@@ -1523,31 +1524,6 @@
         sporeGeo.setAttribute('position', new THREE.BufferAttribute(sporePos, 3));
         const sporePoints = new THREE.Points(sporeGeo, new THREE.PointsMaterial({ color: 0x86efac, size: 0.32, transparent: true, opacity: 0.8 }));
         scene.add(sporePoints);
-
-        // Holographic Boundary Walls (Spanning Y=0 to 165m, Z=+55 to -220m)
-        const glassMat = new THREE.MeshPhysicalMaterial({
-            color: 0x38bdf8, transmission: 0.94, opacity: 0.04, transparent: true, roughness: 0.05, depthWrite: false
-        });
-        const borderMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.18 });
-
-        const wallF = new THREE.Mesh(new THREE.BoxGeometry(80, 165, 0.5), glassMat);
-        wallF.position.set(0, 82.5, 55.25); scene.add(wallF);
-
-        const wallB = new THREE.Mesh(new THREE.BoxGeometry(80, 165, 0.5), glassMat);
-        wallB.position.set(0, 82.5, -220.25); scene.add(wallB);
-
-        const wallR = new THREE.Mesh(new THREE.BoxGeometry(0.5, 165, 275), glassMat);
-        wallR.position.set(40.25, 82.5, -82.5); scene.add(wallR);
-
-        const wallL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 165, 275), glassMat);
-        wallL.position.set(-40.25, 82.5, -82.5); scene.add(wallL);
-
-        const borders = new THREE.LineSegments(
-            new THREE.EdgesGeometry(new THREE.BoxGeometry(80, 165, 275)),
-            borderMat
-        );
-        borders.position.set(0, 82.5, -82.5);
-        scene.add(borders);
 
         // =====================================================================
         // REALISTIC 3D RENDERED GRASS TUFTS & COSMIC CONIFER FORESTRY
@@ -1602,8 +1578,8 @@
 
         // Scatter 450 3D grass tufts across meadow starting arena
         for (let i = 0; i < 450; i++) {
-            const gx = (Math.random() - 0.5) * 70;
-            const gz = 52 - Math.random() * 85;
+            const gx = (Math.random() - 0.5) * 44;
+            const gz = 54 - Math.random() * 24;
             if (Math.abs(gx) < 1.0 && Math.abs(gz - 45) < 1.5) continue;
 
             const tuft = new THREE.Group();
@@ -1936,47 +1912,6 @@
         const aviationBeacons = [];
 
         // =====================================================================
-        // DISTANT CYBER METROPOLIS LOWER GRID (FAR BELOW THE SKYSCRAPERS)
-        // =====================================================================
-        const cityGroundGroup = new THREE.Group();
-        cityGroundGroup.position.set(0, -42, -35);
-        scene.add(cityGroundGroup);
-
-        // Distant Highway Light Ribbons
-        const highwayMatCyan = new THREE.LineBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.65 });
-        const highwayMatOrange = new THREE.LineBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.65 });
-
-        for (let h = -4; h <= 4; h++) {
-            const hPts = [];
-            const hx = h * 16;
-            for (let hz = 120; hz >= -220; hz -= 20) {
-                hPts.push(new THREE.Vector3(hx + Math.sin(hz * 0.03) * 6, (Math.random() - 0.5) * 2, hz));
-            }
-            const hGeo = new THREE.BufferGeometry().setFromPoints(hPts);
-            const hLine = new THREE.Line(hGeo, h % 2 === 0 ? highwayMatCyan : highwayMatOrange);
-            cityGroundGroup.add(hLine);
-        }
-
-        // Secondary Distant Cyber Tower Silhouettes Rising through the low mist
-        const distantTowerGeo = new THREE.BoxGeometry(4.5, 45, 4.5);
-        const distantTowerMat = new THREE.MeshBasicMaterial({ color: 0x070c18 });
-        const distantEdgeMat = new THREE.LineBasicMaterial({ color: 0x1e3a8a, transparent: true, opacity: 0.45 });
-
-        for (let t = 0; t < 36; t++) {
-            const tx = (Math.random() - 0.5) * 130;
-            const tz = 70 - Math.random() * 250;
-            if (Math.abs(tx) > 7) {
-                const bldg = new THREE.Mesh(distantTowerGeo, distantTowerMat);
-                bldg.position.set(tx, 15, tz);
-                bldg.scale.set(0.6 + Math.random() * 0.8, 0.5 + Math.random() * 0.9, 0.6 + Math.random() * 0.8);
-                cityGroundGroup.add(bldg);
-
-                const bEdges = new THREE.LineSegments(new THREE.EdgesGeometry(distantTowerGeo), distantEdgeMat);
-                bldg.add(bEdges);
-            }
-        }
-
-        // =====================================================================
         // SPACED-OUT 18-STAGE GAUNTLET (3D SKYSCRAPERS, SKYWAYS & CELESTIAL BODIES)
         // =====================================================================
         const hurdleDefinitions = [
@@ -2155,12 +2090,7 @@
                 dishFeed.position.set(0, 0.12, 0.08); dishGroup.add(dishFeed);
                 mesh.add(dishGroup);
 
-                // 3. Rooftop Architectural Details: HVAC Chiller Penthouse & Antenna Mast
-                const hvacGeo = new THREE.BoxGeometry(0.7, 0.45, 0.7);
-                const hvacMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.9, roughness: 0.3 });
-                const hvac = new THREE.Mesh(hvacGeo, hvacMat);
-                hvac.position.set(-p.r * 0.45, p.h / 2 + 0.22, -p.r * 0.35);
-                mesh.add(hvac);
+                // Rooftop Antenna Mast with Aviation Beacon Light
 
                 // Communication Antenna with Blinking Aviation Warning Beacon Light
                 const antMastGeo = new THREE.CylinderGeometry(0.03, 0.05, 3.2, 8);
@@ -2266,25 +2196,13 @@
                 railR.position.set(p.w / 2 - 0.04, p.h / 2 + 0.35, 0);
                 mesh.add(railR);
 
-                // 3. Under-Deck Skyscraper Support Tower or Truss
-                const underTowerHeight = 32.0;
-                const underTowerGeo = new THREE.BoxGeometry(p.w * 0.85, underTowerHeight, p.d * 0.85);
-                const underTowerMat = new THREE.MeshStandardMaterial({
-                    map: bldgFacadeCyanTex,
-                    roughness: 0.25,
-                    metalness: 0.85,
-                    emissive: 0x0369a1,
-                    emissiveIntensity: 0.15
-                });
-                const underTower = new THREE.Mesh(underTowerGeo, underTowerMat);
-                underTower.position.y = -underTowerHeight / 2 - p.h / 2;
-                mesh.add(underTower);
+                // Sleek suspended anti-gravity skyway (no heavy under-blocks)
 
             } else if (p.type === "planet") {
                 const geo = new THREE.SphereGeometry(p.r, 36, 36);
                 mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(p.x, p.y, p.z);
-                hurdlePlanets.push({ mesh: mesh, speed: 0.25 });
+                hurdlePlanets.push({ mesh: mesh, speed: 0.4 });
 
                 const haloGeo = new THREE.SphereGeometry(p.r * 1.12, 32, 32);
                 const haloMat = new THREE.MeshBasicMaterial({
@@ -2301,7 +2219,6 @@
                 mesh.position.set(p.x, p.y, p.z);
                 const sMesh = new THREE.Mesh(new THREE.SphereGeometry(p.r, 36, 36), mat);
                 mesh.add(sMesh);
-                hurdlePlanets.push({ mesh: sMesh, speed: 0.2 });
 
                 const haloGeo = new THREE.SphereGeometry(p.r * 1.12, 32, 32);
                 const haloMat = new THREE.MeshBasicMaterial({
@@ -2328,6 +2245,7 @@
                 );
                 rInner.rotation.x = Math.PI / 2.3;
                 mesh.add(rInner);
+                hurdlePlanets.push({ mesh: sMesh, ring: rMesh, ring2: rInner, speed: 0.38 });
 
             } else if (p.type === "earth") {
                 mesh = new THREE.Group();
@@ -4610,29 +4528,35 @@
                 sunStarburst.scale.set(sbX, sbY, 1);
             }
 
-            // 2. Vast Gas Giant, Rings & Orbiting Moons
-            if (typeof distPlanetMesh !== 'undefined') distPlanetMesh.rotation.y += dt * 0.04;
-            if (typeof distRingMesh !== 'undefined') distRingMesh.rotation.z += dt * 0.02;
-            if (typeof distRingInner !== 'undefined') distRingInner.rotation.z -= dt * 0.015;
+            // 2. Vast Gas Giant, Rings & Orbiting Moons (Visibly Rotating!)
+            if (typeof distPlanetMesh !== 'undefined') distPlanetMesh.rotation.y += dt * 0.22;
+            if (typeof distRingMesh !== 'undefined') distRingMesh.rotation.z += dt * 0.16;
+            if (typeof distRingInner !== 'undefined') distRingInner.rotation.z -= dt * 0.12;
             if (typeof miniMoon1 !== 'undefined') {
-                const mAngle = time * 0.35;
+                const mAngle = time * 0.75;
                 miniMoon1.position.set(Math.cos(mAngle) * 320, 60, Math.sin(mAngle) * 320);
+                miniMoon1.rotation.y += dt * 0.3;
             }
             if (typeof miniMoon2 !== 'undefined') {
-                const mAngle2 = -time * 0.5;
+                const mAngle2 = -time * 0.6;
                 miniMoon2.position.set(Math.cos(mAngle2) * 390, -45, Math.sin(mAngle2) * 390);
+                miniMoon2.rotation.y += dt * 0.25;
             }
 
-            // 3. Moon & Earth Summit Rotations
-            if (typeof moonMesh !== 'undefined') moonMesh.rotation.y += dt * 0.025;
-            if (typeof earthMesh !== 'undefined' && earthMesh) earthMesh.rotation.y += dt * 0.03;
-            if (typeof cloudsMesh !== 'undefined' && cloudsMesh) cloudsMesh.rotation.y += dt * 0.045;
+            // 3. Distant Sky Moon & Planet Earth Summit (Visibly Rotating!)
+            if (typeof moonMesh !== 'undefined') moonMesh.rotation.y += dt * 0.18;
+            if (typeof earthMesh !== 'undefined' && earthMesh) earthMesh.rotation.y += dt * 0.22;
+            if (typeof cloudsMesh !== 'undefined' && cloudsMesh) cloudsMesh.rotation.y += dt * 0.32;
+            if (typeof atmosRing !== 'undefined' && atmosRing) atmosRing.rotation.z += dt * 0.15;
 
-            // 4. Continuous rotation of all celestial planet hurdles
+            // 4. Continuous rotation of all celestial planet hurdles (Sphere & Rings!)
             if (typeof hurdlePlanets !== 'undefined') {
-                hurdlePlanets.forEach(p => {
+                for (let i = 0; i < hurdlePlanets.length; i++) {
+                    const p = hurdlePlanets[i];
                     if (p.mesh) p.mesh.rotation.y += dt * p.speed;
-                });
+                    if (p.ring) p.ring.rotation.z += dt * (p.speed * 0.75);
+                    if (p.ring2) p.ring2.rotation.z -= dt * (p.speed * 0.5);
+                }
             }
 
             // 5. 3D Grass Tufts Organic Wind Sway
