@@ -1,7 +1,7 @@
 # 🚀 Mission Moon: 3D Planetary Ascent & Cosmic Exploration
 
 > **Built 100% From Scratch with AntSeed AI Agent Suite**  
-> *Powered by GLM 5.3 Flash, DeepSeek V4 Flash, and GPT OSS 120B / ChatGPT.*  
+> *Powered by AntSeed AI Model GLM 5.3 Flash, GPT OSS 120b & DeepSeek V4 Flash.*  
 > **Total Development & Inference Cost: $0.00 — 100% Free of Cost!**
 
 [![Live Game](https://img.shields.io/badge/Play_Live-GitHub_Pages-0284c7?style=for-the-badge&logo=googlechrome&logoColor=white)](https://faizanshekh351.github.io/MissionMoon/)
@@ -177,4 +177,4 @@ Licensed under the [MIT License](LICENSE).
 
 ---
 
-*Mission Moon © 2026. Created and Owned by Faizan. Powered by AntSeed AI & GLM 5.3 Flash.*
+*Mission Moon © 2026. Created and Owned by Faizan. Powered by AntSeed AI Model GLM 5.3 Flash, GPT OSS 120b & DeepSeek V4 Flash.*
