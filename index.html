@@ -69,18 +69,85 @@
         /* Bottom Controls */
         #bottom-hud {
             position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 10px; z-index: 10;
+            display: flex; gap: 8px; z-index: 10; flex-wrap: wrap; justify-content: center;
+            max-width: 95vw; pointer-events: auto;
         }
         .hud-btn {
             background: rgba(13, 16, 25, 0.92); backdrop-filter: blur(16px);
             border: 1px solid rgba(245, 158, 11, 0.3); color: #f8fafc;
-            padding: 10px 22px; border-radius: 8px; font-size: 12px; font-weight: 800;
+            padding: 10px 18px; border-radius: 8px; font-size: 11.5px; font-weight: 800;
             cursor: pointer; transition: all 0.2s; font-family: monospace;
             box-shadow: 0 6px 18px rgba(0,0,0,0.6);
         }
         .hud-btn:hover { background: #f59e0b; color: #050505; transform: translateY(-2px); box-shadow: 0 0 20px rgba(245, 158, 11, 0.7); }
         .btn-jump-main { border-color: #f59e0b; color: #fbbf24; }
         .btn-jump-main:hover { background: #fbbf24; color: #050505; box-shadow: 0 0 24px rgba(251, 191, 36, 0.85); }
+
+        /* Mobile Touch Controls */
+        #mobile-controls {
+            position: absolute; bottom: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 12; display: none;
+        }
+        @media (max-width: 1024px), (pointer: coarse) {
+            #mobile-controls { display: block; }
+            #bottom-hud { bottom: 12px; }
+            .hud-btn { padding: 7px 12px; font-size: 10.5px; }
+            #top-hud { flex-direction: column; gap: 8px; align-items: flex-start; }
+            .brand-title { font-size: 13px; }
+            .progress-box { width: 160px; }
+        }
+        #mobile-dpad {
+            position: absolute; bottom: 20px; left: 16px;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            pointer-events: auto; user-select: none; -webkit-user-select: none;
+        }
+        .dpad-row { display: flex; gap: 5px; align-items: center; }
+        .dpad-btn {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: rgba(13, 16, 25, 0.85); backdrop-filter: blur(14px);
+            border: 1.5px solid rgba(245, 158, 11, 0.45); color: #fbbf24;
+            font-size: 18px; font-weight: 900; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.6); touch-action: none; cursor: pointer;
+            transition: transform 0.08s, background 0.08s;
+        }
+        .dpad-btn:active, .dpad-btn.active {
+            background: #f59e0b; color: #000; transform: scale(0.92);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.9);
+        }
+        .dpad-sprint {
+            border-color: #38bdf8; color: #38bdf8; font-size: 14px;
+        }
+        .dpad-sprint:active, .dpad-sprint.active {
+            background: #38bdf8; color: #000;
+        }
+
+        #mobile-action-pad {
+            position: absolute; bottom: 20px; right: 16px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            pointer-events: auto; user-select: none; -webkit-user-select: none;
+        }
+        .mob-act-btn {
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-family: monospace; font-weight: 900; touch-action: none; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.7); backdrop-filter: blur(14px);
+            transition: transform 0.08s, box-shadow 0.08s;
+        }
+        .mob-btn-jump {
+            width: 72px; height: 72px; font-size: 11px; letter-spacing: 0.8px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: 2px solid #fbbf24; color: #050505;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.7);
+        }
+        .mob-btn-jump:active {
+            transform: scale(0.9); box-shadow: 0 0 35px rgba(251, 191, 36, 0.95);
+        }
+        .mob-btn-hover {
+            width: 48px; height: 48px; font-size: 18px;
+            background: rgba(14, 165, 233, 0.2); border: 1.5px solid #38bdf8; color: #38bdf8;
+        }
+        .mob-btn-hover:active, .mob-btn-hover.active {
+            background: #38bdf8; color: #000; transform: scale(0.92);
+        }
 
         /* Victory Flight Overlay */
         #victory-modal {
@@ -640,13 +707,27 @@
 
     <!-- Bottom Controls -->
     <div id="bottom-hud">
-        <button class="hud-btn" id="b-floor">⬇ MEADOW [1]</button>
-        <button class="hud-btn" id="b-wall">➡ WALL-WALK [2]</button>
         <button class="hud-btn" id="b-hover" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.16);" title="Toggle Anti-Gravity Hover (Press H)">🛸 HOVER [H]</button>
         <button class="hud-btn btn-jump-main" id="b-jump">▲ JUMP / BOOST (SPACE)</button>
-        <button class="hud-btn" id="b-launch-starship" style="display: none; background: linear-gradient(135deg, #f59e0b, #ec4899); color: #fff; font-weight: 900; border-color: #fbbf24; box-shadow: 0 0 25px rgba(245, 158, 11, 0.85); animation: brandGlow 1.5s infinite alternate;" title="Ignite Starship & Escape to the Moon! [L]">🚀 LAUNCH STARSHIP [L]</button>
         <button class="hud-btn" id="b-reset">🔄 RESET TO MEADOW</button>
         <button class="hud-btn" id="b-home">🏠 HOMESCREEN</button>
+    </div>
+
+    <!-- Mobile On-Screen Touch Controls (Active on phones & tablets) -->
+    <div id="mobile-controls">
+        <div id="mobile-dpad">
+            <button class="dpad-btn" id="dpad-fwd" title="Forward (W)">▲</button>
+            <div class="dpad-row">
+                <button class="dpad-btn" id="dpad-left" title="Left (A)">◀</button>
+                <button class="dpad-btn dpad-sprint" id="dpad-sprint" title="Sprint (Shift)">⚡</button>
+                <button class="dpad-btn" id="dpad-right" title="Right (D)">▶</button>
+            </div>
+            <button class="dpad-btn" id="dpad-back" title="Back (S)">▼</button>
+        </div>
+        <div id="mobile-action-pad">
+            <button class="mob-act-btn mob-btn-hover" id="mob-hover" title="Hover (H)">🛸</button>
+            <button class="mob-act-btn mob-btn-jump" id="mob-jump" title="Jump / Boost (Space)">▲ JUMP</button>
+        </div>
     </div>
 
     <!-- Cinematic Full-Screen Mission Briefing Intro (True Fullscreen Ken Burns Cutscenes & Deep Commander Voice) -->
@@ -922,6 +1003,7 @@
         const oscillatingPlatforms = [];
         const animatedTrampolines = [];
         const hurdlePlanets = [];
+        const animatedMoonlets = [];
         let earthMesh = null;
         let cloudsMesh = null;
 
@@ -974,49 +1056,35 @@
         sunGroup.position.set(1550, 880, -100);
         scene.add(sunGroup);
 
-        // Procedural Solar Surface Photosphere Texture (Boiling Convection Granulation & Flares)
+        // Procedural Solar Surface Photosphere Texture (Incandescent Brilliant Stellar Plasma)
         function createSolarSurfaceTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 512; canvas.height = 512;
             const ctx = canvas.getContext('2d');
 
-            // Radiant Incandescent Solar Base
-            const grad = ctx.createRadialGradient(256, 256, 40, 256, 256, 256);
+            // Radiant Incandescent Solar Base (Smooth, brilliant white to solar yellow to warm gold)
+            const grad = ctx.createRadialGradient(256, 256, 30, 256, 256, 256);
             grad.addColorStop(0, '#ffffff');
-            grad.addColorStop(0.35, '#fef08a');
-            grad.addColorStop(0.7, '#f59e0b');
-            grad.addColorStop(1, '#ea580c');
+            grad.addColorStop(0.25, '#fffbeb');
+            grad.addColorStop(0.55, '#fef08a');
+            grad.addColorStop(0.82, '#f59e0b');
+            grad.addColorStop(1.0, '#ea580c');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, 512, 512);
 
-            // Granular Convection Boiling Cells
-            for (let i = 0; i < 90; i++) {
+            // Solar Convection Granulation (Soft glowing plasma cells, NO dark blotches!)
+            for (let i = 0; i < 110; i++) {
                 const cx = Math.random() * 512;
                 const cy = Math.random() * 512;
-                const cr = 6 + Math.random() * 28;
+                const cr = 8 + Math.random() * 32;
                 const cGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, cr);
-                cGrad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
-                cGrad.addColorStop(0.6, 'rgba(251, 191, 36, 0.4)');
-                cGrad.addColorStop(1, 'rgba(234, 88, 12, 0)');
+                cGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+                cGrad.addColorStop(0.5, 'rgba(254, 240, 138, 0.45)');
+                cGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
                 ctx.fillStyle = cGrad;
                 ctx.beginPath();
                 ctx.arc(cx, cy, cr, 0, Math.PI * 2);
                 ctx.fill();
-            }
-
-            // Active Magnetic Sunspots
-            for (let s = 0; s < 12; s++) {
-                const sx = 120 + Math.random() * 272;
-                const sy = 120 + Math.random() * 272;
-                const sr = 3 + Math.random() * 7;
-                ctx.fillStyle = 'rgba(67, 20, 7, 0.75)';
-                ctx.beginPath();
-                ctx.arc(sx, sy, sr, 0, Math.PI * 2);
-                ctx.fill();
-                // Penumbra
-                ctx.strokeStyle = 'rgba(154, 52, 18, 0.5)';
-                ctx.lineWidth = 3;
-                ctx.stroke();
             }
 
             return new THREE.CanvasTexture(canvas);
@@ -1029,29 +1097,17 @@
         const sunCore = new THREE.Mesh(sunCoreGeo, sunCoreMat);
         sunGroup.add(sunCore);
 
-        // 2. 3D Coronal Prominence Arcs (Magnetic Plasma Loops extending off the sun!)
-        const prominenceGroup = new THREE.Group();
-        sunGroup.add(prominenceGroup);
-
-        const promGeo = new THREE.TorusGeometry(45, 5.5, 8, 32, Math.PI * 0.85);
-        const promMat1 = new THREE.MeshBasicMaterial({
-            color: 0xfb923c, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, fog: false
+        // Soft Additive Atmosphere Halo around Sun Sphere
+        const sunAtmGeo = new THREE.SphereGeometry(88, 36, 36);
+        const sunAtmMat = new THREE.MeshBasicMaterial({
+            color: 0xfef08a,
+            transparent: true,
+            opacity: 0.55,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending,
+            fog: false
         });
-        const promMat2 = new THREE.MeshBasicMaterial({
-            color: 0xf43f5e, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, fog: false
-        });
-
-        const prominence1 = new THREE.Mesh(promGeo, promMat1);
-        prominence1.position.set(65, 30, 0); prominence1.rotation.y = 0.4; prominenceGroup.add(prominence1);
-
-        const prominence2 = new THREE.Mesh(promGeo, promMat2);
-        prominence2.position.set(-60, 40, 15); prominence2.rotation.z = 1.2; prominenceGroup.add(prominence2);
-
-        const prominence3 = new THREE.Mesh(promGeo, promMat1);
-        prominence3.position.set(0, -65, -20); prominence3.rotation.x = 1.4; prominenceGroup.add(prominence3);
-
-        const prominence4 = new THREE.Mesh(promGeo, promMat2);
-        prominence4.position.set(-50, -45, 35); prominence4.rotation.y = -1.1; prominenceGroup.add(prominence4);
+        sunGroup.add(new THREE.Mesh(sunAtmGeo, sunAtmMat));
 
         // 3. Multi-Layer Volumetric Corona Textures
         function createCoronaGradientTexture(r1, r2, c0, c1, c2) {
@@ -1945,7 +2001,7 @@
             // Stage 2: Spherical Mars Crater Asteroid
             { type: "planet", x: -2.8, y: 4.0, z: 30, r: 2.2, name: "2. MARS CRATER ASTEROID", map: marsTex },
             // Stage 3: Swaying Emerald Transit Bridge (Oscillating)
-            { type: "skyBridge", x: 2.5, y: 7.0, z: 22, w: 2.0, h: 1.2, d: 4.6, name: "3. SWAYING TRANSIT BRIDGE", color: 0x10b981, isOscillating: true, oscSpeed: 1.4, oscAmp: 2.8, baseX: 2.5 },
+            { type: "skyBridge", x: 2.5, y: 7.0, z: 22, w: 1.9, h: 1.2, d: 4.4, name: "3. SWAYING TRANSIT BRIDGE", color: 0x10b981, isOscillating: true, oscSpeed: 2.0, oscAmp: 3.2, baseX: 2.5 },
             // Stage 4: Ion Accelerator Catapult Deck
             { type: "trampolineBuilding", x: -1.5, y: 8.8, z: 15, r: 2.3, h: 1.2, name: "4. ION CATAPULT LAUNCH DECK", color: 0xa855f7, isSuperBounce: true, boostY: 27.5, airLaunchZ: -9.0 },
             // Stage 5: Diamond Crystal Obelisk (Faceted Prismatic Crystal Platform)
@@ -1957,31 +2013,31 @@
             // Stage 6: [CHECKPOINT 1] Glacial Ice Dwarf Planet
             { type: "planet", x: -2.8, y: 22.0, z: -3, r: 2.2, name: "6. FROZEN ICE PLANETOID (CHECKPOINT 1)", map: iceTex, isCheckpoint: true, stageNum: 6 },
             // Stage 7: Golden Solar Array Station (Twin photovoltaic wings)
-            { type: "solarStation", x: 2.0, y: 25.2, z: -12, r: 2.1, h: 2.2, name: "7. ORBITAL SOLAR ARRAY", color: 0xf59e0b, isRotating: true, rotSpeed: 0.4 },
+            { type: "solarStation", x: 2.0, y: 25.2, z: -12, r: 2.1, h: 2.2, name: "7. ORBITAL SOLAR ARRAY", color: 0xf59e0b, isRotating: true, rotSpeed: 0.65 },
             // Stage 8: Hyperion Launch Catapult Pad
             { type: "trampolineBuilding", x: -1.5, y: 27.4, z: -20, r: 2.3, h: 1.2, name: "8. HYPERION LAUNCH TOWER", color: 0xec4899, isSuperBounce: true, boostY: 29.5, airLaunchZ: -10.0 },
             // Stage 9: Golden Saturnian Ringed Moon
             { type: "ringPlanet", x: 2.5, y: 36.8, z: -30, r: 2.2, ringR: 4.6, name: "9. RINGED CELESTIAL MOON", map: ringPlanetTex },
-            // Stage 10: Swaying Quantum Rail Truss Bridge (Oscillating)
-            { type: "skyBridge", x: -2.5, y: 40.2, z: -39, w: 1.8, h: 1.4, d: 3.2, name: "10. QUANTUM RAIL TRUSS", color: 0x3b82f6, isOscillating: true, oscSpeed: 1.6, oscAmp: 3.0, baseX: -2.5 },
+            // Stage 10: Swaying Quantum Rail Truss Bridge (Oscillating) — faster!
+            { type: "skyBridge", x: -2.5, y: 40.2, z: -39, w: 1.7, h: 1.4, d: 3.0, name: "10. QUANTUM RAIL TRUSS", color: 0x3b82f6, isOscillating: true, oscSpeed: 2.4, oscAmp: 3.4, baseX: -2.5 },
             // Stage 11: Amethyst Crystal Monolith
-            { type: "crystalPrism", x: 1.5, y: 43.2, z: -47, r: 2.0, h: 2.2, name: "11. AMETHYST CRYSTAL MONOLITH", color: 0x8b5cf6, isRotating: true, rotSpeed: -0.5 },
+            { type: "crystalPrism", x: 1.5, y: 43.2, z: -47, r: 2.0, h: 2.2, name: "11. AMETHYST CRYSTAL MONOLITH", color: 0x8b5cf6, isRotating: true, rotSpeed: -0.7 },
 
             // =================================================================
             // SECTOR 3: QUANTUM ANTI-GRAVITY & CELESTIAL ASTRO-DECKS (45m - 75m)
             // =================================================================
             // Stage 12: Stratosphere Launch Complex
             { type: "trampolineBuilding", x: 0, y: 45.4, z: -55, r: 2.3, h: 1.2, name: "12. STRATOSPHERE LAUNCH COMPLEX", color: 0x06b6d4, isSuperBounce: true, boostY: 28.5, airLaunchZ: -10.0 },
-            // Stage 13: [CHECKPOINT 2] Rotating Celestial Astro-Deck
-            { type: "buildingHex", x: 2.0, y: 54.8, z: -65, r: 2.2, h: 2.0, name: "13. CELESTIAL ASTRO-DECK (CHECKPOINT 2)", facade: bldgFacadeAmberTex, color: 0x6366f1, isRotating: true, rotSpeed: 0.45, isCheckpoint: true, stageNum: 13 },
+            // Stage 13: [CHECKPOINT 2] Rotating Celestial Astro-Deck — faster spin
+            { type: "buildingHex", x: 2.0, y: 54.8, z: -65, r: 2.2, h: 2.0, name: "13. CELESTIAL ASTRO-DECK (CHECKPOINT 2)", facade: bldgFacadeAmberTex, color: 0x6366f1, isRotating: true, rotSpeed: 0.7, isCheckpoint: true, stageNum: 13 },
             // Stage 14: Quantum Portal Stargate Ring (Spinning Torus Portal)
             { type: "quantumPortal", x: -2.0, y: 58.4, z: -74, r: 2.2, h: 1.4, name: "14. QUANTUM STARGATE RING", color: 0x38bdf8 },
-            // Stage 15: Rotating Orbital Telemetry Radar Hub
-            { type: "radarHub", x: 2.0, y: 62.0, z: -83, r: 2.1, h: 1.8, name: "15. ORBITAL TELEMETRY RADOME", isRotating: true, rotSpeed: -0.4 },
+            // Stage 15: Rotating Orbital Telemetry Radar Hub — fast spin
+            { type: "radarHub", x: 2.0, y: 62.0, z: -83, r: 2.1, h: 1.8, name: "15. ORBITAL TELEMETRY RADOME", isRotating: true, rotSpeed: -0.75 },
             // Stage 16: Emerald Bio-Crystalline Spire
             { type: "crystalPrism", x: -1.8, y: 65.5, z: -91, r: 2.1, h: 2.0, name: "16. EMERALD CRYSTAL SPIRE", color: 0x10b981 },
-            // Stage 17: High Mesosphere Swaying Skyway (Oscillating)
-            { type: "skyBridge", x: 1.5, y: 69.0, z: -99, w: 1.8, h: 1.2, d: 3.6, name: "17. HIGH MESOSPHERE SKYWAY", color: 0x06b6d4, isOscillating: true, oscSpeed: 1.5, oscAmp: 2.6, baseX: 1.5 },
+            // Stage 17: High Mesosphere Swaying Skyway (Oscillating) — faster & narrower!
+            { type: "skyBridge", x: 1.5, y: 69.0, z: -99, w: 1.6, h: 1.2, d: 3.4, name: "17. HIGH MESOSPHERE SKYWAY", color: 0x06b6d4, isOscillating: true, oscSpeed: 2.5, oscAmp: 3.5, baseX: 1.5 },
             // Stage 18: Aurora Ion Overdrive Pad
             { type: "trampolineBuilding", x: -1.0, y: 71.8, z: -107, r: 2.3, h: 1.2, name: "18. AURORA ION OVERDRIVE PAD", color: 0xf59e0b, isSuperBounce: true, boostY: 29.0, airLaunchZ: -10.0 },
 
@@ -1989,13 +2045,13 @@
             // SECTOR 4: THERMOSPHERE SATELLITE ARRAYS & TWIN PLANETS (75m - 105m)
             // =================================================================
             // Stage 19: [CHECKPOINT 3] Rotating Helios Solar Station
-            { type: "solarStation", x: 2.2, y: 81.5, z: -117, r: 2.2, h: 2.0, name: "19. HELIOS SOLAR STATION (CHECKPOINT 3)", isRotating: true, rotSpeed: 0.45, isCheckpoint: true, stageNum: 19 },
+            { type: "solarStation", x: 2.2, y: 81.5, z: -117, r: 2.2, h: 2.0, name: "19. HELIOS SOLAR STATION (CHECKPOINT 3)", isRotating: true, rotSpeed: 0.7, isCheckpoint: true, stageNum: 19 },
             // Stage 20: Crimson Mars Twin Asteroid
             { type: "planet", x: -2.5, y: 85.0, z: -125, r: 2.2, name: "20. CRIMSON MARS TWIN ASTEROID", map: marsTex },
-            // Stage 21: Titanium Truss Runway (Oscillating)
-            { type: "skyBridge", x: 1.8, y: 88.4, z: -133, w: 1.8, h: 1.2, d: 3.8, name: "21. TITANIUM TRUSS RUNWAY", color: 0x3b82f6, isOscillating: true, oscSpeed: 1.7, oscAmp: 3.2, baseX: 1.8 },
-            // Stage 22: Rotating Deep Space Radar Hub
-            { type: "radarHub", x: -2.0, y: 91.8, z: -141, r: 2.0, h: 2.0, name: "22. DEEP SPACE TELEMETRY RADAR", isRotating: true, rotSpeed: -0.5 },
+            // Stage 21: Titanium Truss Runway (Oscillating) — very fast!
+            { type: "skyBridge", x: 1.8, y: 88.4, z: -133, w: 1.6, h: 1.2, d: 3.6, name: "21. TITANIUM TRUSS RUNWAY", color: 0x3b82f6, isOscillating: true, oscSpeed: 2.8, oscAmp: 3.6, baseX: 1.8 },
+            // Stage 22: Rotating Deep Space Radar Hub — fast spin
+            { type: "radarHub", x: -2.0, y: 91.8, z: -141, r: 2.0, h: 2.0, name: "22. DEEP SPACE TELEMETRY RADAR", isRotating: true, rotSpeed: -0.85 },
             // Stage 23: Starlight Catapult Deck
             { type: "trampolineBuilding", x: 1.0, y: 94.2, z: -149, r: 2.3, h: 1.2, name: "23. STARLIGHT CATAPULT DECK", color: 0x8b5cf6, isSuperBounce: true, boostY: 29.5, airLaunchZ: -10.0 },
             // Stage 24: Glacial Ringed Planetoid
@@ -2006,10 +2062,10 @@
             // =================================================================
             // Stage 25: [CHECKPOINT 4] Grand Orbital Monolith Gateway
             { type: "buildingHex", x: 2.0, y: 106.8, z: -167, r: 2.2, h: 2.2, name: "25. ORBITAL MONOLITH (CHECKPOINT 4)", facade: bldgFacadeAmberTex, color: 0x0284c7, isCheckpoint: true, stageNum: 25 },
-            // Stage 26: Zero-G Translucent Runway (Oscillating)
-            { type: "skyBridge", x: -1.5, y: 110.2, z: -174, w: 1.8, h: 1.2, d: 3.6, name: "26. ZERO-G EXPEDITION RUNWAY", color: 0x10b981, isOscillating: true, oscSpeed: 1.6, oscAmp: 2.8, baseX: -1.5 },
+            // Stage 26: Zero-G Translucent Runway (Oscillating) — fast!
+            { type: "skyBridge", x: -1.5, y: 110.2, z: -174, w: 1.7, h: 1.2, d: 3.4, name: "26. ZERO-G EXPEDITION RUNWAY", color: 0x10b981, isOscillating: true, oscSpeed: 2.2, oscAmp: 3.2, baseX: -1.5 },
             // Stage 27: Exosphere Zenith Crystal Bastion
-            { type: "crystalPrism", x: 1.8, y: 113.6, z: -181, r: 2.1, h: 2.0, name: "27. EXOSPHERE CRYSTAL BASTION", color: 0xa855f7, isRotating: true, rotSpeed: 0.5 },
+            { type: "crystalPrism", x: 1.8, y: 113.6, z: -181, r: 2.1, h: 2.0, name: "27. EXOSPHERE CRYSTAL BASTION", color: 0xa855f7, isRotating: true, rotSpeed: 0.8 },
             // Stage 28: Sub-Orbital Magnetic Rail
             { type: "skyBridge", x: -1.2, y: 116.8, z: -187, w: 1.8, h: 1.2, d: 3.4, name: "28. SUB-ORBITAL MAGNETIC RAIL", color: 0x38bdf8 },
             // Stage 29: Stargate Celestial Observatory Radome
@@ -2035,115 +2091,144 @@
                 mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
 
-                // 1. Rooftop Landing Deck
-                const roofGeo = new THREE.CylinderGeometry(p.r, p.r, p.h, 6);
+                const bW = p.r * 2.0, bD = p.r * 2.0;
+
+                // 1. Rooftop Landing Deck — crisp flat box
+                const roofGeo = new THREE.BoxGeometry(bW, p.h, bD);
                 const roofMat = new THREE.MeshStandardMaterial({
                     map: bldgRoofTex,
-                    roughness: 0.35,
-                    metalness: 0.75
+                    roughness: 0.3,
+                    metalness: 0.82
                 });
                 const roof = new THREE.Mesh(roofGeo, roofMat);
                 mesh.add(roof);
 
                 // Glowing Neon Perimeter Cornice
-                const edgeLine = new THREE.LineSegments(
+                const corniceEdges = new THREE.LineSegments(
                     new THREE.EdgesGeometry(roofGeo),
-                    new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 })
+                    new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.9 })
                 );
-                roof.add(edgeLine);
+                roof.add(corniceEdges);
 
-                // 2. Colossal Skyscraper Body Shaft extending downwards into the cosmos
+                // 2. Rectangular Skyscraper Shaft
                 const shaftHeight = 38.0;
-                const shaftGeo = new THREE.CylinderGeometry(p.r * 0.96, p.r * 1.05, shaftHeight, 6);
+                const shaftW = bW * 0.9, shaftD = bD * 0.9;
+                const shaftGeo = new THREE.BoxGeometry(shaftW, shaftHeight, shaftD);
                 const facadeMat = new THREE.MeshStandardMaterial({
                     map: p.facade || bldgFacadeAmberTex,
-                    roughness: 0.25,
-                    metalness: 0.85,
-                    emissive: 0x0284c7,
-                    emissiveIntensity: 0.2
+                    roughness: 0.22,
+                    metalness: 0.88,
+                    emissive: 0x0f2850,
+                    emissiveIntensity: 0.18
                 });
                 const shaft = new THREE.Mesh(shaftGeo, facadeMat);
                 shaft.position.y = -shaftHeight / 2;
                 mesh.add(shaft);
 
-                // Vertical Neon Corner Accent Ribs
+                // Neon Edge Lines on shaft
                 const shaftEdges = new THREE.LineSegments(
                     new THREE.EdgesGeometry(shaftGeo),
-                    new THREE.LineBasicMaterial({
-                        color: p.facade === bldgFacadeAmberTex ? 0xf59e0b : 0x38bdf8,
-                        transparent: true,
-                        opacity: 0.75
-                    })
+                    new THREE.LineBasicMaterial({ color: p.facade === bldgFacadeAmberTex ? 0xf59e0b : 0x38bdf8, transparent: true, opacity: 0.7 })
                 );
                 shaft.add(shaftEdges);
 
-                // Holographic Neon Corporate Signboard on Building Front
+                // 3. Mid-level stepped setback crown
+                const crownW = bW * 1.06, crownD = bD * 1.06;
+                const crownGeo = new THREE.BoxGeometry(crownW, 0.55, crownD);
+                const crown = new THREE.Mesh(crownGeo, new THREE.MeshStandardMaterial({ color: 0x1e3a5f, metalness: 0.95, roughness: 0.15, emissive: 0x38bdf8, emissiveIntensity: 0.3 }));
+                crown.position.y = p.h / 2 + 0.28;
+                mesh.add(crown);
+
+                // 4. Corner Vertical Neon Pillar Columns
+                const pillarMat = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, emissive: 0x0284c7, emissiveIntensity: 0.9, metalness: 0.9, roughness: 0.1 });
+                for (let cx = -1; cx <= 1; cx += 2) {
+                    for (let cz = -1; cz <= 1; cz += 2) {
+                        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.18, shaftHeight + p.h, 0.18), pillarMat);
+                        pillar.position.set(cx * (shaftW / 2 + 0.09), -shaftHeight / 2, cz * (shaftD / 2 + 0.09));
+                        mesh.add(pillar);
+                    }
+                }
+
+                // 5. HVAC Mechanical Box
+                const hvacBox = new THREE.Mesh(new THREE.BoxGeometry(bW * 0.55, 0.45, bD * 0.45), new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.88, roughness: 0.3 }));
+                hvacBox.position.set(-bW * 0.18, p.h / 2 + 0.52, bD * 0.18);
+                mesh.add(hvacBox);
+
+                // 6. Holographic Neon Signboard
                 const signGeo = new THREE.PlaneGeometry(2.4, 0.8);
-                const signMat = new THREE.MeshBasicMaterial({
-                    map: createHoloSignTexture(p.name),
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 0.88
-                });
+                const signMat = new THREE.MeshBasicMaterial({ map: createHoloSignTexture(p.name), side: THREE.DoubleSide, transparent: true, opacity: 0.88 });
                 const signMesh = new THREE.Mesh(signGeo, signMat);
-                signMesh.position.set(0, -2.6, p.r * 0.98);
+                signMesh.position.set(0, -2.6, bD / 2 + 0.01);
                 mesh.add(signMesh);
 
-                // Rooftop Satellite Uplink Dish
+                // 7. Satellite Uplink Dish
                 const dishGroup = new THREE.Group();
-                dishGroup.position.set(-p.r * 0.45, p.h / 2 + 0.35, p.r * 0.35);
-                const dish = new THREE.Mesh(
-                    new THREE.ConeGeometry(0.32, 0.14, 16, 1, true),
-                    new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.95, roughness: 0.2 })
-                );
+                dishGroup.position.set(-bW * 0.3, p.h / 2 + 0.55, bD * 0.3);
+                const dish = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.14, 16, 1, true), new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.95, roughness: 0.2 }));
                 dish.rotation.x = Math.PI * 0.65; dish.rotation.y = 0.5; dishGroup.add(dish);
-                const dishFeed = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.015, 0.015, 0.22, 6),
-                    new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.8 })
-                );
+                const dishFeed = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.22, 6), new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.8 }));
                 dishFeed.position.set(0, 0.12, 0.08); dishGroup.add(dishFeed);
                 mesh.add(dishGroup);
 
-                // Rooftop Antenna Mast with Aviation Beacon Light
-
-                // Communication Antenna with Blinking Aviation Warning Beacon Light
-                const antMastGeo = new THREE.CylinderGeometry(0.03, 0.05, 3.2, 8);
+                // 8. Antenna Mast + Aviation Beacon
                 const antMastMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.95 });
-                const antenna = new THREE.Mesh(antMastGeo, antMastMat);
-                antenna.position.set(p.r * 0.45, p.h / 2 + 1.6, -p.r * 0.35);
+                const antenna = new THREE.Mesh(new THREE.BoxGeometry(0.07, 3.2, 0.07), antMastMat);
+                antenna.position.set(bW * 0.33, p.h / 2 + 1.6, -bD * 0.33);
                 mesh.add(antenna);
 
                 const beaconGeo = new THREE.SphereGeometry(0.08, 8, 8);
                 const beaconMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 1.0 });
                 const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-                beacon.position.set(p.r * 0.45, p.h / 2 + 3.2, -p.r * 0.35);
+                beacon.position.set(bW * 0.33, p.h / 2 + 3.2, -bD * 0.33);
                 mesh.add(beacon);
                 aviationBeacons.push(beacon);
+
 
             } else if (p.type === "trampolineBuilding" || p.type === "trampoline") {
                 mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
 
-                // 1. Skyscraper Base Shaft under the Launch Facility
+                const tW = p.r * 2.0, tD = p.r * 2.0;
+
+                // 1. Rectangular Skyscraper Base Shaft
                 const shaftHeight = 35.0;
-                const shaftGeo = new THREE.CylinderGeometry(p.r * 1.02, p.r * 1.12, shaftHeight, 8);
+                const shaftGeo = new THREE.BoxGeometry(tW * 0.88, shaftHeight, tD * 0.88);
                 const shaftMat = new THREE.MeshStandardMaterial({
                     map: bldgFacadeCyanTex,
-                    roughness: 0.25,
-                    metalness: 0.85,
-                    emissive: 0x06b6d4,
-                    emissiveIntensity: 0.25
+                    roughness: 0.22,
+                    metalness: 0.88,
+                    emissive: 0x065e70,
+                    emissiveIntensity: 0.22
                 });
                 const shaft = new THREE.Mesh(shaftGeo, shaftMat);
                 shaft.position.y = -shaftHeight / 2;
                 mesh.add(shaft);
+                shaft.add(new THREE.LineSegments(new THREE.EdgesGeometry(shaftGeo), new THREE.LineBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.65 })));
 
-                // 2. Rooftop Ion Launch Pad Rim
-                const pad = new THREE.Mesh(
-                    new THREE.CylinderGeometry(p.r, p.r * 1.08, p.h, 24),
-                    new THREE.MeshStandardMaterial({ color: p.color, emissive: 0x9333ea, emissiveIntensity: 0.65, roughness: 0.18, metalness: 0.85 })
-                );
+                // Booster Corner Pylons
+                const pylonMat = new THREE.MeshStandardMaterial({ color: 0x0891b2, emissive: 0x0e7490, emissiveIntensity: 0.8, metalness: 0.9, roughness: 0.1 });
+                for (let cx = -1; cx <= 1; cx += 2) {
+                    for (let cz = -1; cz <= 1; cz += 2) {
+                        const pylon = new THREE.Mesh(new THREE.BoxGeometry(0.22, shaftHeight + p.h + 0.4, 0.22), pylonMat);
+                        pylon.position.set(cx * (tW * 0.44 + 0.11), -shaftHeight / 2, cz * (tD * 0.44 + 0.11));
+                        mesh.add(pylon);
+                    }
+                }
+
+                // 2. Rooftop Ion Launch Pad — flat box platform
+                const padGeo = new THREE.BoxGeometry(tW * 1.1, p.h, tD * 1.1);
+                const pad = new THREE.Mesh(padGeo, new THREE.MeshStandardMaterial({ color: p.color, emissive: 0x9333ea, emissiveIntensity: 0.6, roughness: 0.15, metalness: 0.88 }));
                 mesh.add(pad);
+                pad.add(new THREE.LineSegments(new THREE.EdgesGeometry(padGeo), new THREE.LineBasicMaterial({ color: 0xf0abfc, transparent: true, opacity: 0.9 })));
+
+                // Warning stripe ring on pad surface
+                const stripeRing = new THREE.Mesh(
+                    new THREE.RingGeometry(p.r * 0.55, p.r * 1.0, 32),
+                    new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide, transparent: true, opacity: 0.75 })
+                );
+                stripeRing.rotation.x = Math.PI / 2;
+                stripeRing.position.y = p.h / 2 + 0.02;
+                mesh.add(stripeRing);
 
                 // Glowing Neon Launch Rings
                 const trampRing = new THREE.Mesh(
@@ -2151,7 +2236,7 @@
                     new THREE.MeshBasicMaterial({ color: 0xf0abfc, side: THREE.DoubleSide })
                 );
                 trampRing.rotation.x = Math.PI / 2;
-                trampRing.position.y = p.h / 2 + 0.05;
+                trampRing.position.y = p.h / 2 + 0.06;
                 mesh.add(trampRing);
 
                 const trampPulse = new THREE.Mesh(
@@ -2159,21 +2244,22 @@
                     new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
                 );
                 trampPulse.rotation.x = Math.PI / 2;
-                trampPulse.position.y = p.h / 2 + 0.06;
+                trampPulse.position.y = p.h / 2 + 0.07;
                 mesh.add(trampPulse);
 
-                // Corner Power Capacitors on Launch Pad
+                // Corner Power Capacitor Boxes (square instead of cylinder)
                 for (let a = 0; a < 4; a++) {
                     const ang = (a * Math.PI) / 2;
                     const cap = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.12, 0.12, 0.4, 8),
-                        new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0284c7, emissiveIntensity: 0.8, metalness: 0.9 })
+                        new THREE.BoxGeometry(0.22, 0.5, 0.22),
+                        new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0284c7, emissiveIntensity: 0.85, metalness: 0.9 })
                     );
-                    cap.position.set(Math.cos(ang) * (p.r * 0.95), p.h / 2 + 0.2, Math.sin(ang) * (p.r * 0.95));
+                    cap.position.set(Math.cos(ang) * (p.r * 1.0), p.h / 2 + 0.25, Math.sin(ang) * (p.r * 1.0));
                     mesh.add(cap);
                 }
 
                 animatedTrampolines.push({ ring: trampRing, pulse: trampPulse });
+
 
             } else if (p.type === "skyBridge") {
                 mesh = new THREE.Group();
@@ -2213,11 +2299,14 @@
                 // Sleek suspended anti-gravity skyway (no heavy under-blocks)
 
             } else if (p.type === "planet") {
-                const geo = new THREE.SphereGeometry(p.r, 36, 36);
-                mesh = new THREE.Mesh(geo, mat);
+                mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
-                hurdlePlanets.push({ mesh: mesh, speed: 0.4 });
 
+                const planetCore = new THREE.Mesh(new THREE.SphereGeometry(p.r, 36, 36), mat);
+                mesh.add(planetCore);
+                hurdlePlanets.push({ mesh: planetCore, speed: 0.4 });
+
+                // Animated additive atmosphere halo (pulsates in animate)
                 const haloGeo = new THREE.SphereGeometry(p.r * 1.12, 32, 32);
                 const haloMat = new THREE.MeshBasicMaterial({
                     color: p.name.includes("MARS") ? 0xf97316 : 0x38bdf8,
@@ -2226,7 +2315,27 @@
                     opacity: 0.55,
                     blending: THREE.AdditiveBlending
                 });
-                mesh.add(new THREE.Mesh(haloGeo, haloMat));
+                const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+                mesh.add(haloMesh);
+
+                // Orbiting moonlet satellite
+                const moonletOrbit = new THREE.Group();
+                mesh.add(moonletOrbit);
+                const moonletMesh = new THREE.Mesh(
+                    new THREE.SphereGeometry(p.r * 0.18, 10, 10),
+                    new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7, metalness: 0.4 })
+                );
+                moonletMesh.position.set(p.r * 1.75, 0, 0);
+                moonletOrbit.add(moonletMesh);
+                // Tiny solar panel on moonlet
+                const panelL = new THREE.Mesh(new THREE.BoxGeometry(p.r * 0.28, 0.015, p.r * 0.14), new THREE.MeshStandardMaterial({ color: 0x1d4ed8, emissive: 0x1e40af, emissiveIntensity: 0.6, metalness: 0.9 }));
+                panelL.position.x = -p.r * 0.22;
+                moonletMesh.add(panelL);
+                const panelR = panelL.clone();
+                panelR.position.x = p.r * 0.22;
+                moonletMesh.add(panelR);
+
+                animatedMoonlets.push({ orbit: moonletOrbit, halo: haloMesh, speed: p.name.includes("MARS") ? 1.6 : 1.2 });
 
             } else if (p.type === "ringPlanet") {
                 mesh = new THREE.Group();
@@ -2429,12 +2538,13 @@
                 };
             } else if (p.type === "buildingHex" || p.type === "trampolineBuilding" || p.type === "hex" || p.type === "trampoline" || p.type === "crystalPrism" || p.type === "solarStation" || p.type === "quantumPortal" || p.type === "radarHub") {
                 physObj = {
-                    shape: "cylinder",
-                    cx: p.x, cy: p.y, cz: p.z, r: p.r, halfH: p.h / 2,
+                    shape: "box",
+                    cx: p.x, cy: p.y, cz: p.z,
                     minX: p.x - p.r, maxX: p.x + p.r,
                     minY: p.y - p.h / 2, maxY: p.y + p.h / 2,
                     minZ: p.z - p.r, maxZ: p.z + p.r,
-                    name: p.name, isSuperBounce: !!p.isSuperBounce, 
+                    halfW: p.r, halfD: p.r, halfH: p.h / 2,
+                    name: p.name, isSuperBounce: !!p.isSuperBounce,
                     boostY: p.boostY || 28.0, airLaunchZ: p.airLaunchZ || -9.5
                 };
             } else {
@@ -4118,9 +4228,13 @@
             }
         });
 
-        // Touch drag support for 360° look
+        // Touch drag support for 360° look (Excludes UI buttons & mobile controls)
         window.addEventListener('touchstart', (e) => {
             if (e.touches && e.touches.length > 0) {
+                if (e.target.closest('#mobile-controls') || e.target.closest('#bottom-hud') || e.target.closest('button')) {
+                    cameraRig.isDragging = false;
+                    return;
+                }
                 cameraRig.isDragging = true;
                 cameraRig.lastX = e.touches[0].clientX;
                 cameraRig.lastY = e.touches[0].clientY;
@@ -4140,23 +4254,66 @@
             }
         }, { passive: true });
 
+        // Mobile On-Screen Touch D-Pad & Controls Binder
+        function bindTouchKey(elemId, keyName) {
+            const el = document.getElementById(elemId);
+            if (!el) return;
+            const press = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                keys[keyName] = true;
+                el.classList.add('active');
+            };
+            const release = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                keys[keyName] = false;
+                el.classList.remove('active');
+            };
+            el.addEventListener('touchstart', press, { passive: false });
+            el.addEventListener('touchend', release, { passive: false });
+            el.addEventListener('touchcancel', release, { passive: false });
+            el.addEventListener('mousedown', press);
+            el.addEventListener('mouseup', release);
+            el.addEventListener('mouseleave', release);
+        }
+
+        bindTouchKey('dpad-fwd', 'w');
+        bindTouchKey('dpad-back', 's');
+        bindTouchKey('dpad-left', 'a');
+        bindTouchKey('dpad-right', 'd');
+        bindTouchKey('dpad-sprint', 'shift');
+
+        const mobJump = document.getElementById('mob-jump');
+        if (mobJump) {
+            mobJump.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleJumpAction();
+            }, { passive: false });
+            mobJump.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handleJumpAction();
+            });
+        }
+
+        const mobHover = document.getElementById('mob-hover');
+        if (mobHover) {
+            mobHover.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleHoverPower();
+            }, { passive: false });
+            mobHover.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleHoverPower();
+            });
+        }
+
         // UI Buttons
-        document.getElementById('b-floor').addEventListener('click', () => setSurface(0));
-        document.getElementById('b-wall').addEventListener('click', () => setSurface(1));
         document.getElementById('b-jump').addEventListener('click', () => handleJumpAction());
         const bHover = document.getElementById('b-hover');
         if (bHover) bHover.addEventListener('click', () => toggleHoverPower());
-        const bLaunchStarship = document.getElementById('b-launch-starship');
-        if (bLaunchStarship) {
-            bLaunchStarship.addEventListener('click', (e) => {
-                e.stopPropagation();
-                triggerSpaceshipLaunch();
-            });
-            bLaunchStarship.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-                triggerSpaceshipLaunch();
-            }, { passive: true });
-        }
         document.getElementById('b-reset').addEventListener('click', () => resetPlayer());
         document.getElementById('btn-replay').addEventListener('click', () => resetPlayer());
         const bHome = document.getElementById('b-home');
@@ -4767,6 +4924,16 @@
                 t.pulse.scale.set(pScale, pScale, 1);
             }
 
+            // Animate Planet Moonlet Orbits & Halo Pulsation
+            for (let i = 0; i < animatedMoonlets.length; i++) {
+                const m = animatedMoonlets[i];
+                m.orbit.rotation.y += dt * m.speed;
+                m.orbit.rotation.x = Math.sin(time * 0.4 + i) * 0.18; // slight inclination wobble
+                if (m.halo && m.halo.material) {
+                    m.halo.material.opacity = 0.4 + Math.sin(time * 2.2 + i * 1.1) * 0.2;
+                }
+            }
+
             // Gentle bio-spores drift
             if (sporeGeo && sporeGeo.attributes.position) {
                 const posArr = sporeGeo.attributes.position.array;
@@ -4787,11 +4954,6 @@
                 sunCore.rotation.y += dt * 0.05;
                 sunCore.rotation.x += dt * 0.02;
             }
-            if (typeof prominence1 !== 'undefined') prominence1.rotation.z += dt * 0.32;
-            if (typeof prominence2 !== 'undefined') prominence2.rotation.y += dt * 0.24;
-            if (typeof prominence3 !== 'undefined') prominence3.rotation.x += dt * 0.2;
-            if (typeof prominence4 !== 'undefined') prominence4.rotation.z -= dt * 0.28;
-            if (typeof prominenceGroup !== 'undefined') prominenceGroup.rotation.y += dt * 0.04;
 
             if (typeof sunInnerCorona !== 'undefined') {
                 const cPulse = 450 + Math.sin(time * 3.2) * 35;
@@ -4942,17 +5104,6 @@
             // -------------------------------------------------------------
             // B. NORMAL GAMEPLAY TICK
             // -------------------------------------------------------------
-            // Dynamic Starship Launch Button on Summit
-            const bLaunchStarship = document.getElementById('b-launch-starship');
-            if (bLaunchStarship) {
-                if (player.pos.y >= 120.0 || player.pos.z <= -190.0) {
-                    bLaunchStarship.style.display = 'inline-block';
-                } else {
-                    bLaunchStarship.style.display = 'none';
-                }
-            }
-
-            // Starship Jump-to-Board Trigger (Triggers when player JUMPS directly onto the Starship on summit)
             if (!player.isGrounded && player.pos.y >= 125.0) {
                 const dx = Math.abs(player.pos.x - spaceship.position.x);
                 const dz = Math.abs(player.pos.z - spaceship.position.z);
@@ -5206,9 +5357,9 @@
                                 if (p.isEarth) {
                                     curStageName = "31. PLANET EARTH SUMMIT (BOARD STARSHIP)";
                                     document.getElementById('pill-mode').className = "tag-pill tag-earth";
-                                    document.getElementById('pill-mode').textContent = "EARTH SUMMIT // CLICK '🚀 LAUNCH STARSHIP' OR BOARD!";
+                                     document.getElementById('pill-mode').textContent = "EARTH SUMMIT // BOARD THE STARSHIP!";
                                     if (alertBanner && bannerTimer <= 0) {
-                                        alertBanner.textContent = "🌍 PLANET EARTH SUMMIT REACHED! Click '🚀 LAUNCH STARSHIP' [L] or board craft! 🚀";
+                                        alertBanner.textContent = "🌍 PLANET EARTH SUMMIT REACHED! Board the Starship to escape! 🚀";
                                         alertBanner.style.background = "linear-gradient(135deg, rgba(14, 165, 233, 0.95), rgba(30, 58, 138, 0.95))";
                                         alertBanner.style.borderColor = "#38bdf8";
                                         alertBanner.style.boxShadow = "0 0 35px rgba(56, 189, 248, 0.8)";
