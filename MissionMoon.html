@@ -3349,9 +3349,18 @@
                 modal.style.display = 'block';
                 modal.style.opacity = '1';
                 this.active = true;
+                gameState = "INTRO";
                 this.step = 0;
 
-                // Start terrifying atmospheric horror soundscape
+                // Reset visual slides to first slide
+                for (let i = 0; i < this.slides.length; i++) {
+                    const img = document.getElementById(this.slides[i].imgId);
+                    const dot = document.getElementById(this.slides[i].dotId);
+                    if (img) img.classList.toggle('active', i === 0);
+                    if (dot) dot.classList.toggle('active', i === 0);
+                }
+
+                // Start atmospheric cinematic intro soundscape
                 AudioMaster.startHorrorIntroAmbience();
                 this.showStep(0);
             },
@@ -3449,6 +3458,7 @@
             finish() {
                 if (!this.active) return;
                 this.stop();
+                resetPlayer();
                 gameState = "PLAYING";
 
                 // Stop horror ambience and transition to ambient flight music
@@ -4458,7 +4468,9 @@
             AudioMaster.init();
             if (gameState === "HOMESCREEN" && (e.code === 'Enter' || e.key === 'Enter' || e.code === 'Space' || e.key === ' ')) {
                 e.preventDefault();
-                if (typeof launchActiveExpedition === 'function') {
+                if (typeof startExpeditionWithIntro === 'function') {
+                    startExpeditionWithIntro();
+                } else if (typeof launchActiveExpedition === 'function') {
                     launchActiveExpedition();
                 }
                 return;
@@ -4844,15 +4856,29 @@
             }
         }
 
+        function startExpeditionWithIntro() {
+            AudioMaster.init();
+            const hsModal = document.getElementById('homescreen-modal');
+            if (hsModal) {
+                hsModal.style.opacity = '0';
+                setTimeout(() => { hsModal.style.display = 'none'; }, 400);
+            }
+            if (IntroSequence) {
+                IntroSequence.start();
+            } else {
+                launchActiveExpedition();
+            }
+        }
+
         const btnStartExp = document.getElementById('btn-start-expedition');
         if (btnStartExp) {
             btnStartExp.addEventListener('click', (e) => {
                 e.stopPropagation();
-                launchActiveExpedition();
+                startExpeditionWithIntro();
             });
             btnStartExp.addEventListener('touchstart', (e) => {
                 e.stopPropagation();
-                launchActiveExpedition();
+                startExpeditionWithIntro();
             }, { passive: true });
         }
 
@@ -4860,10 +4886,12 @@
         if (btnWatchBriefing) {
             btnWatchBriefing.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const hsModal = document.getElementById('homescreen-modal');
-                if (hsModal) hsModal.style.display = 'none';
-                IntroSequence.start();
+                startExpeditionWithIntro();
             });
+            btnWatchBriefing.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                startExpeditionWithIntro();
+            }, { passive: true });
         }
 
         // AntSeed AI VPN Live Inspector Modal Controls
