@@ -3322,7 +3322,50 @@
         }
 
         // =====================================================================
-        // STORY NARRATOR: WEB SPEECH SYNTHESIS AUDIO GUIDE (DARK POWERFUL VOCALS)
+        // STUDIO CINEMATIC NARRATOR AUDIO PLAYER (HOLLYWOOD MALE VOICE ON ALL DEVICES)
+        // =====================================================================
+        const NarratorAudioPlayer = {
+            audio: null,
+            init() {
+                if (!this.audio) {
+                    this.audio = new Audio();
+                    this.audio.preload = 'auto';
+                }
+            },
+            play(src, onEnd, onError) {
+                this.init();
+                this.stop();
+                this.audio.src = src;
+                this.audio.currentTime = 0;
+                this.audio.onended = () => {
+                    if (onEnd) onEnd();
+                };
+                this.audio.onerror = (err) => {
+                    console.warn("Studio narration file load failed, falling back to TTS:", err);
+                    if (onError) onError();
+                };
+                const playPromise = this.audio.play();
+                if (playPromise && playPromise.catch) {
+                    playPromise.catch(err => {
+                        console.warn("Audio autoplay blocked, falling back to TTS:", err);
+                        if (onError) onError();
+                    });
+                }
+            },
+            stop() {
+                if (this.audio) {
+                    try {
+                        this.audio.pause();
+                        this.audio.currentTime = 0;
+                        this.audio.onended = null;
+                        this.audio.onerror = null;
+                    } catch(e) {}
+                }
+            }
+        };
+
+        // =====================================================================
+        // STORY NARRATOR: STUDIO AUDIO GUIDE (DEEP COMMANDING MALE VOICE)
         // =====================================================================
         const StoryNarrator = {
             speaking: false,
@@ -3335,58 +3378,49 @@
                 "Master the low-gravity physics, defy the darkness, and ignite escape velocity. The void awaits.",
 
             play() {
-                if (!this.synth) {
-                    alert("Web Speech Synthesis is not supported in this browser.");
-                    return;
-                }
                 if (this.speaking) {
                     this.stop();
                     return;
                 }
-                this.synth.cancel();
-                if (this.synth.resume) this.synth.resume();
-                this.utterance = new SpeechSynthesisUtterance(this.storyText);
-                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                // On mobile, pitch 1.0 is required: mobile synthesizers have no neural pitch shifter,
-                // so pitch < 1.0 causes harsh metallic vocoder distortion & muffled gargling.
-                this.utterance.rate = isMobile ? 0.94 : 0.80;  // Measured, articulate cadence
-                this.utterance.pitch = isMobile ? 1.0 : 0.54;  // Clean natural on mobile, deep on desktop
-                this.utterance.volume = 1.0;
+                this.speaking = true;
+                const btn = document.getElementById('btn-audio-guide');
+                if (btn) {
+                    btn.innerHTML = '⏹️ PAUSE AUDIO GUIDE';
+                    btn.classList.add('narrator-active');
+                }
 
-                const horrorVoice = getHorrorVoice(this.synth);
-                if (horrorVoice) this.utterance.voice = horrorVoice;
-
-                this.utterance.onstart = () => {
-                    this.speaking = true;
-                    const btn = document.getElementById('btn-audio-guide');
-                    if (btn) {
-                        btn.innerHTML = '⏹️ PAUSE AUDIO GUIDE';
-                        btn.classList.add('narrator-active');
-                    }
-                };
-
-                this.utterance.onend = () => {
+                const handleEnd = () => {
                     this.speaking = false;
-                    const btn = document.getElementById('btn-audio-guide');
                     if (btn) {
                         btn.innerHTML = '🎙️ LISTEN TO AUDIO GUIDE';
                         btn.classList.remove('narrator-active');
                     }
                 };
 
-                this.utterance.onerror = () => {
-                    this.speaking = false;
-                    const btn = document.getElementById('btn-audio-guide');
-                    if (btn) {
-                        btn.innerHTML = '🎙️ LISTEN TO AUDIO GUIDE';
-                        btn.classList.remove('narrator-active');
+                // Play pristine studio-quality male voice track (identical on phone & PC)
+                NarratorAudioPlayer.play(
+                    'assets/audio/audio_guide.mp3',
+                    handleEnd,
+                    () => {
+                        if (!this.synth) return;
+                        this.synth.cancel();
+                        if (this.synth.resume) this.synth.resume();
+                        this.utterance = new SpeechSynthesisUtterance(this.storyText);
+                        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                        this.utterance.rate = isMobile ? 0.94 : 0.80;
+                        this.utterance.pitch = isMobile ? 1.0 : 0.54;
+                        this.utterance.volume = 1.0;
+                        const v = getHorrorVoice(this.synth);
+                        if (v) this.utterance.voice = v;
+                        this.utterance.onend = handleEnd;
+                        this.utterance.onerror = handleEnd;
+                        this.synth.speak(this.utterance);
                     }
-                };
-
-                this.synth.speak(this.utterance);
+                );
             },
 
             stop() {
+                NarratorAudioPlayer.stop();
                 if (this.synth) this.synth.cancel();
                 this.speaking = false;
                 const btn = document.getElementById('btn-audio-guide');
@@ -3398,7 +3432,7 @@
         };
 
         // =====================================================================
-        // CINEMATIC INTRO SEQUENCE: HORROR DEPTH VOCALS + DOOM IMPACTS + CAPTIONS
+        // CINEMATIC INTRO SEQUENCE: STUDIO MALE NARRATION + DOOM IMPACTS + CAPTIONS
         // =====================================================================
         const IntroSequence = {
             active: false,
@@ -3409,20 +3443,23 @@
                 {
                     imgId: 'intro-slide-1',
                     dotId: 'dot-1',
+                    audioSrc: 'assets/audio/intro_1.mp3',
                     caption: "The planetary core is dying. Gravitational anomalies have shattered reality into an endless cosmic abyss. The void is calling.",
                     duration: 6200
                 },
                 {
                     imgId: 'intro-slide-2',
                     dotId: 'dot-2',
+                    audioSrc: 'assets/audio/intro_2.mp3',
                     caption: "Pilot Zaddr. A lone cybernetic soul condemned above the darkness. Ignite your thrusters... and conquer the eighteen celestial monoliths.",
-                    duration: 6400
+                    duration: 6600
                 },
                 {
                     imgId: 'intro-slide-3',
                     dotId: 'dot-3',
+                    audioSrc: 'assets/audio/intro_3.mp3',
                     caption: "At the summit waits the Starship. Escape Earth's dying grave... before the cold shadows swallow you whole.",
-                    duration: 6000
+                    duration: 5600
                 }
             ],
 
@@ -3430,6 +3467,7 @@
 
             start() {
                 this.startTime = Date.now();
+                NarratorAudioPlayer.init();
                 const modal = document.getElementById('intro-modal');
                 if (!modal) return;
                 modal.style.display = 'block';
@@ -3497,6 +3535,7 @@
                 const advanceStep = () => {
                     if (stepAdvanced || !this.active) return;
                     stepAdvanced = true;
+                    NarratorAudioPlayer.stop();
                     clearTimeout(this.timer);
                     if (index + 1 < this.slides.length) {
                         this.showStep(index + 1);
@@ -3505,53 +3544,61 @@
                     }
                 };
 
-                // Calibrated pitch & rate: consistent deep cinematic tone on PC, pristine natural audio on mobile
-                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                const voicePitch = isMobile ? 1.0 : 0.62; // Native 1.0 on mobile eliminates all vocoder artifacts & metallic buzz
-                const voiceRate = isMobile ? 0.94 : 0.82;  // Clear, authoritative cadence
+                const fallbackTTS = () => {
+                    if (this.synth) {
+                        try {
+                            if (this.synth.speaking) this.synth.cancel();
+                            this.synth.resume();
+                            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                            const utt = new SpeechSynthesisUtterance(s.caption);
+                            utt.pitch = isMobile ? 1.0 : 0.62;
+                            utt.rate = isMobile ? 0.94 : 0.82;
+                            utt.volume = 1.0;
+                            const horrorVoice = getHorrorVoice(this.synth);
+                            if (horrorVoice) utt.voice = horrorVoice;
 
-                if (this.synth) {
-                    try {
-                        if (this.synth.speaking) {
-                            this.synth.cancel();
+                            utt.onend = () => {
+                                clearTimeout(this.timer);
+                                this.timer = setTimeout(advanceStep, 1000);
+                            };
+                            utt.onerror = () => {
+                                clearTimeout(this.timer);
+                                this.timer = setTimeout(advanceStep, 800);
+                            };
+                            this.synth.speak(utt);
+                        } catch(e) {
+                            console.warn("Speech synthesis error:", e);
                         }
-                        this.synth.resume();
-                        const utt = new SpeechSynthesisUtterance(s.caption);
-                        utt.pitch = voicePitch;
-                        utt.rate = voiceRate;
-                        utt.volume = 1.0;
-                        const horrorVoice = getHorrorVoice(this.synth);
-                        if (horrorVoice) utt.voice = horrorVoice;
-
-                        utt.onend = () => {
-                            clearTimeout(this.timer);
-                            const pauseMs = (index === this.slides.length - 1) ? 1400 : 1000;
-                            this.timer = setTimeout(advanceStep, pauseMs);
-                        };
-
-                        utt.onerror = () => {
-                            clearTimeout(this.timer);
-                            this.timer = setTimeout(advanceStep, 800);
-                        };
-
-                        // Stagger voice start by 260ms so initial doom horn impact punch doesn't mask speech
-                        setTimeout(() => {
-                            if (this.active && this.step === index) {
-                                try { this.synth.speak(utt); } catch(e) {}
-                            }
-                        }, isMobile ? 260 : 60);
-                    } catch(e) {
-                        console.warn("Speech synthesis error:", e);
                     }
+                };
+
+                // Play studio Hollywood-tier male narration track (identical on phone & PC)
+                if (s.audioSrc) {
+                    setTimeout(() => {
+                        if (this.active && this.step === index) {
+                            NarratorAudioPlayer.play(
+                                s.audioSrc,
+                                () => {
+                                    clearTimeout(this.timer);
+                                    const pauseMs = (index === this.slides.length - 1) ? 1400 : 1000;
+                                    this.timer = setTimeout(advanceStep, pauseMs);
+                                },
+                                fallbackTTS
+                            );
+                        }
+                    }, 220);
+                } else {
+                    fallbackTTS();
                 }
 
-                // Fallback timer matched to slide duration (6-7s) so mobile advances naturally even if TTS is muted
+                // Fallback timer matched to slide duration (6-7s) so mobile advances naturally even if muted
                 clearTimeout(this.timer);
                 this.timer = setTimeout(advanceStep, s.duration || 6500);
             },
 
             stop() {
                 this.active = false;
+                NarratorAudioPlayer.stop();
                 clearTimeout(this.timer);
                 if (this.synth) {
                     try { this.synth.cancel(); } catch(e) {}
@@ -3587,23 +3634,27 @@
 
                 // Voice transmission on game launch: "Are you ready cadet, to reach the moon?"
                 setTimeout(() => {
-                    if (window.speechSynthesis) {
-                        try {
-                            window.speechSynthesis.cancel();
-                            window.speechSynthesis.resume();
-                            const readyUtt = new SpeechSynthesisUtterance("Are you ready cadet, to reach the moon?");
-                            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                            readyUtt.rate = isMobile ? 0.94 : 0.86;
-                            readyUtt.pitch = isMobile ? 1.0 : 0.70; // Pure 1.0 on mobile prevents vocoder distortion
-                            readyUtt.volume = 1.0;
-                            const voice = getHorrorVoice(window.speechSynthesis);
-                            if (voice) readyUtt.voice = voice;
-                            window.speechSynthesis.speak(readyUtt);
-                        } catch(e) {
-                            console.warn("Speech synthesis error:", e);
+                    NarratorAudioPlayer.play(
+                        'assets/audio/launch_ready.mp3',
+                        null,
+                        () => {
+                            if (window.speechSynthesis) {
+                                try {
+                                    window.speechSynthesis.cancel();
+                                    window.speechSynthesis.resume();
+                                    const readyUtt = new SpeechSynthesisUtterance("Are you ready cadet, to reach the moon?");
+                                    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                                    readyUtt.rate = isMobile ? 0.94 : 0.86;
+                                    readyUtt.pitch = isMobile ? 1.0 : 0.70;
+                                    readyUtt.volume = 1.0;
+                                    const voice = getHorrorVoice(window.speechSynthesis);
+                                    if (voice) readyUtt.voice = voice;
+                                    window.speechSynthesis.speak(readyUtt);
+                                } catch(e) {}
+                            }
                         }
-                    }
-                }, 400);
+                    );
+                }, 350);
 
                 if (alertBanner) {
                     alertBanner.textContent = "🎙️ MISSION CONTROL: \"Are you ready cadet, to reach the moon?\" 🚀";
@@ -3622,7 +3673,7 @@
         };
 
         // =====================================================================
-        // CINEMATIC OUTRO SEQUENCE: HOW ZADDR CONQUERED THE MONOLITHS & WON
+        // CINEMATIC OUTRO SEQUENCE: STUDIO MALE NARRATION + DOOM IMPACTS + CAPTIONS
         // =====================================================================
         const OutroSequence = {
             active: false,
@@ -3634,18 +3685,21 @@
                 {
                     imgId: 'outro-slide-1',
                     dotId: 'dot-o1',
+                    audioSrc: 'assets/audio/outro_1.mp3',
                     caption: "Against all celestial odds, Pilot Zaddr conquered all thirty-two gravity monoliths across five atmospheric tiers and broke Earth's dying atmosphere. The Lunar Starship pierced the cosmic void.",
                     duration: 6800
                 },
                 {
                     imgId: 'outro-slide-2',
                     dotId: 'dot-o2',
+                    audioSrc: 'assets/audio/outro_2.mp3',
                     caption: "Touching down upon the silent lunar regolith, Zaddr gazed back at the pale blue world. The nightmare of the anomaly was left behind in the stars.",
                     duration: 6800
                 },
                 {
                     imgId: 'outro-slide-3',
                     dotId: 'dot-o3',
+                    audioSrc: 'assets/audio/outro_3.mp3',
                     caption: "At the dawn of the new lunar colony, humanity's future was secured. Pilot Zaddr's name is carved into eternity. Mission Moon is won.",
                     duration: 6500
                 }
@@ -3655,6 +3709,7 @@
                 if (this.active) return;
                 this.active = true;
                 this.startTime = Date.now();
+                NarratorAudioPlayer.init();
                 this.step = 0;
                 clearTimeout(this.timer);
                 this.timer = null;
@@ -3700,6 +3755,7 @@
                 const advanceStep = () => {
                     if (stepAdvanced || !this.active) return;
                     stepAdvanced = true;
+                    NarratorAudioPlayer.stop();
                     clearTimeout(this.timer);
                     this.timer = null;
                     if (index + 1 < this.slides.length) {
@@ -3709,40 +3765,55 @@
                     }
                 };
 
-                // Powerful outro voice narration
-                if (this.synth) {
-                    try {
-                        this.synth.cancel();
-                        this.synth.resume();
-                        const utt = new SpeechSynthesisUtterance(s.caption);
-                        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                        utt.pitch = isMobile ? 1.0 : 0.60;
-                        utt.rate = isMobile ? 0.94 : 0.80;
-                        utt.volume = 1.0;
-                        const horrorVoice = getHorrorVoice(this.synth);
-                        if (horrorVoice) utt.voice = horrorVoice;
+                const fallbackTTS = () => {
+                    if (this.synth) {
+                        try {
+                            this.synth.cancel();
+                            this.synth.resume();
+                            const utt = new SpeechSynthesisUtterance(s.caption);
+                            const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
+                            utt.pitch = isMobile ? 1.0 : 0.60;
+                            utt.rate = isMobile ? 0.94 : 0.80;
+                            utt.volume = 1.0;
+                            const horrorVoice = getHorrorVoice(this.synth);
+                            if (horrorVoice) utt.voice = horrorVoice;
 
-                        utt.onend = () => {
-                            if (!this.active) return;
-                            clearTimeout(this.timer);
-                            const pauseMs = (index === this.slides.length - 1) ? 1500 : 1200;
-                            this.timer = setTimeout(advanceStep, pauseMs);
-                        };
+                            utt.onend = () => {
+                                if (!this.active) return;
+                                clearTimeout(this.timer);
+                                const pauseMs = (index === this.slides.length - 1) ? 1500 : 1200;
+                                this.timer = setTimeout(advanceStep, pauseMs);
+                            };
 
-                        utt.onerror = () => {
-                            if (!this.active) return;
-                            clearTimeout(this.timer);
-                            this.timer = setTimeout(advanceStep, 1000);
-                        };
+                            utt.onerror = () => {
+                                if (!this.active) return;
+                                clearTimeout(this.timer);
+                                this.timer = setTimeout(advanceStep, 1000);
+                            };
 
-                        setTimeout(() => {
-                            if (this.active && this.step === index) {
-                                try { this.synth.speak(utt); } catch(e) {}
-                            }
-                        }, isMobile ? 260 : 60);
-                    } catch(e) {
-                        console.warn("Speech synthesis error:", e);
+                            this.synth.speak(utt);
+                        } catch(e) {}
                     }
+                };
+
+                // Play studio Hollywood-tier male narration track (identical on phone & PC)
+                if (s.audioSrc) {
+                    setTimeout(() => {
+                        if (this.active && this.step === index) {
+                            NarratorAudioPlayer.play(
+                                s.audioSrc,
+                                () => {
+                                    if (!this.active) return;
+                                    clearTimeout(this.timer);
+                                    const pauseMs = (index === this.slides.length - 1) ? 1500 : 1200;
+                                    this.timer = setTimeout(advanceStep, pauseMs);
+                                },
+                                fallbackTTS
+                            );
+                        }
+                    }, 220);
+                } else {
+                    fallbackTTS();
                 }
 
                 clearTimeout(this.timer);
@@ -3751,6 +3822,7 @@
 
             stop() {
                 this.active = false;
+                NarratorAudioPlayer.stop();
                 clearTimeout(this.timer);
                 this.timer = null;
                 if (this.synth) {
@@ -4972,6 +5044,7 @@
 
         function startExpeditionWithIntro() {
             AudioMaster.init();
+            NarratorAudioPlayer.init();
             const hsModal = document.getElementById('homescreen-modal');
             if (hsModal) {
                 hsModal.style.opacity = '0';
