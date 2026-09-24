@@ -2855,15 +2855,16 @@
                     this.sfxGain.gain.setValueAtTime(0.35, this.ctx.currentTime);
                     this.sfxGain.connect(this.ctx.destination);
 
-                    // Music Lowpass Filter for soft, warm cosmic texture
+                    // Music Lowpass Filter: opened up to 1400Hz with gentle Q (0.7)
+                    // so phone micro-transducers cleanly reproduce harmonic overtones & warm pads
                     this.filterNode = this.ctx.createBiquadFilter();
                     this.filterNode.type = 'lowpass';
-                    this.filterNode.frequency.setValueAtTime(420, this.ctx.currentTime);
-                    this.filterNode.Q.setValueAtTime(1.2, this.ctx.currentTime);
+                    this.filterNode.frequency.setValueAtTime(1400, this.ctx.currentTime);
+                    this.filterNode.Q.setValueAtTime(0.7, this.ctx.currentTime);
 
-                    // Music Bus
+                    // Music Bus (Balanced volume for mobile phone speakers and headphones)
                     this.musicGain = this.ctx.createGain();
-                    this.musicGain.gain.setValueAtTime(0.26, this.ctx.currentTime);
+                    this.musicGain.gain.setValueAtTime(0.42, this.ctx.currentTime);
                     this.filterNode.connect(this.musicGain);
                     this.musicGain.connect(this.ctx.destination);
                 } catch(e) {
@@ -2873,21 +2874,42 @@
 
             startRelaxingMusic() {
                 this.init();
-                if (!this.ctx || this.isMusicPlaying || !this.musicEnabled) return;
-                if (this.ctx.state === 'suspended') this.ctx.resume();
+                if (!this.ctx || !this.musicEnabled) return;
+                if (this.ctx.state === 'suspended') {
+                    try { this.ctx.resume(); } catch(e) {}
+                }
+
+                // If already playing, ensure musicGain is cleanly audible and return
+                if (this.isMusicPlaying) {
+                    if (this.musicGain) {
+                        try {
+                            const now = this.ctx.currentTime;
+                            this.musicGain.gain.cancelScheduledValues(now);
+                            this.musicGain.gain.setValueAtTime(this.musicGain.gain.value, now);
+                            this.musicGain.gain.linearRampToValueAtTime(0.42, now + 1.2);
+                        } catch(e) {}
+                    }
+                    return;
+                }
 
                 this.isMusicPlaying = true;
-                this.musicGain.gain.cancelScheduledValues(this.ctx.currentTime);
-                this.musicGain.gain.setValueAtTime(0.001, this.ctx.currentTime);
-                this.musicGain.gain.linearRampToValueAtTime(0.26, this.ctx.currentTime + 3.0);
+                if (this.musicGain) {
+                    try {
+                        const now = this.ctx.currentTime;
+                        this.musicGain.gain.cancelScheduledValues(now);
+                        this.musicGain.gain.setValueAtTime(0.01, now);
+                        this.musicGain.gain.linearRampToValueAtTime(0.42, now + 2.5);
+                    } catch(e) {}
+                }
 
-                // Ethereal cosmic drone chord progressions (soft pentatonic & major 7th pads)
-                // Chords: Dm9, Fmaj7, Cmaj7, Am7
+                // Ethereal cosmic drone chord progressions (warm pentatonic & major 7th / 9th pads)
+                // Voiced in mid-low to midrange (174Hz to 660Hz) with rich harmonic overtone content
+                // perfectly audible on mobile phone speakers without distortion
                 const chords = [
-                    [146.83, 220.00, 261.63, 329.63], // D3, A3, C4, E4
-                    [174.61, 261.63, 329.63, 392.00], // F3, C4, E4, G4
-                    [130.81, 196.00, 246.94, 329.63], // C3, G3, B3, E4
-                    [110.00, 164.81, 220.00, 261.63]  // A2, E3, A3, C4
+                    [220.00, 261.63, 329.63, 440.00, 523.25], // Dm9 / A3-C4-E4-A4-C5
+                    [261.63, 329.63, 392.00, 523.25, 659.25], // Cmaj9 / C4-E4-G4-C5-E5
+                    [174.61, 261.63, 349.23, 440.00, 523.25], // Fmaj7 / F3-C4-F4-A4-C5
+                    [196.00, 246.94, 293.66, 392.00, 493.88]  // G6 / G3-B3-D4-G4-B4
                 ];
 
                 let currentChordIdx = 0;
@@ -2904,8 +2926,8 @@
                     oldOscs.forEach(o => {
                         try {
                             o.gain.gain.cancelScheduledValues(now);
-                            o.gain.gain.linearRampToValueAtTime(0.0001, now + 3.2);
-                            setTimeout(() => { try { o.osc.stop(); o.osc.disconnect(); } catch(e){} }, 3400);
+                            o.gain.gain.linearRampToValueAtTime(0.0001, now + 3.0);
+                            setTimeout(() => { try { o.osc.stop(); o.osc.disconnect(); } catch(e){} }, 3200);
                         } catch(e) {}
                     });
 
@@ -2915,12 +2937,12 @@
                             const osc = this.ctx.createOscillator();
                             const gain = this.ctx.createGain();
                             osc.type = i % 2 === 0 ? 'sine' : 'triangle';
-                            const detune = (i - 1.5) * 4.2;
+                            const detune = (i - 2.0) * 3.8;
                             osc.frequency.setValueAtTime(freq, now);
                             osc.detune.setValueAtTime(detune, now);
 
                             gain.gain.setValueAtTime(0.0001, now);
-                            gain.gain.linearRampToValueAtTime(0.035, now + 2.5);
+                            gain.gain.linearRampToValueAtTime(0.065, now + 2.4);
 
                             osc.connect(gain);
                             gain.connect(this.filterNode);
@@ -2931,13 +2953,13 @@
                 };
 
                 playChord();
-                this.droneTimer = setInterval(playChord, 7800);
+                this.droneTimer = setInterval(playChord, 7600);
 
-                // Celestial sparkling chimes (soft pentatonic twinkling every 2.5-6s)
+                // Celestial sparkling chimes (soft pentatonic twinkling every 2.4-5.5s)
                 const chimeNotes = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50]; // C5, D5, E5, G5, A5, C6
                 const scheduleChime = () => {
                     if (!this.isMusicPlaying || !this.ctx) return;
-                    const nextTime = 2400 + Math.random() * 3600;
+                    const nextTime = 2200 + Math.random() * 3400;
                     this.chimeTimer = setTimeout(() => {
                         this.playAmbientChime(chimeNotes[Math.floor(Math.random() * chimeNotes.length)]);
                         scheduleChime();
@@ -2956,11 +2978,12 @@
                     osc.frequency.setValueAtTime(freq, now);
 
                     gain.gain.setValueAtTime(0.0001, now);
-                    gain.gain.linearRampToValueAtTime(0.022, now + 0.15);
+                    gain.gain.linearRampToValueAtTime(0.07, now + 0.12);
                     gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
 
+                    // Connect directly to musicGain so sparkling chimes aren't muffled by filterNode
                     osc.connect(gain);
-                    gain.connect(this.filterNode);
+                    gain.connect(this.musicGain);
                     osc.start(now);
                     osc.stop(now + 3.0);
                 } catch(e) {}
@@ -2995,6 +3018,7 @@
                 this.init();
                 if (this.musicEnabled) {
                     this.musicEnabled = false;
+                    this.stopRelaxingMusic();
                     if (this.musicGain && this.ctx) {
                         this.musicGain.gain.setValueAtTime(0.0, this.ctx.currentTime);
                     }
@@ -3002,11 +3026,9 @@
                 } else {
                     this.musicEnabled = true;
                     if (this.musicGain && this.ctx) {
-                        this.musicGain.gain.setValueAtTime(0.26, this.ctx.currentTime);
+                        this.musicGain.gain.setValueAtTime(0.42, this.ctx.currentTime);
                     }
-                    if (!this.isMusicPlaying) {
-                        this.startRelaxingMusic();
-                    }
+                    this.startRelaxingMusic();
                     return true;
                 }
             },
@@ -3020,12 +3042,17 @@
             startHorrorIntroAmbience() {
                 this.init();
                 if (!this.ctx) return;
-                if (this.ctx.state === 'suspended') this.ctx.resume();
+                if (this.ctx.state === 'suspended') {
+                    try { this.ctx.resume(); } catch(e) {}
+                }
 
-                // Stop regular background music during the cinematic intro
+                // Cleanly stop regular background music during the cinematic intro
+                this.stopRelaxingMusic();
                 if (this.musicGain) {
-                    this.musicGain.gain.cancelScheduledValues(this.ctx.currentTime);
-                    this.musicGain.gain.setValueAtTime(0.0, this.ctx.currentTime);
+                    try {
+                        this.musicGain.gain.cancelScheduledValues(this.ctx.currentTime);
+                        this.musicGain.gain.setValueAtTime(0.0, this.ctx.currentTime);
+                    } catch(e) {}
                 }
 
                 const now = this.ctx.currentTime;
@@ -3172,6 +3199,14 @@
                 this.droneTimer = null;
                 this.chimeTimer = null;
                 this.isMusicPlaying = false;
+                if (this.musicGain && this.ctx) {
+                    try {
+                        const now = this.ctx.currentTime;
+                        this.musicGain.gain.cancelScheduledValues(now);
+                        this.musicGain.gain.setValueAtTime(this.musicGain.gain.value, now);
+                        this.musicGain.gain.linearRampToValueAtTime(0.0001, now + 0.8);
+                    } catch(e) {}
+                }
                 if (!this.ctx || this.droneOscs.length === 0) return;
                 const now = this.ctx.currentTime;
                 this.droneOscs.forEach(o => {
@@ -4866,6 +4901,23 @@
             acquireWakeLock();
             document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') acquireWakeLock(); });
         }
+
+        // Global mobile audio unblock & resume handler (for iOS Safari, iPadOS, Android Chrome)
+        const ensureMobileAudio = () => {
+            if (typeof AudioMaster !== 'undefined' && AudioMaster) {
+                AudioMaster.init();
+                if (AudioMaster.ctx && AudioMaster.ctx.state === 'suspended') {
+                    AudioMaster.ctx.resume().catch(() => {});
+                }
+                if (typeof gameState !== 'undefined' && gameState === 'PLAYING') {
+                    if (AudioMaster.musicEnabled && !AudioMaster.isMusicPlaying) {
+                        AudioMaster.startRelaxingMusic();
+                    }
+                }
+            }
+        };
+        window.addEventListener('touchstart', ensureMobileAudio, { passive: true });
+        window.addEventListener('pointerdown', ensureMobileAudio, { passive: true });
 
         // =====================================================================
         // SETTINGS PANEL TOGGLE
