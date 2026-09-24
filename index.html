@@ -619,6 +619,7 @@
             <button id="pill-antseed-ai" class="tag-pill tag-antseed" title="Click to open AntSeed AI VPN Live Inspector">⚡ ANTSEED AI VPN: CONNECTED</button>
             <button id="btn-toggle-music" class="tag-pill" style="cursor: pointer; background: rgba(245, 158, 11, 0.16); border: 1px solid #f59e0b; color: #fbbf24;" title="Toggle Ambient Music">🎵 MUSIC: ON</button>
             <span id="pill-mode" class="tag-pill tag-grass">LUSH MEADOW</span>
+            <span id="pill-checkpoint" class="tag-pill" style="border: 1px solid #10b981; color: #34d399; background: rgba(16, 185, 129, 0.16);">CHECKPOINT: FIRST LANE</span>
             <span id="pill-best" class="tag-pill tag-gold">PEAK: 0.0m</span>
         </div>
     </div>
@@ -641,6 +642,7 @@
     <div id="bottom-hud">
         <button class="hud-btn" id="b-floor">⬇ MEADOW [1]</button>
         <button class="hud-btn" id="b-wall">➡ WALL-WALK [2]</button>
+        <button class="hud-btn" id="b-hover" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.16);" title="Toggle Anti-Gravity Hover (Press H)">🛸 HOVER [H]</button>
         <button class="hud-btn btn-jump-main" id="b-jump">▲ JUMP / BOOST (SPACE)</button>
         <button class="hud-btn" id="b-reset">🔄 RESET TO MEADOW</button>
         <button class="hud-btn" id="b-home">🏠 HOMESCREEN</button>
@@ -1933,7 +1935,7 @@
             // SECTOR 2: CLOUDLINE SKYWAYS & ASTEROID DRIFT (Altitude: 20m - 45m)
             // =================================================================
             // Stage 6: Frozen Ice Dwarf Planetoid (Slippery Glacial Sphere)
-            { type: "planet", x: -2.8, y: 22.0, z: -3, r: 2.2, name: "6. FROZEN ICE PLANETOID", map: iceTex },
+            { type: "planet", x: -2.8, y: 22.0, z: -3, r: 2.2, name: "6. FROZEN ICE PLANETOID (CHECKPOINT 1)", map: iceTex, isCheckpoint: true, stageNum: 6 },
             // Stage 7: Rotating Omni-Corp Spire
             { type: "buildingHex", x: 2.0, y: 25.2, z: -12, r: 2.0, h: 2.4, name: "7. ROTATING OMNI-CORP SPIRE", facade: bldgFacadeAmberTex, color: 0xd97706, isRotating: true, rotSpeed: 0.55 },
             // Stage 8: Hyperion Tower Rooftop Launch Catapult (Boost forward to Y=37m!)
@@ -1951,7 +1953,7 @@
             // Stage 12: Stratosphere Launch Complex (Ion launcher to Y=55m!)
             { type: "trampolineBuilding", x: 0, y: 45.4, z: -55, r: 2.3, h: 1.2, name: "12. STRATOSPHERE LAUNCH COMPLEX", color: 0x06b6d4, isSuperBounce: true, boostY: 28.5, airLaunchZ: -10.0 },
             // Stage 13: Rotating Celestial Sky-Deck
-            { type: "buildingHex", x: 2.0, y: 54.8, z: -65, r: 2.2, h: 2.0, name: "13. ROTATING CELESTIAL SKY-DECK", facade: bldgFacadeAmberTex, color: 0x6366f1, isRotating: true, rotSpeed: 0.45 },
+            { type: "buildingHex", x: 2.0, y: 54.8, z: -65, r: 2.2, h: 2.0, name: "13. CELESTIAL ASTRO-DECK (CHECKPOINT 2)", facade: bldgFacadeAmberTex, color: 0x6366f1, isRotating: true, rotSpeed: 0.45, isCheckpoint: true, stageNum: 13 },
             // Stage 14: Suspended Girder Skyway
             { type: "skyBridge", x: -2.0, y: 58.4, z: -74, w: 1.6, h: 1.4, d: 4.2, name: "14. SUSPENDED GIRDER SKYWAY", color: 0x3b82f6 },
             // Stage 15: Rotating Orbital Sky-Tower
@@ -1967,7 +1969,7 @@
             // SECTOR 4: THERMOSPHERE ORBITAL SUPER-TOWERS (Altitude: 75m - 105m)
             // =================================================================
             // Stage 19: Rotating Helios Observation Spire
-            { type: "buildingHex", x: 2.2, y: 81.5, z: -117, r: 2.2, h: 2.0, name: "19. HELIOS OBSERVATION SPIRE", facade: bldgFacadeAmberTex, color: 0xf97316, isRotating: true, rotSpeed: 0.5 },
+            { type: "buildingHex", x: 2.2, y: 81.5, z: -117, r: 2.2, h: 2.0, name: "19. HELIOS SOLAR ARRAY (CHECKPOINT 3)", facade: bldgFacadeAmberTex, color: 0xf97316, isRotating: true, rotSpeed: 0.5, isCheckpoint: true, stageNum: 19 },
             // Stage 20: Crimson Mars Twin Asteroid
             { type: "planet", x: -2.5, y: 85.0, z: -125, r: 2.2, name: "20. CRIMSON MARS TWIN ASTEROID", map: marsTex },
             // Stage 21: Swaying Titanium Truss Bridge (Oscillating)
@@ -1983,7 +1985,7 @@
             // SECTOR 5: CELESTIAL EXOSPHERE & PLANETARY ORBIT (Altitude: 105m - 126m)
             // =================================================================
             // Stage 25: Orbital Monolith Spire
-            { type: "buildingHex", x: 2.0, y: 106.8, z: -167, r: 2.1, h: 2.0, name: "25. ORBITAL MONOLITH SPIRE", facade: bldgFacadeAmberTex, color: 0x0284c7 },
+            { type: "buildingHex", x: 2.0, y: 106.8, z: -167, r: 2.1, h: 2.0, name: "25. ORBITAL MONOLITH (CHECKPOINT 4)", facade: bldgFacadeAmberTex, color: 0x0284c7, isCheckpoint: true, stageNum: 25 },
             // Stage 26: Zero-G Expedition Skyway (Oscillating)
             { type: "skyBridge", x: -1.5, y: 110.2, z: -174, w: 1.8, h: 1.2, d: 3.6, name: "26. ZERO-G EXPEDITION SKYWAY", color: 0x10b981, isOscillating: true, oscSpeed: 1.6, oscAmp: 2.8, baseX: -1.5 },
             // Stage 27: Rotating Exosphere Zenith Bastion
@@ -2287,6 +2289,27 @@
                 mesh.add(atmosRing);
             }
 
+            
+            // Checkpoint Holographic Beacon Beam
+            if (p.isCheckpoint) {
+                const beamGeo = new THREE.CylinderGeometry(0.5, 0.9, 14, 16, 1, true);
+                const beamMat = new THREE.MeshBasicMaterial({
+                    color: 0x10b981, transparent: true, opacity: 0.55, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthWrite: false
+                });
+                const beam = new THREE.Mesh(beamGeo, beamMat);
+                beam.position.set(0, (p.h ? p.h / 2 : p.r) + 7, 0);
+                mesh.add(beam);
+
+                const ringGeo = new THREE.RingGeometry(p.r * 0.4, p.r * 0.9, 24);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x34d399, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / 2;
+                ring.position.set(0, (p.h ? p.h / 2 : p.r) + 0.05, 0);
+                mesh.add(ring);
+
+                checkpointBeacons.push({ beam, ring, stageNum: p.stageNum });
+            }
+    
             if (p.isRotating) {
                 rotatingPlatforms.push({ mesh: mesh, rotSpeed: p.rotSpeed || 0.35 });
             }
@@ -3988,6 +4011,7 @@
             if (e.key === '2') setSurface(1);
             if (e.key === '3') setSurface(2);
             if (e.key === '9' || e.key.toLowerCase() === 'l') triggerSpaceshipLaunch();
+            if (e.key.toLowerCase() === 'h' || e.key.toLowerCase() === 'f') toggleHoverPower();
         });
         window.addEventListener('keyup', (e) => {
             keys[e.key.toLowerCase()] = false;
@@ -4009,17 +4033,43 @@
             if (cameraRig.isDragging) {
                 const dx = e.clientX - cameraRig.lastX;
                 const dy = e.clientY - cameraRig.lastY;
-                cameraRig.yaw -= dx * 0.005;
-                cameraRig.pitch = Math.max(0.04, Math.min(1.35, cameraRig.pitch + dy * 0.005));
+                cameraRig.yaw -= dx * 0.006;
+                const minP = (typeof player !== 'undefined' && player.isHovering) ? -1.38 : 0.02;
+                const maxP = (typeof player !== 'undefined' && player.isHovering) ? 1.45 : 1.35;
+                cameraRig.pitch = Math.max(minP, Math.min(maxP, cameraRig.pitch + dy * 0.006));
                 cameraRig.lastX = e.clientX;
                 cameraRig.lastY = e.clientY;
             }
         });
 
+        // Touch drag support for 360° look
+        window.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length > 0) {
+                cameraRig.isDragging = true;
+                cameraRig.lastX = e.touches[0].clientX;
+                cameraRig.lastY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+        window.addEventListener('touchend', () => { cameraRig.isDragging = false; });
+        window.addEventListener('touchmove', (e) => {
+            if (cameraRig.isDragging && e.touches && e.touches.length > 0) {
+                const dx = e.touches[0].clientX - cameraRig.lastX;
+                const dy = e.touches[0].clientY - cameraRig.lastY;
+                cameraRig.yaw -= dx * 0.006;
+                const minP = (typeof player !== 'undefined' && player.isHovering) ? -1.38 : 0.02;
+                const maxP = (typeof player !== 'undefined' && player.isHovering) ? 1.45 : 1.35;
+                cameraRig.pitch = Math.max(minP, Math.min(maxP, cameraRig.pitch + dy * 0.006));
+                cameraRig.lastX = e.touches[0].clientX;
+                cameraRig.lastY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
         // UI Buttons
         document.getElementById('b-floor').addEventListener('click', () => setSurface(0));
         document.getElementById('b-wall').addEventListener('click', () => setSurface(1));
         document.getElementById('b-jump').addEventListener('click', () => handleJumpAction());
+        const bHover = document.getElementById('b-hover');
+        if (bHover) bHover.addEventListener('click', () => toggleHoverPower());
         document.getElementById('b-reset').addEventListener('click', () => resetPlayer());
         document.getElementById('btn-replay').addEventListener('click', () => resetPlayer());
         const bHome = document.getElementById('b-home');
@@ -4233,7 +4283,8 @@
             player.airVelZ = 0; player.airVelX = 0;
             player.isGrounded = true; player.hasDoubleJump = true;
             player.standingPlatform = null;
-            spaceship.position.set(0, 71.6, -107.5);
+            spaceship.position.set(0, 126.4, -207.5);
+            player.isHovering = false;
             spaceship.rotation.set(0, 0, 0);
             gameState = "HOMESCREEN";
             flightTime = 0;
@@ -4246,6 +4297,75 @@
             if (window.startHomescreenStars) window.startHomescreenStars();
         }
 
+        
+        // =====================================================================
+        // CHECKPOINT & RESPAWN STATE (FIRST LANE VS SECTOR MILESTONES)
+        // =====================================================================
+        let activeCheckpoint = null; // { x, y, z, name, stageNum }
+        const checkpointBeacons = [];
+
+        function setCheckpoint(stageNum, name, x, y, z) {
+            if (activeCheckpoint && activeCheckpoint.stageNum >= stageNum) return; // Keep highest checkpoint
+            activeCheckpoint = { stageNum, name, x, y, z };
+            const cpPill = document.getElementById('pill-checkpoint');
+            if (cpPill) {
+                cpPill.textContent = `CHECKPOINT: STAGE ${stageNum}`;
+                cpPill.style.color = '#34d399';
+                cpPill.style.borderColor = '#10b981';
+                cpPill.style.background = 'rgba(16, 185, 129, 0.3)';
+            }
+            if (alertBanner) {
+                alertBanner.textContent = `📍 CHECKPOINT UNLOCKED: ${name.replace(/^\d+\.\s*/, '')} // PROGRESS SAVED! 🚀`;
+                alertBanner.style.background = "linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95))";
+                alertBanner.style.borderColor = "#34d399";
+                alertBanner.style.boxShadow = "0 0 35px rgba(52, 211, 153, 0.8)";
+                alertBanner.style.display = 'block';
+                bannerTimer = 3.5;
+            }
+            AudioMaster.playJump();
+        }
+
+        function handleSpaceFall() {
+            stats.falls++;
+            if (activeCheckpoint) {
+                // Respawn safely on top of the unlocked Checkpoint platform!
+                player.pos.set(activeCheckpoint.x, activeCheckpoint.y + 0.4, activeCheckpoint.z);
+                player.velX = 0; player.velY = 0; player.velZ = 0;
+                player.airVelZ = 0; player.airVelX = 0;
+                player.isGrounded = true;
+                player.hasDoubleJump = true;
+                player.jumpTimer = 0;
+                curStageName = activeCheckpoint.name;
+
+                if (alertBanner) {
+                    alertBanner.textContent = `⚡ RE-MATERIALIZED AT CHECKPOINT: STAGE ${activeCheckpoint.stageNum} // KEEP ASCENDING!`;
+                    alertBanner.style.background = "linear-gradient(135deg, rgba(14, 165, 233, 0.95), rgba(30, 58, 138, 0.95))";
+                    alertBanner.style.borderColor = "#38bdf8";
+                    alertBanner.style.boxShadow = "0 0 35px rgba(56, 189, 248, 0.8)";
+                    alertBanner.style.display = 'block';
+                    bannerTimer = 3.0;
+                }
+            } else {
+                // No checkpoint yet: respawn at First Lane (Starting Meadow)
+                player.pos.set(0, 0, 45);
+                player.velX = 0; player.velY = 0; player.velZ = 0;
+                player.airVelZ = 0; player.airVelX = 0;
+                player.isGrounded = true;
+                player.hasDoubleJump = true;
+                player.jumpTimer = 0;
+                curStageName = "FIRST LANE (STARTING MEADOW)";
+
+                if (alertBanner) {
+                    alertBanner.textContent = "🌌 FELL INTO OPEN SPACE // RESTARTING AT FIRST LANE";
+                    alertBanner.style.background = "linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(185, 28, 28, 0.95))";
+                    alertBanner.style.borderColor = "#f87171";
+                    alertBanner.style.boxShadow = "0 0 35px rgba(239, 68, 68, 0.8)";
+                    alertBanner.style.display = 'block';
+                    bannerTimer = 3.0;
+                }
+            }
+        }
+    
         function resetPlayer() {
             if (OutroSequence) OutroSequence.stop();
             if (IntroSequence) IntroSequence.stop();
@@ -4295,6 +4415,43 @@
             if (cameraRig.lookTarget) cameraRig.lookTarget.set(0, 1.2, 45);
         }
 
+        
+        // =====================================================================
+        // ANTI-GRAVITY HOVER POWER (360° FREE LOOK & LEVITATION)
+        // =====================================================================
+        function toggleHoverPower() {
+            player.isHovering = !player.isHovering;
+            const hBtn = document.getElementById('b-hover');
+            if (player.isHovering) {
+                player.velY = 0;
+                player.airVelZ = 0;
+                player.airVelX = 0;
+                player.isGrounded = false;
+                if (hBtn) {
+                    hBtn.textContent = "🛸 HOVER: ON";
+                    hBtn.style.background = "rgba(56, 189, 248, 0.4)";
+                    hBtn.style.borderColor = "#38bdf8";
+                    hBtn.style.color = "#ffffff";
+                }
+                if (alertBanner) {
+                    alertBanner.textContent = "🛸 ANTI-GRAVITY HOVER ENGAGED // 360° FREE LOOK ACTIVE (SPACE: UP | SHIFT: DOWN | H: OFF)";
+                    alertBanner.style.background = "linear-gradient(135deg, rgba(56, 189, 248, 0.95), rgba(14, 165, 233, 0.95))";
+                    alertBanner.style.borderColor = "#38bdf8";
+                    alertBanner.style.boxShadow = "0 0 35px rgba(56, 189, 248, 0.8)";
+                    alertBanner.style.display = 'block';
+                    bannerTimer = 3.2;
+                }
+                AudioMaster.playJump();
+            } else {
+                if (hBtn) {
+                    hBtn.textContent = "🛸 HOVER [H]";
+                    hBtn.style.background = "rgba(56, 189, 248, 0.16)";
+                    hBtn.style.borderColor = "#38bdf8";
+                    hBtn.style.color = "#38bdf8";
+                }
+            }
+        }
+    
         function handleJumpAction() {
             if (gameState !== "PLAYING") return;
             const diff = DIFFICULTIES[currentDiff];
@@ -4808,7 +4965,22 @@
                 }
             }
 
-            if (!player.isGrounded) {
+            // Hover Mode Power Handling
+            if (player.isHovering) {
+                player.isGrounded = false;
+                player.standingPlatform = null;
+                // Vertical thrust controls in hover
+                if (keys['space'] || keys[' ']) {
+                    player.velY = 6.5; // Ascend
+                } else if (keys['shift'] || keys['c']) {
+                    player.velY = -6.5; // Descend
+                } else {
+                    player.velY = Math.sin(time * 3.0) * 0.15; // Gentle anti-gravity bob
+                }
+                player.pos.y += player.velY * dt;
+                flameGroupL.visible = true;
+                flameGroupR.visible = true;
+            } else if (!player.isGrounded) {
                 // In free-fall / ascending: apply smooth calibrated gravity
                 player.velY -= diff.gravity * dt;
                 const prevY = player.pos.y;
@@ -4834,8 +5006,8 @@
                     }
                 }
 
-                // 2. Check touchdown on Meadow Floor (Y = 0)
-                if (player.pos.y <= 0) {
+                // 2. Check touchdown on Meadow Floor (Only over Starting Hub: Z >= 27m and |X| <= 25m)
+                if (player.pos.y <= 0 && player.pos.z >= 26.5 && Math.abs(player.pos.x) <= 25.0) {
                     const impactSpeed = Math.abs(player.velY);
                     player.pos.y = 0;
                     player.velY = 0;
@@ -4849,12 +5021,12 @@
                     if (impactSpeed > 7.0) {
                         player.landSquish = Math.min(0.18, impactSpeed / 45.0);
                     }
-                    if (player.highestY > 7.0) {
-                        stats.falls++;
-                    }
-                    curStageName = "LUSH GRASS MEADOW";
+                    curStageName = "FIRST LANE (STARTING MEADOW)";
                     document.getElementById('pill-mode').className = "tag-pill tag-grass";
-                    document.getElementById('pill-mode').textContent = isSprinting ? "LUSH MEADOW (SPRINT)" : "LUSH MEADOW";
+                    document.getElementById('pill-mode').textContent = isSprinting ? "FIRST LANE (SPRINT)" : "FIRST LANE";
+                } else if (player.pos.y < -14.0) {
+                    // Fell past platforms into the deep cosmic void!
+                    handleSpaceFall();
                 } else if (player.velY <= 0) {
                     // 3. Check swept landing on platform top surfaces (only downward velocity)
                     const pad = diff.edgeMargin;
@@ -4881,6 +5053,9 @@
                                 }
 
                                 curStageName = p.name;
+                                if (p.isCheckpoint) {
+                                    setCheckpoint(p.stageNum, p.name, p.cx, p.maxY, p.cz);
+                                }
 
                                 // Starship boarding launch (landing directly onto the rocket)
                                 if (p.isSpaceship) {
@@ -5047,7 +5222,11 @@
                 player.highestY = player.pos.y;
                 document.getElementById('pill-best').textContent = `PEAK: ${player.highestY.toFixed(1)}m`;
             }
-            document.getElementById('val-alt').textContent = `${player.pos.y.toFixed(1)}m`;
+            document.getElementById('val-alt').textContent = `${player.pos.y.toFixed(1)}m${player.isHovering ? ' [HOVER]' : ''}`;
+            if (player.isHovering) {
+                document.getElementById('pill-mode').className = "tag-pill tag-earth";
+                document.getElementById('pill-mode').textContent = "🛸 HOVER POWER: ON [360° LOOK]";
+            }
             document.getElementById('val-stage').textContent = curStageName;
 
             // Progress percentage
@@ -5167,7 +5346,9 @@
             // 360° ORBIT CAMERA (CRITICALLY-DAMPED SMOOTH LOOKAT: ZERO FLUCTUATION)
             // =====================================================================
             const cx = player.pos.x + cameraRig.dist * Math.sin(cameraRig.yaw) * Math.cos(cameraRig.pitch);
-            const cy = Math.max(player.pos.y + 0.6, player.pos.y + cameraRig.dist * Math.sin(cameraRig.pitch) + 1.2);
+            const cy = (player.isHovering) 
+                ? (player.pos.y + cameraRig.dist * Math.sin(cameraRig.pitch) + 1.0)
+                : Math.max(player.pos.y + 0.6, player.pos.y + cameraRig.dist * Math.sin(cameraRig.pitch) + 1.2);
             const cz = player.pos.z + cameraRig.dist * Math.cos(cameraRig.yaw) * Math.cos(cameraRig.pitch);
 
             camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(dt * 12.0, 1.0));
