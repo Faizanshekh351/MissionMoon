@@ -3092,8 +3092,11 @@
 
                 try {
                     const now = this.ctx.currentTime;
+                    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
 
                     // A. Cinematic Doom BRAAAM Horn (Detuned low-end brass reese)
+                    // Scaled gain on mobile to prevent phone speaker clipping and ducking limiter pumping
+                    const hornGain = isMobile ? 0.11 : 0.32;
                     [-15, 0, 15].forEach(dt => {
                         const osc = this.ctx.createOscillator();
                         const gain = this.ctx.createGain();
@@ -3105,11 +3108,11 @@
                         osc.detune.setValueAtTime(dt * 3.8, now);
 
                         filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(520, now);
+                        filter.frequency.setValueAtTime(isMobile ? 380 : 520, now);
                         filter.frequency.exponentialRampToValueAtTime(70, now + 2.2);
-                        filter.Q.setValueAtTime(4.5, now);
+                        filter.Q.setValueAtTime(3.2, now);
 
-                        gain.gain.setValueAtTime(0.32, now);
+                        gain.gain.setValueAtTime(hornGain, now);
                         gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
 
                         osc.connect(filter);
@@ -3120,14 +3123,14 @@
                         osc.stop(now + 3.0);
                     });
 
-                    // B. Seismic Sub-Drop Boom
+                    // B. Seismic Sub-Drop Boom (Tuned for phone transducer frequency response)
                     const subOsc = this.ctx.createOscillator();
                     const subGain = this.ctx.createGain();
                     subOsc.type = 'sine';
-                    subOsc.frequency.setValueAtTime(95, now);
-                    subOsc.frequency.exponentialRampToValueAtTime(22, now + 1.0);
+                    subOsc.frequency.setValueAtTime(isMobile ? 110 : 95, now);
+                    subOsc.frequency.exponentialRampToValueAtTime(isMobile ? 44 : 22, now + 1.0);
 
-                    subGain.gain.setValueAtTime(0.55, now);
+                    subGain.gain.setValueAtTime(isMobile ? 0.18 : 0.55, now);
                     subGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
 
                     subOsc.connect(subGain);
@@ -3242,7 +3245,7 @@
             }
         }
 
-        // Deep Cinematic Voice Selector with Robust Mobile (iOS/Android) & Desktop Support
+        // High-Fidelity Cinematic Voice Selector with Platform Scoring (iOS, Android, Windows, Mac)
         function getHorrorVoice(synth) {
             if (!synth) synth = (typeof window !== 'undefined') ? window.speechSynthesis : null;
             if (!synth) return null;
@@ -3255,49 +3258,67 @@
             }
             if (!voices || voices.length === 0) return null;
 
+            // Prioritize English voices
             const enVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
             const pool = enVoices.length > 0 ? enVoices : voices;
 
-            // 1. Explicit search for premier authoritative deep male voices across Android, iOS, Windows, Mac
-            const preferredMale = pool.find(v => {
+            let bestVoice = null;
+            let highestScore = -9999;
+
+            pool.forEach(v => {
                 const name = (v.name || '').toLowerCase();
                 const uri = (v.voiceURI || '').toLowerCase();
-                const combined = name + ' ' + uri;
-                return (
-                    combined.includes('male') ||
-                    combined.includes('david') ||
-                    combined.includes('daniel') ||
-                    combined.includes('arthur') ||
-                    combined.includes('aaron') ||
-                    combined.includes('gordon') ||
-                    combined.includes('george') ||
-                    combined.includes('guy') ||
-                    combined.includes('mark') ||
-                    combined.includes('rishi') ||
-                    combined.includes('rjs') ||   // Android Google UK Male
-                    combined.includes('tpd') ||   // Android Google US Male
-                    combined.includes('iol') ||   // Android Google Male
-                    combined.includes('en-gb') || // British voices tend to be deeper and clearer
-                    combined.includes('en-au')
-                ) && !combined.includes('female') && !combined.includes('fred');
-            });
-            if (preferredMale) return preferredMale;
+                const lang = (v.lang || '').toLowerCase();
+                const text = `${name} ${uri} ${lang}`;
+                let score = 0;
 
-            // 2. Reject known high-pitched female voices (Samantha on iOS, Zira on Windows, etc.)
-            const nonFemale = pool.find(v => {
-                const name = (v.name || '').toLowerCase();
-                return !name.includes('female') &&
-                       !name.includes('samantha') &&
-                       !name.includes('zira') &&
-                       !name.includes('karen') &&
-                       !name.includes('victoria') &&
-                       !name.includes('eva') &&
-                       !name.includes('helena') &&
-                       !name.includes('moira');
-            });
-            if (nonFemale) return nonFemale;
+                // Heavily penalize novelty/robotic/distorted voices
+                if (text.includes('fred') || text.includes('bad news') || text.includes('bahh') || 
+                    text.includes('bells') || text.includes('boing') || text.includes('bubbles') || 
+                    text.includes('cellos') || text.includes('deranged') || text.includes('good news') || 
+                    text.includes('hysterical') || text.includes('pipe organ') || text.includes('trinoids') || 
+                    text.includes('whisper') || text.includes('zarvox') || text.includes('albert') || 
+                    text.includes('junior') || text.includes('ralph')) {
+                    score -= 800;
+                }
 
-            return pool[0];
+                // Penalize high-pitched female voices for dark cinematic commander tone
+                if (text.includes('female') || text.includes('samantha') || text.includes('victoria') || 
+                    text.includes('karen') || text.includes('zira') || text.includes('moira') || 
+                    text.includes('tessa') || text.includes('fiona') || text.includes('helena') || 
+                    text.includes('catherine') || text.includes('susan') || text.includes('eva')) {
+                    score -= 300;
+                }
+
+                // Premier authoritative male voices (Desktop & Mobile)
+                if (text.includes('alex')) score += 140;       // Apple's flagship natural male voice
+                if (text.includes('daniel')) score += 135;     // Apple / Android premier deep UK male
+                if (text.includes('david')) score += 130;      // Windows flagship deep male
+                if (text.includes('arthur')) score += 125;     // iOS / macOS natural British male
+                if (text.includes('oliver')) score += 120;     // iOS natural British male
+                if (text.includes('aaron')) score += 115;      // iOS natural US male
+                if (text.includes('george')) score += 110;     // Windows / Android male
+                if (text.includes('mark')) score += 105;       // Windows natural male
+
+                // Android Google TTS high-fidelity male identifiers
+                if (text.includes('rjs') || text.includes('tpd') || text.includes('sfg') || text.includes('iol')) score += 125;
+                if (text.includes('male') && !text.includes('female')) score += 90;
+
+                // Regional preferences (British & US baritones sound best for sci-fi commanders)
+                if (lang.includes('en-gb') || lang.includes('en_gb')) score += 35;
+                else if (lang.includes('en-us') || lang.includes('en_us')) score += 20;
+
+                // Prefer local low-latency voices over compressed network streams
+                if (v.localService) score += 15;
+                if (v.default) score += 5;
+
+                if (score > highestScore) {
+                    highestScore = score;
+                    bestVoice = v;
+                }
+            });
+
+            return bestVoice || pool[0];
         }
 
         // =====================================================================
@@ -3323,10 +3344,13 @@
                     return;
                 }
                 this.synth.cancel();
+                if (this.synth.resume) this.synth.resume();
                 this.utterance = new SpeechSynthesisUtterance(this.storyText);
                 const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                this.utterance.rate = isMobile ? 0.88 : 0.80;  // Measured cadence
-                this.utterance.pitch = isMobile ? 0.78 : 0.54; // Deep, rich horror vocal timbre
+                // On mobile, pitch 1.0 is required: mobile synthesizers have no neural pitch shifter,
+                // so pitch < 1.0 causes harsh metallic vocoder distortion & muffled gargling.
+                this.utterance.rate = isMobile ? 0.94 : 0.80;  // Measured, articulate cadence
+                this.utterance.pitch = isMobile ? 1.0 : 0.54;  // Clean natural on mobile, deep on desktop
                 this.utterance.volume = 1.0;
 
                 const horrorVoice = getHorrorVoice(this.synth);
@@ -3481,10 +3505,10 @@
                     }
                 };
 
-                // Calibrated pitch & rate: consistent deep cinematic tone on both mobile & PC
+                // Calibrated pitch & rate: consistent deep cinematic tone on PC, pristine natural audio on mobile
                 const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                const voicePitch = isMobile ? 0.78 : 0.62; // Deep and rich, preventing mobile TTS helium/distortion
-                const voiceRate = isMobile ? 0.88 : 0.82;  // Measured cinematic cadence
+                const voicePitch = isMobile ? 1.0 : 0.62; // Native 1.0 on mobile eliminates all vocoder artifacts & metallic buzz
+                const voiceRate = isMobile ? 0.94 : 0.82;  // Clear, authoritative cadence
 
                 if (this.synth) {
                     try {
@@ -3510,7 +3534,12 @@
                             this.timer = setTimeout(advanceStep, 800);
                         };
 
-                        this.synth.speak(utt);
+                        // Stagger voice start by 260ms so initial doom horn impact punch doesn't mask speech
+                        setTimeout(() => {
+                            if (this.active && this.step === index) {
+                                try { this.synth.speak(utt); } catch(e) {}
+                            }
+                        }, isMobile ? 260 : 60);
                     } catch(e) {
                         console.warn("Speech synthesis error:", e);
                     }
@@ -3564,8 +3593,8 @@
                             window.speechSynthesis.resume();
                             const readyUtt = new SpeechSynthesisUtterance("Are you ready cadet, to reach the moon?");
                             const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                            readyUtt.rate = isMobile ? 0.88 : 0.86;
-                            readyUtt.pitch = isMobile ? 0.78 : 0.70; // Deep, commanding mission commander voice
+                            readyUtt.rate = isMobile ? 0.94 : 0.86;
+                            readyUtt.pitch = isMobile ? 1.0 : 0.70; // Pure 1.0 on mobile prevents vocoder distortion
                             readyUtt.volume = 1.0;
                             const voice = getHorrorVoice(window.speechSynthesis);
                             if (voice) readyUtt.voice = voice;
@@ -3687,8 +3716,8 @@
                         this.synth.resume();
                         const utt = new SpeechSynthesisUtterance(s.caption);
                         const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window);
-                        utt.pitch = isMobile ? 0.78 : 0.60;
-                        utt.rate = isMobile ? 0.88 : 0.80;
+                        utt.pitch = isMobile ? 1.0 : 0.60;
+                        utt.rate = isMobile ? 0.94 : 0.80;
                         utt.volume = 1.0;
                         const horrorVoice = getHorrorVoice(this.synth);
                         if (horrorVoice) utt.voice = horrorVoice;
@@ -3706,7 +3735,11 @@
                             this.timer = setTimeout(advanceStep, 1000);
                         };
 
-                        this.synth.speak(utt);
+                        setTimeout(() => {
+                            if (this.active && this.step === index) {
+                                try { this.synth.speak(utt); } catch(e) {}
+                            }
+                        }, isMobile ? 260 : 60);
                     } catch(e) {
                         console.warn("Speech synthesis error:", e);
                     }
