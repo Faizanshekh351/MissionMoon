@@ -252,6 +252,63 @@
             transform: scale(0.9);
         }
 
+        /* Hover mode vertical control buttons — shown only when hovering */
+        #mob-hover-controls {
+            position: absolute;
+            bottom: 22px;
+            right: 18px;
+            display: none; /* shown by JS when hover active */
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .mob-btn-ascend {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            font-size: 13px; font-weight: 900;
+            letter-spacing: 0.5px;
+            background: linear-gradient(145deg, #22c55e, #15803d);
+            border: 3px solid #4ade80;
+            color: #fff;
+            box-shadow: 0 0 28px rgba(34, 197, 94, 0.7);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            touch-action: none; cursor: pointer;
+            transition: transform 0.07s;
+        }
+        .mob-btn-ascend:active { transform: scale(0.88); box-shadow: 0 0 40px rgba(74, 222, 128, 1); }
+        .mob-btn-descend {
+            width: 58px; height: 58px;
+            border-radius: 50%;
+            font-size: 13px; font-weight: 900;
+            letter-spacing: 0.5px;
+            background: rgba(8, 10, 18, 0.88);
+            border: 2.5px solid #f97316;
+            color: #f97316;
+            box-shadow: 0 0 16px rgba(249, 115, 22, 0.45);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            touch-action: none; cursor: pointer;
+            transition: transform 0.07s;
+        }
+        .mob-btn-descend:active { background: rgba(249, 115, 22, 0.85); color: #000; transform: scale(0.9); }
+        /* Small hover-toggle button shown inside hover controls */
+        .mob-btn-hover-exit {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            font-size: 11px; font-weight: 900;
+            background: rgba(56, 189, 248, 0.15);
+            border: 2px solid #38bdf8;
+            color: #38bdf8;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            touch-action: none; cursor: pointer;
+            transition: transform 0.07s;
+        }
+        .mob-btn-hover-exit:active { background: #38bdf8; color: #000; }
 
         /* Victory Flight Overlay */
         #victory-modal {
@@ -666,6 +723,10 @@
             padding: 12px 18px; z-index: 25; box-shadow: 0 12px 35px rgba(0,0,0,0.7), 0 0 20px rgba(56,189,248,0.25);
             transition: opacity 0.3s, transform 0.3s; display: block;
         }
+        /* Hide AI copilot on touch/mobile — it covers the D-pad */
+        @media (pointer: coarse) {
+            #ai-copilot-hud { display: none !important; }
+        }
         .ai-copilot-head {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
         }
@@ -836,10 +897,16 @@
             </div>
             <button class="dpad-btn" id="dpad-back" title="Back">▼</button>
         </div>
-        <!-- RIGHT: Action buttons -->
+        <!-- RIGHT: Normal action buttons (shown when NOT hovering) -->
         <div id="mobile-action-pad">
-            <button class="mob-act-btn mob-btn-hover" id="mob-hover" title="Hover">🛸</button>
+            <button class="mob-act-btn mob-btn-hover" id="mob-hover" title="Toggle Hover">🛸</button>
             <button class="mob-act-btn mob-btn-jump" id="mob-jump" title="Jump">▲<br>JUMP</button>
+        </div>
+        <!-- RIGHT: Hover mode controls (shown ONLY when hovering) -->
+        <div id="mob-hover-controls">
+            <button class="mob-btn-ascend" id="mob-ascend" title="Ascend">▲<br><span style="font-size:10px">UP</span></button>
+            <button class="mob-btn-hover-exit" id="mob-hover-exit" title="Exit Hover">🛸<br><span style="font-size:8px">OFF</span></button>
+            <button class="mob-btn-descend" id="mob-descend" title="Descend">▼<br><span style="font-size:10px">DOWN</span></button>
         </div>
     </div>
 
@@ -4424,15 +4491,48 @@
                 mobJump.addEventListener('click', (e) => { e.stopPropagation(); handleJumpAction(); });
             }
 
-            // Hover action button
+            // Hover toggle button + panel swap
+            const mobActionPad     = document.getElementById('mobile-action-pad');
+            const mobHoverControls = document.getElementById('mob-hover-controls');
+
+            function updateHoverPanel() {
+                const isHov = player && player.isHovering;
+                if (mobActionPad)     mobActionPad.style.display     = isHov ? 'none' : 'flex';
+                if (mobHoverControls) mobHoverControls.style.display  = isHov ? 'flex' : 'none';
+                const mobHoverBtn = document.getElementById('mob-hover');
+                if (mobHoverBtn) mobHoverBtn.classList.toggle('active', !!isHov);
+            }
+
             const mobHover = document.getElementById('mob-hover');
             if (mobHover) {
-                mobHover.addEventListener('touchstart', (e) => {
+                const onHoverTap = (e) => {
                     e.preventDefault(); e.stopPropagation();
                     toggleHoverPower();
-                }, { passive: false });
-                mobHover.addEventListener('click', (e) => { e.stopPropagation(); toggleHoverPower(); });
+                    setTimeout(updateHoverPanel, 50);
+                };
+                mobHover.addEventListener('touchstart', onHoverTap, { passive: false });
+                mobHover.addEventListener('click', (e) => { e.stopPropagation(); toggleHoverPower(); setTimeout(updateHoverPanel, 50); });
             }
+
+            // Hover-exit button (inside hover controls panel)
+            const mobHoverExit = document.getElementById('mob-hover-exit');
+            if (mobHoverExit) {
+                const onExitTap = (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    if (player && player.isHovering) { toggleHoverPower(); setTimeout(updateHoverPanel, 50); }
+                };
+                mobHoverExit.addEventListener('touchstart', onExitTap, { passive: false });
+                mobHoverExit.addEventListener('click', (e) => { e.stopPropagation(); if (player && player.isHovering) { toggleHoverPower(); setTimeout(updateHoverPanel, 50); } });
+            }
+
+            // ASCEND button — hold to go up (sets space key)
+            bindTouchKey('mob-ascend', 'space');
+
+            // DESCEND button — hold to go down (sets c key, which triggers descent in hover)
+            bindTouchKey('mob-descend', 'c');
+
+            // Poll hover state every 200ms to keep panel in sync
+            setInterval(updateHoverPanel, 200);
 
             // --- Landscape-only enforcement ---
             function checkOrientation() {
@@ -5582,11 +5682,12 @@
 
             for (let i = 0; i < physicalPlatforms.length; i++) {
                 const p = physicalPlatforms[i];
-                // If player is safely standing on top of this platform, skip it
+                // If player is safely standing on top of this platform, skip lateral checks entirely
                 if (player.isGrounded && player.standingPlatform === p) continue;
 
                 // Only check sides if the character's vertical body overlaps this obstacle's height
-                if (footY < p.maxY - 0.12 && headY > p.minY + 0.08) {
+                // Use 0.22 tolerance so feet don't clip through roof surface
+                if (footY < p.maxY - 0.22 && headY > p.minY + 0.08) {
                     if (p.shape === "cylinder") {
                         // Cylindrical obstacles (hex stone pylons, trampolines)
                         const dx = player.pos.x - p.cx;
@@ -5647,7 +5748,7 @@
                             }
                         }
                     } else {
-                        // Box obstacles (catwalks, balance beams, bridge, spaceship)
+                        // Box obstacles (catwalks, balance beams, bridge, skybuildings)
                         const bMinX = p.minX - charR;
                         const bMaxX = p.maxX + charR;
                         const bMinZ = p.minZ - charR;
@@ -5655,9 +5756,23 @@
 
                         if (player.pos.x > bMinX && player.pos.x < bMaxX &&
                             player.pos.z > bMinZ && player.pos.z < bMaxZ) {
-                            const dLeft = player.pos.x - bMinX;
+
+                            // TOP SURFACE CORRECTION: if feet are sinking into the top, push up
+                            const playerOnTop = footY >= p.minY && footY <= p.maxY + 0.35 && player.velY <= 0;
+                            if (playerOnTop) {
+                                player.pos.y = p.maxY;
+                                player.velY = 0;
+                                player.isGrounded = true;
+                                player.standingPlatform = p;
+                                player.hasDoubleJump = true;
+                                curStageName = p.name;
+                                continue; // no lateral push needed
+                            }
+
+                            // LATERAL push — find the shallowest axis to eject from
+                            const dLeft  = player.pos.x - bMinX;
                             const dRight = bMaxX - player.pos.x;
-                            const dBack = player.pos.z - bMinZ;
+                            const dBack  = player.pos.z - bMinZ;
                             const dFront = bMaxZ - player.pos.z;
 
                             const minD = Math.min(dLeft, dRight, dBack, dFront);
