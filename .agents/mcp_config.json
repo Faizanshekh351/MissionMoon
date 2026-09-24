@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "unreal-engine": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "unreal-engine-mcp-server"
+      ],
+      "env": {
+        "UE_PROJECT_PATH": "D:\\Games\\MissionMoon\\MissionMoon.uproject"
+      }
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "D:\\Games\\MissionMoon"
+      ]
+    },
+    "3d-asset-builder": {
+      "command": "node",
+      "args": [
+        "D:\\Games\\tools\\3d-builder-mcp.js"
+      ]
+    }
+  }
+}

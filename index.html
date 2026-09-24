@@ -1395,62 +1395,160 @@
         const earthTex = createEarthTexture();
 
         // =====================================================================
-        // SPACED-OUT 18-STAGE GAUNTLET (ZERO OVERLAPPING CEILINGS, 100% REACHABLE!)
+        // PROCEDURAL ARCHITECTURAL TEXTURES FOR 3D SCI-FI SKYSCRAPERS & SKYWAYS
         // =====================================================================
-        // CHALLENGING ATHLETIC GAUNTLET (ROTATING PLATFORMS, NARROW BEAMS)
+        function createBuildingFacadeTexture(style = 'amber') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            // Dark metallic architectural composite panels
+            ctx.fillStyle = '#0b0f19';
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Vertical structural mullions (steel columns)
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 4;
+            for (let x = 0; x <= 512; x += 32) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
+            }
+            // Floor dividing spandrel beams
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 6;
+            for (let y = 0; y <= 512; y += 32) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+            }
+
+            // High-rise windows with warm amber or cool cyan illumination
+            const warmColors = ['#f59e0b', '#fbbf24', '#fef08a', '#ea580c'];
+            const coolColors = ['#38bdf8', '#0ea5e9', '#06b6d4', '#67e8f9'];
+            const activeColors = style === 'cyan' ? coolColors : warmColors;
+
+            for (let y = 4; y < 512; y += 32) {
+                for (let x = 4; x < 512; x += 32) {
+                    const state = Math.random();
+                    if (state > 0.52) {
+                        ctx.fillStyle = activeColors[Math.floor(Math.random() * activeColors.length)];
+                        ctx.fillRect(x + 2, y + 2, 24, 22);
+                        // Subtle horizontal window blind louvers
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+                        ctx.fillRect(x + 2, y + 8, 24, 2);
+                        ctx.fillRect(x + 2, y + 14, 24, 2);
+                    } else if (state > 0.35) {
+                        ctx.fillStyle = style === 'cyan' ? '#083344' : '#451a03';
+                        ctx.fillRect(x + 2, y + 2, 24, 22);
+                    } else {
+                        ctx.fillStyle = '#020617';
+                        ctx.fillRect(x + 2, y + 2, 24, 22);
+                    }
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            return tex;
+        }
+
+        function createBuildingRoofTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            // Rooftop dark composite deck
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Concrete rooftop tile joints
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 4;
+            for (let i = 0; i <= 512; i += 64) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 512); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke();
+            }
+
+            // Yellow hazard safety border stripes
+            ctx.strokeStyle = '#eab308';
+            ctx.lineWidth = 14;
+            ctx.strokeRect(10, 10, 492, 492);
+
+            // Clean center area
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(30, 30, 452, 452);
+
+            // Rooftop Landing Mark / Heli Ring
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 8;
+            ctx.beginPath(); ctx.arc(256, 256, 140, 0, Math.PI * 2); ctx.stroke();
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 96px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('H', 256, 256);
+
+            const tex = new THREE.CanvasTexture(canvas);
+            return tex;
+        }
+
+        const bldgFacadeAmberTex = createBuildingFacadeTexture('amber');
+        const bldgFacadeCyanTex = createBuildingFacadeTexture('cyan');
+        const bldgRoofTex = createBuildingRoofTexture();
+        const aviationBeacons = [];
+
         // =====================================================================
-        // Calibrated tighter targets requiring parkour precision & sprint timing!
+        // SPACED-OUT 18-STAGE GAUNTLET (3D SKYSCRAPERS, SKYWAYS & CELESTIAL BODIES)
+        // =====================================================================
         const hurdleDefinitions = [
-            // Stage 1: Mossy Stone Stepping Pillars (Tighter Footing!)
-            { type: "hex", x: 0, y: 1.4, z: 38, r: 2.2, h: 2.8, name: "1. MOSSY STONE PYLON", color: 0x1e3a8a },
+            // Stage 1: Hexagonal Cyber Skyscraper Plaza Tower
+            { type: "buildingHex", x: 0, y: 1.4, z: 38, r: 2.2, h: 2.8, name: "1. CYBER PLAZA SKYSCRAPER", facade: bldgFacadeAmberTex, color: 0x1e3a8a },
             
             // Stage 2: Spherical Mars Crater Asteroid (Precision Sphere Landing!)
             { type: "planet", x: -2.8, y: 3.8, z: 30, r: 2.2, name: "2. MARS CRATER ASTEROID", map: marsTex },
             
-            // Stage 3: Swaying Sky Balance Catwalk (Actively Oscillates Across the Chasm!)
-            { type: "box", x: 2.5, y: 6.8, z: 22, w: 2.0, h: 1.2, d: 4.6, name: "3. SWAYING SKY CATWALK", color: 0x2563eb, isOscillating: true, oscSpeed: 1.4, oscAmp: 2.8, baseX: 2.5 },
+            // Stage 3: Suspended Cyber Transit Sky-Bridge (Actively Oscillates Across the Chasm!)
+            { type: "skyBridge", x: 2.5, y: 6.8, z: 22, w: 2.0, h: 1.2, d: 4.6, name: "3. SWAYING SKYWAY BRIDGE", color: 0x2563eb, isOscillating: true, oscSpeed: 1.4, oscAmp: 2.8, baseX: 2.5 },
 
-            // Stage 4: SUPER TRAMPOLINE ALPHA (High-velocity rocket boost across chasm!)
-            { type: "trampoline", x: -1.5, y: 8.6, z: 15, r: 2.3, h: 1.2, name: "4. SUPER TRAMPOLINE ALPHA", color: 0xa855f7, isSuperBounce: true, boostY: 27.5, airLaunchZ: -9.0 },
+            // Stage 4: Skyscraper Rooftop Ion Launch Deck (High-velocity rocket boost across chasm!)
+            { type: "trampolineBuilding", x: -1.5, y: 8.6, z: 15, r: 2.3, h: 1.2, name: "4. SKY-SPIRE LAUNCH DECK", color: 0xa855f7, isSuperBounce: true, boostY: 27.5, airLaunchZ: -9.0 },
 
-            // Stage 5: High Chasm Landing Perch
-            { type: "hex", x: 2.0, y: 18.5, z: 6, r: 2.2, h: 2.8, name: "5. HIGH CHASM PERCH", color: 0x4f46e5 },
+            // Stage 5: High Apex Skyscraper Tower
+            { type: "buildingHex", x: 2.0, y: 18.5, z: 6, r: 2.2, h: 2.8, name: "5. NEO-SHANGHAI APEX TOWER", facade: bldgFacadeCyanTex, color: 0x4f46e5 },
 
             // Stage 6: Frozen Ice Dwarf Planetoid (Slippery Glacial Perch)
             { type: "planet", x: -2.8, y: 22.0, z: -3, r: 2.2, name: "6. FROZEN ICE PLANETOID", map: iceTex },
 
-            // Stage 7: Hexagonal Starlight Spire (ROTATING SPIRE - HIGHER SPEED!)
-            { type: "hex", x: 2.0, y: 25.0, z: -12, r: 2.0, h: 2.4, name: "7. ROTATING STARLIGHT SPIRE", color: 0xd97706, isRotating: true, rotSpeed: 0.55 },
+            // Stage 7: Rotating Omni-Corp Spire (ROTATING SPIRE SKYSCRAPER!)
+            { type: "buildingHex", x: 2.0, y: 25.0, z: -12, r: 2.0, h: 2.4, name: "7. ROTATING OMNI-CORP SPIRE", facade: bldgFacadeAmberTex, color: 0xd97706, isRotating: true, rotSpeed: 0.55 },
 
-            // Stage 8: SUPER TRAMPOLINE BETA (Catapults forward to Y=37m!)
-            { type: "trampoline", x: -1.5, y: 27.2, z: -20, r: 2.3, h: 1.2, name: "8. COLOSSAL TRAMPOLINE BETA", color: 0xec4899, isSuperBounce: true, boostY: 29.5, airLaunchZ: -10.0 },
+            // Stage 8: Hyperion Tower Rooftop Launch Catapult (Catapults forward to Y=37m!)
+            { type: "trampolineBuilding", x: -1.5, y: 27.2, z: -20, r: 2.3, h: 1.2, name: "8. HYPERION LAUNCH TOWER", color: 0xec4899, isSuperBounce: true, boostY: 29.5, airLaunchZ: -10.0 },
 
             // Stage 9: Golden Saturnian Ringed Moon (Precision Landing on Orbiting Moon!)
             { type: "ringPlanet", x: 2.5, y: 36.5, z: -30, r: 2.2, ringR: 4.6, name: "9. RINGED CELESTIAL MOON", map: ringPlanetTex },
 
-            // Stage 10: Swaying Emerald Diamond Shard (Actively Oscillates Along X!)
-            { type: "box", x: -2.5, y: 40.0, z: -39, w: 1.8, h: 1.8, d: 2.2, name: "10. SWAYING EMERALD SHARD", color: 0x059669, isOscillating: true, oscSpeed: 1.6, oscAmp: 3.0, baseX: -2.5 },
+            // Stage 10: Suspended Emerald Sky-Bridge (Actively Oscillates Along X!)
+            { type: "skyBridge", x: -2.5, y: 40.0, z: -39, w: 1.8, h: 1.8, d: 2.2, name: "10. SWAYING EMERALD SKYWAY", color: 0x059669, isOscillating: true, oscSpeed: 1.6, oscAmp: 3.0, baseX: -2.5 },
 
-            // Stage 11: Needle Spire Perch (ROTATING NEEDLE PERCH - HIGH DIFFICULTY!)
-            { type: "hex", x: 1.5, y: 43.0, z: -47, r: 1.5, h: 2.4, name: "11. ROTATING NEEDLE SPIRE", color: 0x8b5cf6, isRotating: true, rotSpeed: -0.65 },
+            // Stage 11: Rotating Zenith Transmission Tower (ROTATING TOWER SKYSCRAPER!)
+            { type: "buildingHex", x: 1.5, y: 43.0, z: -47, r: 1.5, h: 2.4, name: "11. ROTATING ZENITH TRANSMISSION TOWER", facade: bldgFacadeCyanTex, color: 0x8b5cf6, isRotating: true, rotSpeed: -0.65 },
 
-            // Stage 12: SUPER TRAMPOLINE GAMMA (Ion Launcher forward to Y=55m!)
-            { type: "trampoline", x: 0, y: 45.2, z: -55, r: 2.3, h: 1.2, name: "12. SUPER TRAMPOLINE GAMMA", color: 0x06b6d4, isSuperBounce: true, boostY: 28.5, airLaunchZ: -10.0 },
+            // Stage 12: Stratosphere Launch Complex (Ion Launcher forward to Y=55m!)
+            { type: "trampolineBuilding", x: 0, y: 45.2, z: -55, r: 2.3, h: 1.2, name: "12. STRATOSPHERE LAUNCH COMPLEX", color: 0x06b6d4, isSuperBounce: true, boostY: 28.5, airLaunchZ: -10.0 },
 
-            // Stage 13: Neon Orbital Balcony (ROTATING HIGH-ALTITUDE BALCONY!)
-            { type: "hex", x: 2.0, y: 54.5, z: -65, r: 2.2, h: 2.0, name: "13. ROTATING ORBITAL BALCONY", color: 0x6366f1, isRotating: true, rotSpeed: 0.45 },
+            // Stage 13: Rotating Celestial Penthouse Deck (ROTATING HIGH-ALTITUDE OBSERVATION DECK!)
+            { type: "buildingHex", x: 2.0, y: 54.5, z: -65, r: 2.2, h: 2.0, name: "13. ROTATING CELESTIAL SKY-DECK", facade: bldgFacadeAmberTex, color: 0x6366f1, isRotating: true, rotSpeed: 0.45 },
 
-            // Stage 14: Narrow Starlight Balance Beam (TIGHT SUSPENDED BALANCE BEAM!)
-            { type: "box", x: -2.0, y: 58.2, z: -74, w: 1.4, h: 1.4, d: 4.2, name: "14. NARROW BALANCE BEAM", color: 0x3b82f6 },
+            // Stage 14: Suspended Structural Girder Skyway
+            { type: "skyBridge", x: -2.0, y: 58.2, z: -74, w: 1.4, h: 1.4, d: 4.2, name: "14. SUSPENDED GIRDER SKYWAY", color: 0x3b82f6 },
 
-            // Stage 15: Cyber Celestial Pylon (ROTATING CELESTIAL PYLON!)
-            { type: "hex", x: 2.0, y: 61.8, z: -83, r: 2.0, h: 1.8, name: "15. ROTATING CELESTIAL PYLON", color: 0x0284c7, isRotating: true, rotSpeed: -0.5 },
+            // Stage 15: Rotating Orbital Sky-Tower (ROTATING CELESTIAL SKYSCRAPER!)
+            { type: "buildingHex", x: 2.0, y: 61.8, z: -83, r: 2.0, h: 1.8, name: "15. ROTATING ORBITAL SKY-TOWER", facade: bldgFacadeCyanTex, color: 0x0284c7, isRotating: true, rotSpeed: -0.5 },
 
-            // Stage 16: Earth Orbital Launch Pad (Tight Launch Platform!)
-            { type: "hex", x: 0, y: 65.0, z: -91, r: 2.2, h: 1.8, name: "16. EARTH LAUNCH PAD", color: 0x0d9488 },
+            // Stage 16: Earth-Orbit Gateway Skyscraper (Terminus High-Rise!)
+            { type: "buildingHex", x: 0, y: 65.0, z: -91, r: 2.2, h: 1.8, name: "16. EARTH-ORBIT GATEWAY SKYSCRAPER", facade: bldgFacadeAmberTex, color: 0x0d9488 },
 
-            // Stage 17: Earth Docking Gantry Bridge (Narrow Runway to Earth!)
-            { type: "box", x: 0, y: 68.2, z: -97, w: 1.8, h: 1.2, d: 3.8, name: "17. EARTH DOCKING BRIDGE", color: 0x10b981 },
+            // Stage 17: Grand Earth Docking Sky-Bridge (Approach Gantry Runway!)
+            { type: "skyBridge", x: 0, y: 68.2, z: -97, w: 1.8, h: 1.2, d: 3.8, name: "17. EARTH SKYWAY APPROACH DOCK", color: 0x10b981 },
 
             // Stage 18: THE BLUE MARBLE: PLANET EARTH (Center Y = 66.0m, Z = -105, r = 5.2, Summit Y = 71.2m!)
             { type: "earth", x: 0, y: 66.0, z: -105, r: 5.2, name: "18. PLANET EARTH (FINAL HURDLE)", isEarth: true }
@@ -1463,9 +1561,9 @@
         let earthMesh = null;
         let cloudsMesh = null;
 
-        // Build all hurdles with High-End PBR and Cybernetic Edge Effects
+        // Build all hurdles with High-End 3D Skyscraper Architecture & Cybernetic Lighting
         hurdleDefinitions.forEach(p => {
-            let geo, mesh;
+            let mesh;
             const mat = new THREE.MeshStandardMaterial({
                 color: p.color || 0xffffff,
                 map: p.map || null,
@@ -1474,16 +1572,88 @@
                 emissive: p.emissive || (p.isSuperBounce ? 0x581c87 : 0x000000)
             });
 
-            if (p.type === "trampoline") {
+            if (p.type === "buildingHex") {
                 mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
 
+                // 1. Rooftop Landing Deck
+                const roofGeo = new THREE.CylinderGeometry(p.r, p.r, p.h, 6);
+                const roofMat = new THREE.MeshStandardMaterial({
+                    map: bldgRoofTex,
+                    roughness: 0.35,
+                    metalness: 0.75
+                });
+                const roof = new THREE.Mesh(roofGeo, roofMat);
+                mesh.add(roof);
+
+                // Glowing Neon Perimeter Cornice
+                const edgeLine = new THREE.LineSegments(
+                    new THREE.EdgesGeometry(roofGeo),
+                    new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 })
+                );
+                roof.add(edgeLine);
+
+                // 2. Colossal Skyscraper Body Shaft extending downwards into the cosmos
+                const shaftHeight = 38.0;
+                const shaftGeo = new THREE.CylinderGeometry(p.r * 0.96, p.r * 1.05, shaftHeight, 6);
+                const facadeMat = new THREE.MeshStandardMaterial({
+                    map: p.facade || bldgFacadeAmberTex,
+                    roughness: 0.25,
+                    metalness: 0.85,
+                    emissive: 0x0284c7,
+                    emissiveIntensity: 0.2
+                });
+                const shaft = new THREE.Mesh(shaftGeo, facadeMat);
+                shaft.position.y = -shaftHeight / 2;
+                mesh.add(shaft);
+
+                // 3. Rooftop Architectural Details: HVAC Chiller Penthouse & Antenna Mast
+                const hvacGeo = new THREE.BoxGeometry(0.7, 0.45, 0.7);
+                const hvacMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.9, roughness: 0.3 });
+                const hvac = new THREE.Mesh(hvacGeo, hvacMat);
+                hvac.position.set(-p.r * 0.45, p.h / 2 + 0.22, -p.r * 0.35);
+                mesh.add(hvac);
+
+                // Communication Antenna with Blinking Aviation Warning Beacon Light
+                const antMastGeo = new THREE.CylinderGeometry(0.03, 0.05, 3.2, 8);
+                const antMastMat = new THREE.MeshStandardMaterial({ color: 0x64748b, metalness: 0.95 });
+                const antenna = new THREE.Mesh(antMastGeo, antMastMat);
+                antenna.position.set(p.r * 0.45, p.h / 2 + 1.6, -p.r * 0.35);
+                mesh.add(antenna);
+
+                const beaconGeo = new THREE.SphereGeometry(0.08, 8, 8);
+                const beaconMat = new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 1.0 });
+                const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+                beacon.position.set(p.r * 0.45, p.h / 2 + 3.2, -p.r * 0.35);
+                mesh.add(beacon);
+                aviationBeacons.push(beacon);
+
+            } else if (p.type === "trampolineBuilding" || p.type === "trampoline") {
+                mesh = new THREE.Group();
+                mesh.position.set(p.x, p.y, p.z);
+
+                // 1. Skyscraper Base Shaft under the Launch Facility
+                const shaftHeight = 35.0;
+                const shaftGeo = new THREE.CylinderGeometry(p.r * 1.02, p.r * 1.12, shaftHeight, 8);
+                const shaftMat = new THREE.MeshStandardMaterial({
+                    map: bldgFacadeCyanTex,
+                    roughness: 0.25,
+                    metalness: 0.85,
+                    emissive: 0x06b6d4,
+                    emissiveIntensity: 0.25
+                });
+                const shaft = new THREE.Mesh(shaftGeo, shaftMat);
+                shaft.position.y = -shaftHeight / 2;
+                mesh.add(shaft);
+
+                // 2. Rooftop Ion Launch Pad Rim
                 const pad = new THREE.Mesh(
-                    new THREE.CylinderGeometry(p.r, p.r * 1.1, p.h, 24),
+                    new THREE.CylinderGeometry(p.r, p.r * 1.08, p.h, 24),
                     new THREE.MeshStandardMaterial({ color: p.color, emissive: 0x9333ea, emissiveIntensity: 0.65, roughness: 0.18, metalness: 0.85 })
                 );
                 mesh.add(pad);
 
+                // Glowing Neon Launch Rings
                 const trampRing = new THREE.Mesh(
                     new THREE.RingGeometry(p.r * 0.45, p.r * 0.92, 32),
                     new THREE.MeshBasicMaterial({ color: 0xf0abfc, side: THREE.DoubleSide })
@@ -1500,19 +1670,70 @@
                 trampPulse.position.y = p.h / 2 + 0.06;
                 mesh.add(trampPulse);
 
+                // Corner Power Capacitors on Launch Pad
+                for (let a = 0; a < 4; a++) {
+                    const ang = (a * Math.PI) / 2;
+                    const cap = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.12, 0.12, 0.4, 8),
+                        new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0284c7, emissiveIntensity: 0.8, metalness: 0.9 })
+                    );
+                    cap.position.set(Math.cos(ang) * (p.r * 0.95), p.h / 2 + 0.2, Math.sin(ang) * (p.r * 0.95));
+                    mesh.add(cap);
+                }
+
                 animatedTrampolines.push({ ring: trampRing, pulse: trampPulse });
-            } else if (p.type === "hex") {
-                geo = new THREE.CylinderGeometry(p.r, p.r, p.h, 6);
-                mesh = new THREE.Mesh(geo, mat);
+
+            } else if (p.type === "skyBridge") {
+                mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
 
-                const hexEdge = new THREE.LineSegments(
-                    new THREE.EdgesGeometry(geo),
-                    new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.7 })
+                // 1. Deck Floor
+                const deckGeo = new THREE.BoxGeometry(p.w, p.h, p.d);
+                const deckMat = new THREE.MeshStandardMaterial({
+                    color: 0x1e293b,
+                    metalness: 0.92,
+                    roughness: 0.25
+                });
+                const deck = new THREE.Mesh(deckGeo, deckMat);
+                mesh.add(deck);
+
+                // Illuminated Neon Edge Track lines
+                const edgeLine = new THREE.LineSegments(
+                    new THREE.EdgesGeometry(deckGeo),
+                    new THREE.LineBasicMaterial({ color: p.isOscillating ? 0x34d399 : 0x38bdf8, transparent: true, opacity: 0.75 })
                 );
-                mesh.add(hexEdge);
+                deck.add(edgeLine);
+
+                // 2. Cyber Glass Balustrades / Safety Handrails on sides
+                const railMat = new THREE.MeshBasicMaterial({
+                    color: p.isOscillating ? 0x10b981 : 0x0284c7,
+                    transparent: true,
+                    opacity: 0.55
+                });
+                const railL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.7, p.d), railMat);
+                railL.position.set(-p.w / 2 + 0.04, p.h / 2 + 0.35, 0);
+                mesh.add(railL);
+
+                const railR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.7, p.d), railMat);
+                railR.position.set(p.w / 2 - 0.04, p.h / 2 + 0.35, 0);
+                mesh.add(railR);
+
+                // 3. Under-Deck Skyscraper Support Tower or Truss
+                const underTowerHeight = 32.0;
+                const underTowerGeo = new THREE.BoxGeometry(p.w * 0.85, underTowerHeight, p.d * 0.85);
+                const underTowerMat = new THREE.MeshStandardMaterial({
+                    map: bldgFacadeCyanTex,
+                    roughness: 0.25,
+                    metalness: 0.85,
+                    emissive: 0x0369a1,
+                    emissiveIntensity: 0.15
+                });
+                const underTower = new THREE.Mesh(underTowerGeo, underTowerMat);
+                underTower.position.y = -underTowerHeight / 2 - p.h / 2;
+                mesh.add(underTower);
+
             } else if (p.type === "planet") {
-                geo = new THREE.SphereGeometry(p.r, 36, 36);
+                const geo = new THREE.SphereGeometry(p.r, 36, 36);
                 mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(p.x, p.y, p.z);
 
@@ -1525,6 +1746,7 @@
                     blending: THREE.AdditiveBlending
                 });
                 mesh.add(new THREE.Mesh(haloGeo, haloMat));
+
             } else if (p.type === "ringPlanet") {
                 mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
@@ -1556,6 +1778,7 @@
                 );
                 rInner.rotation.x = Math.PI / 2.3;
                 mesh.add(rInner);
+
             } else if (p.type === "earth") {
                 mesh = new THREE.Group();
                 mesh.position.set(p.x, p.y, p.z);
@@ -1594,16 +1817,6 @@
                 const atmosRing = new THREE.Mesh(atmosGeo, atmosMat);
                 atmosRing.rotation.x = Math.PI / 2;
                 mesh.add(atmosRing);
-            } else {
-                geo = new THREE.BoxGeometry(p.w, p.h, p.d);
-                mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(p.x, p.y, p.z);
-
-                const boxEdge = new THREE.LineSegments(
-                    new THREE.EdgesGeometry(geo),
-                    new THREE.LineBasicMaterial({ color: p.isOscillating ? 0x34d399 : 0x60a5fa, transparent: true, opacity: 0.65 })
-                );
-                mesh.add(boxEdge);
             }
 
             if (p.isRotating) {
@@ -1623,7 +1836,7 @@
                     minZ: p.z - p.r, maxZ: p.z + p.r,
                     name: p.name, isSuperBounce: false, isEarth: !!p.isEarth
                 };
-            } else if (p.type === "hex" || p.type === "trampoline") {
+            } else if (p.type === "buildingHex" || p.type === "trampolineBuilding" || p.type === "hex" || p.type === "trampoline") {
                 physObj = {
                     shape: "cylinder",
                     cx: p.x, cy: p.y, cz: p.z, r: p.r, halfH: p.h / 2,
@@ -2772,14 +2985,18 @@
         const darkTitaniumMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.95 });
         const goldVisorMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.05, metalness: 0.98, emissive: 0xeab308, emissiveIntensity: 0.95 });
         const scarfMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0ea5e9, emissiveIntensity: 0.7 });
-        const jetMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.92, roughness: 0.25 });
-        const nozzleMat = new THREE.MeshStandardMaterial({ color: 0x1e1b4b, emissive: 0x4338ca, emissiveIntensity: 0.4, metalness: 0.95 });
+        const jetMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.95, roughness: 0.2 });
+        const nozzleMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, emissive: 0x38bdf8, emissiveIntensity: 0.35, metalness: 0.98 });
         const nozzleRimMat = new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xea580c, emissiveIntensity: 0.7, metalness: 0.9 });
         const reactorGlowMat = new THREE.MeshBasicMaterial({ color: 0x67e8f9 });
         const plasmaCellMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0891b2, emissiveIntensity: 0.95, roughness: 0.1 });
         const chromePistonMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 1.0, roughness: 0.08 });
         const holoHudMat = new THREE.MeshBasicMaterial({ color: 0x4ade80, transparent: true, opacity: 0.85 });
         const antennaLedMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
+        const carbonMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.35, metalness: 0.9 });
+        const headlightMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const ledAmberMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+        const ledGreenMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
 
         // Supersonic Plasma Combustion Materials
         const flameCoreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
@@ -2791,6 +3008,12 @@
         const pelvis = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.24, 0.3), suitMat);
         pelvis.position.y = 0.95;
         character.add(pelvis);
+
+        // Armored Hip Guards
+        const hipArmorL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.16, 0.24), armorMat);
+        hipArmorL.position.set(-0.24, 0.02, 0); pelvis.add(hipArmorL);
+        const hipArmorR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.16, 0.24), armorMat);
+        hipArmorR.position.set(0.24, 0.02, 0); pelvis.add(hipArmorR);
 
         // Tactical Gear Belt
         const belt = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.09, 0.34), darkTitaniumMat);
@@ -2825,10 +3048,27 @@
         gearPouchBack.position.set(0, 0.05, -0.19);
         pelvis.add(gearPouchBack);
 
-        // 2. Torso Cuirass & Arc Reactor Core
+        // 2. Torso Cuirass, Shoulder Floodlights & Arc Reactor Core
         const chest = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.56, 0.38), armorMat);
         chest.position.y = 0.42;
         pelvis.add(chest);
+
+        // Pectoral Sculpted Armor Plates
+        const pecL = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.05), carbonMat);
+        pecL.position.set(-0.14, 0.14, 0.19); pecL.rotation.y = -0.08; chest.add(pecL);
+        const pecR = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.22, 0.05), carbonMat);
+        pecR.position.set(0.14, 0.14, 0.19); pecR.rotation.y = 0.08; chest.add(pecR);
+
+        // Tactical Shoulder Floodlights (Forward Searchlights)
+        const lightPodL = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.08, 12), darkTitaniumMat);
+        lightPodL.rotation.x = Math.PI / 2; lightPodL.position.set(-0.25, 0.28, 0.19); chest.add(lightPodL);
+        const lightLensL = new THREE.Mesh(new THREE.CircleGeometry(0.038, 12), headlightMat);
+        lightLensL.position.set(-0.25, 0.28, 0.235); chest.add(lightLensL);
+
+        const lightPodR = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.08, 12), darkTitaniumMat);
+        lightPodR.rotation.x = Math.PI / 2; lightPodR.position.set(0.25, 0.28, 0.19); chest.add(lightPodR);
+        const lightLensR = new THREE.Mesh(new THREE.CircleGeometry(0.038, 12), headlightMat);
+        lightLensR.position.set(0.25, 0.28, 0.235); chest.add(lightLensR);
 
         // Abdominal kinetic armor segment
         const absArmor = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.18, 0.06), darkTitaniumMat);
@@ -2846,6 +3086,14 @@
         reactorCore.position.set(0, 0.08, 0.205);
         chest.add(reactorCore);
 
+        // Chest Telemetry HUD Status LEDs (Cyan, Amber, Green)
+        const hudLed1 = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.015, 0.01), reactorGlowMat);
+        hudLed1.position.set(-0.08, -0.06, 0.205); chest.add(hudLed1);
+        const hudLed2 = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.015, 0.01), ledAmberMat);
+        hudLed2.position.set(0, -0.06, 0.205); chest.add(hudLed2);
+        const hudLed3 = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.015, 0.01), ledGreenMat);
+        hudLed3.position.set(0.08, -0.06, 0.205); chest.add(hudLed3);
+
         // Mechanical Spinal Column down the back
         for (let s = 0; s < 3; s++) {
             const vert = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.1, 0.05), darkTitaniumMat);
@@ -2854,30 +3102,36 @@
         }
 
         // 3. Dual-Chamber Ion Jetpack with Supersonic Combustion
-        const jetpack = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.5, 0.2), jetMat);
-        jetpack.position.set(0, 0.06, -0.26);
+        const jetpack = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.52, 0.22), jetMat);
+        jetpack.position.set(0, 0.06, -0.27);
         chest.add(jetpack);
 
         // Intake Cowlings on top of Jetpack
         const intakeL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.08, 12), darkTitaniumMat);
-        intakeL.position.set(-0.13, 0.26, 0); jetpack.add(intakeL);
+        intakeL.position.set(-0.13, 0.27, 0); jetpack.add(intakeL);
         const intakeR = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.08, 12), darkTitaniumMat);
-        intakeR.position.set(0.13, 0.26, 0); jetpack.add(intakeR);
+        intakeR.position.set(0.13, 0.27, 0); jetpack.add(intakeR);
 
-        // Titanium Exhaust Nozzle Bells
+        // Titanium Exhaust Nozzle Bells with Glowing Heat Shields
         const jetNozzleL = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.11, 0.14, 12), nozzleMat);
-        jetNozzleL.position.set(-0.13, -0.28, 0); jetpack.add(jetNozzleL);
+        jetNozzleL.position.set(-0.13, -0.29, 0); jetpack.add(jetNozzleL);
         const jetNozzleRimL = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.02, 8, 16), nozzleRimMat);
-        jetNozzleRimL.rotation.x = Math.PI / 2; jetNozzleRimL.position.set(-0.13, -0.35, 0); jetpack.add(jetNozzleRimL);
+        jetNozzleRimL.rotation.x = Math.PI / 2; jetNozzleRimL.position.set(-0.13, -0.36, 0); jetpack.add(jetNozzleRimL);
 
         const jetNozzleR = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.11, 0.14, 12), nozzleMat);
-        jetNozzleR.position.set(0.13, -0.28, 0); jetpack.add(jetNozzleR);
+        jetNozzleR.position.set(0.13, -0.29, 0); jetpack.add(jetNozzleR);
         const jetNozzleRimR = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.02, 8, 16), nozzleRimMat);
-        jetNozzleRimR.rotation.x = Math.PI / 2; jetNozzleRimR.position.set(0.13, -0.35, 0); jetpack.add(jetNozzleRimR);
+        jetNozzleRimR.rotation.x = Math.PI / 2; jetNozzleRimR.position.set(0.13, -0.36, 0); jetpack.add(jetNozzleRimR);
+
+        // Flexible Braided Quantum Power Conduits (Fuel Lines from Hips to Jetpack)
+        const conduitL = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.015, 8, 16, Math.PI * 0.7), carbonMat);
+        conduitL.rotation.y = -Math.PI / 3; conduitL.position.set(-0.22, -0.05, -0.15); chest.add(conduitL);
+        const conduitR = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.015, 8, 16, Math.PI * 0.7), carbonMat);
+        conduitR.rotation.y = Math.PI / 3; conduitR.position.set(0.22, -0.05, -0.15); chest.add(conduitR);
 
         // Compact Sleek Plasma Thruster Jets (Proportional & Neat)
         const flameGroupL = new THREE.Group();
-        flameGroupL.position.set(-0.13, -0.36, 0); flameGroupL.visible = false; jetpack.add(flameGroupL);
+        flameGroupL.position.set(-0.13, -0.37, 0); flameGroupL.visible = false; jetpack.add(flameGroupL);
 
         const coreFlameL = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.24, 8), flameCoreMat);
         coreFlameL.position.y = -0.12; coreFlameL.rotation.x = Math.PI; flameGroupL.add(coreFlameL);
@@ -2886,7 +3140,7 @@
         outerPlumeL.position.y = -0.17; outerPlumeL.rotation.x = Math.PI; flameGroupL.add(outerPlumeL);
 
         const flameGroupR = new THREE.Group();
-        flameGroupR.position.set(0.13, -0.36, 0); flameGroupR.visible = false; jetpack.add(flameGroupR);
+        flameGroupR.position.set(0.13, -0.37, 0); flameGroupR.visible = false; jetpack.add(flameGroupR);
 
         const coreFlameR = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.24, 8), flameCoreMat);
         coreFlameR.position.y = -0.12; coreFlameR.rotation.x = Math.PI; flameGroupR.add(coreFlameR);
@@ -2894,22 +3148,30 @@
         const outerPlumeR = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.34, 8), flameOuterMat);
         outerPlumeR.position.y = -0.17; outerPlumeR.rotation.x = Math.PI; flameGroupR.add(outerPlumeR);
 
-        // 4. Head, Tactical Helmet, Visor & Comms Gear
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.35, 0.32), suitMat);
+        // 4. Head, Sculpted Aerodynamic Astronaut Helmet, Visor & Comms
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.34, 0.32), suitMat);
         head.position.y = 0.54;
         chest.add(head);
 
+        // Rounded Aerodynamic Crown Helmet Dome
+        const helmetDome = new THREE.Mesh(
+            new THREE.SphereGeometry(0.185, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+            armorMat
+        );
+        helmetDome.position.set(0, 0.17, 0);
+        head.add(helmetDome);
+
         // Helmet Brow Guard & Ridge
-        const helmetCrest = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.34), armorMat);
-        helmetCrest.position.set(0, 0.18, 0); head.add(helmetCrest);
+        const helmetCrest = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.34), carbonMat);
+        helmetCrest.position.set(0, 0.21, 0); head.add(helmetCrest);
 
-        // Polished Gold Reflective Visor
-        const visor = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.12, 0.09), goldVisorMat);
-        visor.position.set(0, 0.03, 0.16); head.add(visor);
+        // Sculpted Multi-Layer Gold Reflective Visor
+        const visor = new THREE.Mesh(new THREE.BoxGeometry(0.31, 0.13, 0.1), goldVisorMat);
+        visor.position.set(0, 0.04, 0.165); head.add(visor);
 
-        // Holographic Visor Cyan Scanning Line
+        // Holographic Visor Cyan Scanning Reticle
         const visorScanline = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.02, 0.01), reactorGlowMat);
-        visorScanline.position.set(0, 0.03, 0.21); head.add(visorScanline);
+        visorScanline.position.set(0, 0.04, 0.22); head.add(visorScanline);
 
         // Comms Whip Antenna on Left Ear with Status LED
         const antennaBase = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.06, 8), darkTitaniumMat);
@@ -2919,61 +3181,74 @@
         const antennaLed = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), antennaLedMat);
         antennaLed.position.set(-0.18, 0.38, -0.05); head.add(antennaLed);
 
-        // Dual Rebreather Respirator Filters on Chin
-        const rebreatherL = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.08, 8), darkTitaniumMat);
-        rebreatherL.rotation.z = Math.PI / 3; rebreatherL.position.set(-0.09, -0.14, 0.16); head.add(rebreatherL);
-        const rebreatherR = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.08, 8), darkTitaniumMat);
-        rebreatherR.rotation.z = -Math.PI / 3; rebreatherR.position.set(0.09, -0.14, 0.16); head.add(rebreatherR);
+        // Dual Rebreather Respirator Filters on Chin with Metallic Mesh
+        const rebreatherL = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.08, 8), darkTitaniumMat);
+        rebreatherL.rotation.z = Math.PI / 3; rebreatherL.position.set(-0.09, -0.13, 0.16); head.add(rebreatherL);
+        const rebreatherR = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.08, 8), darkTitaniumMat);
+        rebreatherR.rotation.z = -Math.PI / 3; rebreatherR.position.set(0.09, -0.13, 0.16); head.add(rebreatherR);
 
         // Flowing Cyber Scarf
         const scarf = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.09, 0.55), scarfMat);
         scarf.position.set(0, -0.22, -0.26); head.add(scarf);
 
-        // Tiered Angular Pauldrons (Shoulder Armor)
+        // Tiered Angular Pauldrons (Shoulder Armor with Carbon Trim)
         const pauldronL = new THREE.Group();
         pauldronL.position.set(-0.36, 0.24, 0); chest.add(pauldronL);
-        const pauldronLUpper = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.12, 0.26), armorMat);
+        const pauldronLUpper = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.13, 0.27), armorMat);
         pauldronL.add(pauldronLUpper);
-        const pauldronLLower = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.1, 0.22), darkTitaniumMat);
+        const pauldronLLower = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.1, 0.23), carbonMat);
         pauldronLLower.position.set(-0.03, -0.08, 0); pauldronL.add(pauldronLLower);
 
         const pauldronR = new THREE.Group();
         pauldronR.position.set(0.36, 0.24, 0); chest.add(pauldronR);
-        const pauldronRUpper = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.12, 0.26), armorMat);
+        const pauldronRUpper = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.13, 0.27), armorMat);
         pauldronR.add(pauldronRUpper);
-        const pauldronRLower = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.1, 0.22), darkTitaniumMat);
+        const pauldronRLower = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.1, 0.23), carbonMat);
         pauldronRLower.position.set(0.03, -0.08, 0); pauldronR.add(pauldronRLower);
 
         // 5. Arms with Cyber Gauntlets & Wrist Holo-Terminal
         const armL = new THREE.Group(); armL.position.set(-0.38, 0.15, 0); chest.add(armL);
         const armLMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.52, 8), suitMat);
         armLMesh.position.y = -0.26; armL.add(armLMesh);
+        // Titanium Elbow Guard
+        const elbowL = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), carbonMat);
+        elbowL.position.set(0, -0.26, -0.03); armL.add(elbowL);
         // Cyber Gauntlet on Left Forearm
-        const gauntletL = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.26, 0.17), armorMat);
+        const gauntletL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.26, 0.18), armorMat);
         gauntletL.position.set(0, -0.32, 0); armL.add(gauntletL);
         // Wrist Holographic Display
-        const holoDisplay = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.08, 0.02), holoHudMat);
-        holoDisplay.position.set(0, -0.28, 0.095); armL.add(holoDisplay);
+        const holoDisplay = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.09, 0.02), holoHudMat);
+        holoDisplay.position.set(0, -0.28, 0.1); armL.add(holoDisplay);
 
         const armR = new THREE.Group(); armR.position.set(0.38, 0.15, 0); chest.add(armR);
         const armRMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.52, 8), suitMat);
         armRMesh.position.y = -0.26; armR.add(armRMesh);
-        // Cyber Gauntlet on Right Forearm
-        const gauntletR = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.26, 0.17), armorMat);
+        // Titanium Elbow Guard
+        const elbowR = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), carbonMat);
+        elbowR.position.set(0, -0.26, -0.03); armR.add(elbowR);
+        // Cyber Gauntlet on Right Forearm with Beam Emitter
+        const gauntletR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.26, 0.18), armorMat);
         gauntletR.position.set(0, -0.32, 0); armR.add(gauntletR);
+        const beamEmitterR = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.04, 8), reactorGlowMat);
+        beamEmitterR.rotation.x = Math.PI / 2; beamEmitterR.position.set(0, -0.32, 0.1); armR.add(beamEmitterR);
 
         // 6. Legs with Kinetic Jump Boots & Hydraulic Pistons
         const legL = new THREE.Group(); legL.position.set(-0.16, -0.1, 0); pelvis.add(legL);
         const legLMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.72, 8), suitMat);
         legLMesh.position.y = -0.36; legL.add(legLMesh);
+        // Thigh Kinetic Armor Plate
+        const thighL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.24, 0.05), carbonMat);
+        thighL.position.set(0, -0.16, 0.08); legL.add(thighL);
         // Kinetic Knee Guard & Shin Greave
         const kneeL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.14), armorMat);
         kneeL.position.set(0, -0.24, 0.07); legL.add(kneeL);
         const shinL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.32, 0.08), darkTitaniumMat);
         shinL.position.set(0, -0.48, 0.07); legL.add(shinL);
-        // Heavy Magnetic Jump Boot with Heel Piston
+        // Heavy Magnetic Jump Boot with Heel Piston & Sole Stabilizers
         const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.28), darkTitaniumMat);
         bootL.position.set(0, -0.72, 0.05); legL.add(bootL);
+        const bootSoleL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 0.28), reactorGlowMat);
+        bootSoleL.position.set(0, -0.79, 0.05); legL.add(bootSoleL);
         const pistonL = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8), chromePistonMat);
         pistonL.position.set(0, -0.66, -0.09); legL.add(pistonL);
         const pistonRingL = new THREE.Mesh(new THREE.TorusGeometry(0.03, 0.012, 6, 12), reactorGlowMat);
@@ -2982,18 +3257,30 @@
         const legR = new THREE.Group(); legR.position.set(0.16, -0.1, 0); pelvis.add(legR);
         const legRMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.72, 8), suitMat);
         legRMesh.position.y = -0.36; legR.add(legRMesh);
+        // Thigh Kinetic Armor Plate
+        const thighR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.24, 0.05), carbonMat);
+        thighR.position.set(0, -0.16, 0.08); legR.add(thighR);
         // Kinetic Knee Guard & Shin Greave
         const kneeR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.14), armorMat);
         kneeR.position.set(0, -0.24, 0.07); legR.add(kneeR);
         const shinR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.32, 0.08), darkTitaniumMat);
         shinR.position.set(0, -0.48, 0.07); legR.add(shinR);
-        // Heavy Magnetic Jump Boot with Heel Piston
+        // Heavy Magnetic Jump Boot with Heel Piston & Sole Stabilizers
         const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.14, 0.28), darkTitaniumMat);
         bootR.position.set(0, -0.72, 0.05); legR.add(bootR);
+        const bootSoleR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.03, 0.28), reactorGlowMat);
+        bootSoleR.position.set(0, -0.79, 0.05); legR.add(bootSoleR);
         const pistonR = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.16, 8), chromePistonMat);
         pistonR.position.set(0, -0.66, -0.09); legR.add(pistonR);
         const pistonRingR = new THREE.Mesh(new THREE.TorusGeometry(0.03, 0.012, 6, 12), reactorGlowMat);
         pistonRingR.rotation.x = Math.PI / 2; pistonRingR.position.set(0, -0.68, -0.09); legR.add(pistonRingR);
+
+        // Dynamic Soft Contact Shadow Projector Disc beneath Zaddr
+        const shadowGeo = new THREE.RingGeometry(0.05, 0.45, 24);
+        const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
+        const playerContactShadow = new THREE.Mesh(shadowGeo, shadowMat);
+        playerContactShadow.rotation.x = -Math.PI / 2;
+        scene.add(playerContactShadow);
 
         // =====================================================================
         // GAMEPLAY & KINEMATIC STATE
@@ -3563,6 +3850,14 @@
             // Animate Moon Rotation in Deep Space
             if (typeof moonMesh !== 'undefined' && moonMesh) moonMesh.rotation.y += dt * 0.015;
 
+            // Animate Skyscraper Aviation Warning Beacon Lights
+            for (let bIdx = 0; bIdx < aviationBeacons.length; bIdx++) {
+                const b = aviationBeacons[bIdx];
+                if (b && b.material) {
+                    b.material.opacity = 0.25 + 0.75 * Math.abs(Math.sin(time * 3.8 + bIdx * 0.9));
+                }
+            }
+
             // Animate dynamic cosmic shooting stars (meteors)
             for (let i = 0; i < shootingStars.length; i++) {
                 const s = shootingStars[i];
@@ -4095,6 +4390,15 @@
 
             // Dynamic Character Position
             character.position.copy(player.pos);
+
+            // Dynamic Ground Contact Shadow beneath Zaddr
+            if (typeof playerContactShadow !== 'undefined') {
+                const groundY = player.standingPlatform ? player.standingPlatform.maxY : 0;
+                playerContactShadow.position.set(player.pos.x, groundY + 0.02, player.pos.z);
+                const airGap = Math.max(0, player.pos.y - groundY);
+                playerContactShadow.scale.setScalar(Math.min(2.5, 1.0 + airGap * 0.35));
+                playerContactShadow.material.opacity = Math.max(0.06, 0.55 - airGap * 0.08);
+            }
             // =====================================================================
             // DYNAMIC PROCEDURAL SKELETAL ANIMATION CONTROLLER (ZERO LAG)
             // =====================================================================
