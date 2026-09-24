@@ -812,6 +812,54 @@
             margin-top: 12px; min-height: 48px; line-height: 1.5; white-space: pre-wrap;
         }
 
+        /* ====== SETTINGS PANEL ====== */
+        #settings-btn {
+            position: fixed; top: 14px; right: 14px;
+            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(10,12,18,0.88); backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(245,158,11,0.5); color: #fbbf24;
+            font-size: 18px; cursor: pointer; z-index: 60;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+            transition: background 0.2s, transform 0.2s;
+        }
+        #settings-btn:hover { background: rgba(245,158,11,0.25); transform: rotate(30deg); }
+        #settings-panel {
+            position: fixed; top: 58px; right: 14px;
+            background: rgba(8,10,18,0.96); backdrop-filter: blur(24px);
+            border: 1.5px solid rgba(245,158,11,0.35); border-radius: 14px;
+            padding: 14px 16px; z-index: 59; min-width: 220px;
+            display: none; flex-direction: column; gap: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+        }
+        #settings-panel.open { display: flex; }
+        .sp-row {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 10.5px; font-family: monospace; color: #94a3b8;
+        }
+        .sp-row .tag-pill { font-size: 9.5px; padding: 3px 8px; cursor: pointer; }
+        .sp-label { font-size: 9px; letter-spacing: 1px; color: #64748b; text-transform: uppercase; margin-top: 4px; }
+        /* Tiny ping indicator bottom-right */
+        #ping-display {
+            position: fixed; bottom: 6px; right: 8px;
+            font-size: 9px; font-family: monospace;
+            color: rgba(148,163,184,0.55); z-index: 60;
+            pointer-events: none; letter-spacing: 0.5px;
+        }
+        /* Mobile D-pad scale with viewport */
+        @media (pointer: coarse) {
+            .dpad-btn { width: clamp(40px, 11vw, 64px); height: clamp(40px, 11vw, 64px); font-size: clamp(16px, 4.5vw, 26px); }
+            .dpad-center { width: clamp(32px, 9vw, 52px); height: clamp(32px, 9vw, 52px); }
+            .mob-btn-jump { width: clamp(60px, 16vw, 90px); height: clamp(60px, 16vw, 90px); font-size: clamp(10px, 2.5vw, 14px); }
+            .mob-btn-hover { width: clamp(40px, 11vw, 62px); height: clamp(40px, 11vw, 62px); font-size: clamp(16px, 4.5vw, 24px); }
+            .mob-btn-ascend { width: clamp(56px, 14vw, 80px); height: clamp(56px, 14vw, 80px); font-size: clamp(11px, 2.5vw, 14px); }
+            .mob-btn-descend { width: clamp(44px, 11vw, 64px); height: clamp(44px, 11vw, 64px); font-size: clamp(11px, 2.5vw, 14px); }
+            .mob-btn-hover-exit { width: clamp(32px, 9vw, 50px); height: clamp(32px, 9vw, 50px); }
+            #mobile-dpad { gap: clamp(2px, 1vw, 6px); bottom: clamp(14px, 3vh, 28px); left: clamp(10px, 2.5vw, 22px); }
+            .dpad-row { gap: clamp(2px, 1vw, 6px); }
+            #mobile-action-pad, #mob-hover-controls { bottom: clamp(14px, 3vh, 28px); right: clamp(10px, 2.5vw, 22px); gap: clamp(6px, 1.5vh, 14px); }
+        }
+
         #reticle {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 14px; height: 14px; pointer-events: none; opacity: 0.45;
@@ -837,24 +885,43 @@
         <div class="hud-glass">
             <div class="brand-title">MISSION MOON</div>
             <div style="font-size: 11px; color: #fbbf24; font-weight: 800; letter-spacing: 0.8px; margin-top: 2px;">
-                🚀 DIRECTIVE: ASCEND 18 CELESTIAL HURDLES & BOARD THE LUNAR STARSHIP!
+                🚀 DIRECTIVE: ASCEND 18 CELESTIAL HURDLES &amp; BOARD THE LUNAR STARSHIP!
             </div>
             <div style="font-size: 11px; color: #94a3b8; margin-top: 4px; font-family: monospace;">
-                ALTITUDE: <span id="val-alt" style="color: #fde047; font-weight: bold;">0.0m</span> &nbsp;|&nbsp; 
-                OBJECTIVE: <span id="val-stage" style="color: #fbbf24; font-weight: bold;">GRASSY MEADOW</span>
+                ALT: <span id="val-alt" style="color: #fde047; font-weight: bold;">0.0m</span> &nbsp;|&nbsp;
+                <span id="val-stage" style="color: #fbbf24; font-weight: bold;">GRASSY MEADOW</span>
             </div>
             <div class="progress-box">
                 <div id="summit-prog" class="progress-bar"></div>
             </div>
         </div>
-        <div class="hud-glass" style="display: flex; gap: 8px; align-items: center;">
-            <button id="pill-antseed-ai" class="tag-pill tag-antseed" title="Click to open AntSeed AI VPN Live Inspector">⚡ ANTSEED AI VPN: CONNECTED</button>
-            <button id="btn-toggle-music" class="tag-pill" style="cursor: pointer; background: rgba(245, 158, 11, 0.16); border: 1px solid #f59e0b; color: #fbbf24;" title="Toggle Ambient Music">🎵 MUSIC: ON</button>
+    </div>
+
+    <!-- Settings button (top-right gear) -->
+    <button id="settings-btn" title="Settings">⚙️</button>
+    <div id="settings-panel">
+        <div class="sp-label">Game Settings</div>
+        <div class="sp-row">
+            <button id="pill-antseed-ai" class="tag-pill tag-antseed" title="Click to open AntSeed AI VPN">⚡ ANTSEED AI</button>
+            <button id="btn-toggle-music" class="tag-pill" style="cursor:pointer;background:rgba(245,158,11,0.16);border:1px solid #f59e0b;color:#fbbf24;">🎵 MUSIC</button>
+        </div>
+        <div class="sp-row">
             <span id="pill-mode" class="tag-pill tag-grass">LUSH MEADOW</span>
-            <span id="pill-checkpoint" class="tag-pill" style="border: 1px solid #10b981; color: #34d399; background: rgba(16, 185, 129, 0.16);">CHECKPOINT: FIRST LANE</span>
+        </div>
+        <div class="sp-row">
+            <span id="pill-checkpoint" class="tag-pill" style="border:1px solid #10b981;color:#34d399;background:rgba(16,185,129,0.16);">CHECKPOINT: FIRST LANE</span>
+        </div>
+        <div class="sp-row">
             <span id="pill-best" class="tag-pill tag-gold">PEAK: 0.0m</span>
         </div>
+        <div class="sp-label" style="margin-top:6px;">Controls</div>
+        <div class="sp-row">
+            <button class="hud-btn" id="b-reset" style="font-size:9px;padding:5px 10px;">🔄 RESET</button>
+            <button class="hud-btn" id="b-home" style="font-size:9px;padding:5px 10px;">🏠 HOME</button>
+        </div>
     </div>
+    <!-- Tiny ping counter -->
+    <div id="ping-display">0ms</div>
 
     <!-- Floating AntSeed AI Tactical Co-Pilot HUD Widget -->
     <div id="ai-copilot-hud">
@@ -872,10 +939,8 @@
 
     <!-- Bottom Controls -->
     <div id="bottom-hud">
-        <button class="hud-btn" id="b-hover" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.16);" title="Toggle Anti-Gravity Hover (Press H)">🛸 HOVER [H]</button>
-        <button class="hud-btn btn-jump-main" id="b-jump">▲ JUMP / BOOST (SPACE)</button>
-        <button class="hud-btn" id="b-reset">🔄 RESET TO MEADOW</button>
-        <button class="hud-btn" id="b-home">🏠 HOMESCREEN</button>
+        <button class="hud-btn" id="b-hover" style="border-color:#38bdf8;color:#38bdf8;background:rgba(56,189,248,0.16);" title="Toggle Anti-Gravity Hover (H)">🛸 HOVER [H]</button>
+        <button class="hud-btn btn-jump-main" id="b-jump">▲ JUMP (SPACE)</button>
     </div>
 
     <!-- Portrait-mode blocker (shown on touch devices in portrait) -->
@@ -4553,6 +4618,33 @@
             document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') acquireWakeLock(); });
         }
 
+        // =====================================================================
+        // SETTINGS PANEL TOGGLE
+        // =====================================================================
+        const settingsBtn   = document.getElementById('settings-btn');
+        const settingsPanel = document.getElementById('settings-panel');
+        if (settingsBtn && settingsPanel) {
+            settingsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                settingsPanel.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
+                    settingsPanel.classList.remove('open');
+                }
+            });
+        }
+        // Ping display update
+        const pingDisplay = document.getElementById('ping-display');
+        setInterval(() => {
+            if (!pingDisplay) return;
+            const copilotTelem = document.getElementById('ai-copilot-telemetry');
+            if (copilotTelem) {
+                const match = copilotTelem.textContent.match(/(\d+)ms/);
+                if (match) pingDisplay.textContent = match[1] + 'ms';
+            }
+        }, 2000);
+
         // UI Buttons
         document.getElementById('b-jump').addEventListener('click', () => handleJumpAction());
         const bHover = document.getElementById('b-hover');
@@ -5787,7 +5879,7 @@
             }
 
             // Dynamic Character Position
-            character.position.copy(player.pos);
+            character.position.set(player.pos.x, player.pos.y + 0.08, player.pos.z);
 
             // Dynamic Ground Contact Shadow beneath Zaddr
             if (typeof playerContactShadow !== 'undefined') {
