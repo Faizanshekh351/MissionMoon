@@ -644,6 +644,7 @@
         <button class="hud-btn" id="b-wall">➡ WALL-WALK [2]</button>
         <button class="hud-btn" id="b-hover" style="border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.16);" title="Toggle Anti-Gravity Hover (Press H)">🛸 HOVER [H]</button>
         <button class="hud-btn btn-jump-main" id="b-jump">▲ JUMP / BOOST (SPACE)</button>
+        <button class="hud-btn" id="b-launch-starship" style="display: none; background: linear-gradient(135deg, #f59e0b, #ec4899); color: #fff; font-weight: 900; border-color: #fbbf24; box-shadow: 0 0 25px rgba(245, 158, 11, 0.85); animation: brandGlow 1.5s infinite alternate;" title="Ignite Starship & Escape to the Moon! [L]">🚀 LAUNCH STARSHIP [L]</button>
         <button class="hud-btn" id="b-reset">🔄 RESET TO MEADOW</button>
         <button class="hud-btn" id="b-home">🏠 HOMESCREEN</button>
     </div>
@@ -794,9 +795,12 @@
                 <div class="hs-ctrl-col"><b>LEFT MOUSE DRAG</b> : 360° Orbit Camera</div>
             </div>
 
-            <div class="hs-action-row" style="justify-content: center;">
-                <button id="btn-start-expedition" class="hs-btn-launch" style="flex: none; min-width: 360px; padding: 18px 44px; font-size: 16px;" title="Launch Expedition & Play Soft Ambient Music">
+            <div class="hs-action-row" style="justify-content: center; gap: 14px;">
+                <button id="btn-start-expedition" class="hs-btn-launch" style="flex: none; min-width: 300px; padding: 18px 38px; font-size: 16px; z-index: 10; cursor: pointer;" title="Launch Expedition & Play Immediately">
                     🚀 LAUNCH EXPEDITION
+                </button>
+                <button id="btn-watch-briefing" class="hs-btn-audio" style="font-size: 13px; padding: 16px 24px; z-index: 10; cursor: pointer;" title="Watch Cinematic Lore Briefing">
+                    🎬 WATCH BRIEFING
                 </button>
             </div>
         </div>
@@ -3991,12 +3995,19 @@
         const keys = {};
         window.addEventListener('keydown', (e) => {
             AudioMaster.init();
-            if (IntroSequence.active && (e.key === 'Escape' || e.code === 'Escape' || e.code === 'Space' || e.key === ' ')) {
+            if (gameState === "HOMESCREEN" && (e.code === 'Enter' || e.key === 'Enter' || e.code === 'Space' || e.key === ' ')) {
+                e.preventDefault();
+                if (typeof launchActiveExpedition === 'function') {
+                    launchActiveExpedition();
+                }
+                return;
+            }
+            if (IntroSequence.active && (e.key === 'Escape' || e.code === 'Escape' || e.code === 'Space' || e.key === ' ' || e.key === 'Enter' || e.code === 'Enter')) {
                 e.preventDefault();
                 IntroSequence.finish();
                 return;
             }
-            if (OutroSequence.active && (e.key === 'Escape' || e.code === 'Escape' || e.code === 'Space' || e.key === ' ')) {
+            if (OutroSequence.active && (e.key === 'Escape' || e.code === 'Escape' || e.code === 'Space' || e.key === ' ' || e.key === 'Enter' || e.code === 'Enter')) {
                 e.preventDefault();
                 OutroSequence.finish();
                 return;
@@ -4070,6 +4081,17 @@
         document.getElementById('b-jump').addEventListener('click', () => handleJumpAction());
         const bHover = document.getElementById('b-hover');
         if (bHover) bHover.addEventListener('click', () => toggleHoverPower());
+        const bLaunchStarship = document.getElementById('b-launch-starship');
+        if (bLaunchStarship) {
+            bLaunchStarship.addEventListener('click', (e) => {
+                e.stopPropagation();
+                triggerSpaceshipLaunch();
+            });
+            bLaunchStarship.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                triggerSpaceshipLaunch();
+            }, { passive: true });
+        }
         document.getElementById('b-reset').addEventListener('click', () => resetPlayer());
         document.getElementById('btn-replay').addEventListener('click', () => resetPlayer());
         const bHome = document.getElementById('b-home');
@@ -4104,6 +4126,15 @@
             btnSkipIntro.addEventListener('click', (e) => {
                 e.stopPropagation();
                 IntroSequence.finish();
+            });
+        }
+        const introModalElem = document.getElementById('intro-modal');
+        if (introModalElem) {
+            introModalElem.addEventListener('click', (e) => {
+                if (IntroSequence.active) {
+                    e.stopPropagation();
+                    IntroSequence.finish();
+                }
             });
         }
 
@@ -4190,18 +4221,50 @@
             draw();
         })();
 
+        function launchActiveExpedition() {
+            const hsModal = document.getElementById('homescreen-modal');
+            if (hsModal) {
+                hsModal.style.opacity = '0';
+                hsModal.style.display = 'none';
+            }
+            const introModal = document.getElementById('intro-modal');
+            if (introModal) {
+                introModal.style.opacity = '0';
+                introModal.style.display = 'none';
+            }
+            if (IntroSequence) IntroSequence.stop();
+            if (StoryNarrator) StoryNarrator.stop();
+            resetPlayer();
+            gameState = "PLAYING";
+            AudioMaster.startRelaxingMusic();
+            if (alertBanner) {
+                alertBanner.textContent = "🚀 EXPEDITION ACTIVE! Guide Zaddr across 32 hurdles to the Moon Starship!";
+                alertBanner.style.background = "linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(217, 119, 6, 0.95))";
+                alertBanner.style.borderColor = "#fbbf24";
+                alertBanner.style.boxShadow = "0 0 35px rgba(245, 158, 11, 0.8), 0 0 70px rgba(251, 191, 36, 0.5)";
+                alertBanner.style.display = 'block';
+                bannerTimer = 4.0;
+            }
+        }
+
         const btnStartExp = document.getElementById('btn-start-expedition');
         if (btnStartExp) {
             btnStartExp.addEventListener('click', (e) => {
                 e.stopPropagation();
-                gameState = "PLAYING";
-                StoryNarrator.stop();
+                launchActiveExpedition();
+            });
+            btnStartExp.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+                launchActiveExpedition();
+            }, { passive: true });
+        }
+
+        const btnWatchBriefing = document.getElementById('btn-watch-briefing');
+        if (btnWatchBriefing) {
+            btnWatchBriefing.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const hsModal = document.getElementById('homescreen-modal');
-                if (hsModal) {
-                    hsModal.style.opacity = '0';
-                    setTimeout(() => { hsModal.style.display = 'none'; }, 400);
-                }
-                // Launch the Cinematic AI Briefing Intro!
+                if (hsModal) hsModal.style.display = 'none';
                 IntroSequence.start();
             });
         }
@@ -4395,7 +4458,7 @@
             setSurface(0);
             gameState = "PLAYING";
             flightTime = 0;
-            spaceship.position.set(0, 71.6, -107.5);
+            spaceship.position.set(0, 126.4, -207.0);
             spaceship.rotation.set(0, 0, 0);
             document.getElementById('victory-modal').style.display = 'none';
             const goOverlay = document.getElementById('game-over-flight-overlay');
@@ -4548,7 +4611,7 @@
             const statFallsElem = document.getElementById('stat-falls');
             if (statFallsElem) statFallsElem.textContent = stats.falls;
             const statSeedsElem = document.getElementById('stat-antseeds');
-            if (statSeedsElem) statSeedsElem.textContent = "18 / 18";
+            if (statSeedsElem) statSeedsElem.textContent = "32 / 32";
             const statRatingElem = document.getElementById('stat-rating');
             if (statRatingElem) {
                 if (stats.falls === 0) statRatingElem.textContent = "🌟 CELESTIAL ACE (FLAWLESS)";
@@ -4769,8 +4832,14 @@
                 }
 
                 const thrustScale = 1.8 + Math.random() * 0.6;
-                shipFlameL.scale.set(thrustScale, 1.5 + Math.random() * 1.5, thrustScale);
-                shipFlameR.scale.set(thrustScale, 1.5 + Math.random() * 1.5, thrustScale);
+                if (typeof raptorPlumes !== "undefined" && Array.isArray(raptorPlumes)) {
+                    raptorPlumes.forEach(p => {
+                        if (p) {
+                            p.visible = true;
+                            p.scale.set(thrustScale, thrustScale * (1.2 + Math.random() * 0.5), thrustScale);
+                        }
+                    });
+                }
 
                 const speed = 25.0 + flightTime * 14.0;
                 spaceship.position.y += dt * speed * 0.45;
@@ -4813,11 +4882,21 @@
             // -------------------------------------------------------------
             // B. NORMAL GAMEPLAY TICK
             // -------------------------------------------------------------
-            // Starship Jump-to-Board Trigger (Only triggers when player JUMPS directly onto the rocket at Z=-107.5m)
-            if (!player.isGrounded && player.pos.y >= 71.6) {
+            // Dynamic Starship Launch Button on Summit
+            const bLaunchStarship = document.getElementById('b-launch-starship');
+            if (bLaunchStarship) {
+                if (player.pos.y >= 120.0 || player.pos.z <= -190.0) {
+                    bLaunchStarship.style.display = 'inline-block';
+                } else {
+                    bLaunchStarship.style.display = 'none';
+                }
+            }
+
+            // Starship Jump-to-Board Trigger (Triggers when player JUMPS directly onto the Starship on summit)
+            if (!player.isGrounded && player.pos.y >= 125.0) {
                 const dx = Math.abs(player.pos.x - spaceship.position.x);
                 const dz = Math.abs(player.pos.z - spaceship.position.z);
-                if (dx <= 2.2 && dz <= 2.6) {
+                if (dx <= 2.8 && dz <= 3.2) {
                     triggerSpaceshipLaunch();
                     return;
                 }
@@ -5065,11 +5144,11 @@
 
                                 // Landing on Planet Earth (Final Hurdle - free movement!)
                                 if (p.isEarth) {
-                                    curStageName = "18. PLANET EARTH (FINAL HURDLE)";
+                                    curStageName = "31. PLANET EARTH SUMMIT (BOARD STARSHIP)";
                                     document.getElementById('pill-mode').className = "tag-pill tag-earth";
-                                    document.getElementById('pill-mode').textContent = "EARTH SUMMIT // JUMP ON ROCKET TO LAUNCH!";
+                                    document.getElementById('pill-mode').textContent = "EARTH SUMMIT // CLICK '🚀 LAUNCH STARSHIP' OR BOARD!";
                                     if (alertBanner && bannerTimer <= 0) {
-                                        alertBanner.textContent = "🌍 PLANET EARTH REACHED! Move freely & jump onto the Starship to launch! 🚀";
+                                        alertBanner.textContent = "🌍 PLANET EARTH SUMMIT REACHED! Click '🚀 LAUNCH STARSHIP' [L] or board craft! 🚀";
                                         alertBanner.style.background = "linear-gradient(135deg, rgba(14, 165, 233, 0.95), rgba(30, 58, 138, 0.95))";
                                         alertBanner.style.borderColor = "#38bdf8";
                                         alertBanner.style.boxShadow = "0 0 35px rgba(56, 189, 248, 0.8)";
