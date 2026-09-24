@@ -1,0 +1,45 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.4",
+	"Category": "Cinematic",
+	"Description": "Cinematic Vertical Slice showcasing low gravity mechanics, planetary ascent, and cosmic exploration.",
+	"Modules": [
+		{
+			"Name": "MissionMoon",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"EnhancedInput",
+				"CableComponent",
+				"CinematicCamera"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		},
+		{
+			"Name": "Niagara",
+			"Enabled": true
+		},
+		{
+			"Name": "CableComponent",
+			"Enabled": true
+		},
+		{
+			"Name": "CinematicCamera",
+			"Enabled": true
+		},
+		{
+			"Name": "MovieRenderQueue",
+			"Enabled": true
+		},
+		{
+			"Name": "MovieRenderQueueAdditionalRenderPasses",
+			"Enabled": true
+		}
+	]
+}
